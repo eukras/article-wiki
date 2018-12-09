@@ -1,0 +1,37 @@
+Interlinear Translations
+
+Glosses or parallels are commonly required in linguistics, but can be difficult to format. Wiki markup suits them well, however. There is no limit on the number of translated phrases that can be stacked together. Unicode font substitution can be applied to different character ranges, but is presently only set up for Greek -- note that the font GFS Didot automatically replaces the body font here:
+
+DEMO (wide) ---
+/ *[1] Παῦλος καὶ Τιμόθεος / Paul and Timothy, 
+/ δοῦλοι Χριστοῦ Ἰησοῦ / ^[servants] of Christ Jesus 
+/ πᾶσιν τοῖς ἁγίοις / to all ^[those set apart] 
+/ ἐν Χριστῷ Ἰησοῦ / in Christ Jesus 
+/ τοῖς οὖσιν ἐν Φιλίπποις / who are in Philippi, 
+/ σὺν ἐπισκόποις καὶ διακόνοις· 
+    / together with the ^[overseers and assistants]. 
+/ *[2] χάρις ὑμῖν καὶ εἰρήνη / Grace and peace to you, 
+/ ἀπὸ Θεοῦ Πατρὸς ἡμῶν / from God our Father 
+/ καὶ Κυρίου Ἰησοῦ Χριστοῦ. / and the Lord Jesus Christ.
+
+^ δοῦλοι, also /slaves/
+^ lit. /holy people/, trad. /the saints/
+^ trad. /bishops and deacons/ 
+---
+
+
+- Future Development
+
+* Allowing references to be marked would be useful for text indexing. Maybe with `{1}`, and `$ REFERENCE = Phil 1`.
+* Create automatic indexes of textual references, esp. biblical or classical. Possibly with `\?[1 Cor 2:3]`.
+
+
+- Multiline glosses
+
+DEMO (wide) ---
+/ '[1:14]  Ἕλλησίν / 無 論 是 希 利 尼 人 、 / To Greeks / मैं यूनानियों / A Griegos / لليونانيين 
+/ τε καὶ Βαρβάροις, / 化 外 人 、 / and to Barbarians, / और अन्यभाषियों / y á bárbaros, / والبرابرة 
+/ σοφοῖς / 聰 明 人 、 / to the wise / का और बुद्धिमानों / á sabios / للحكماء
+/ τε καὶ ἀνοήτοις / 愚 拙 人 、 / and to the foolish, / और निर्बुद्धियों / y á no sabios /  والجهلاء
+/ ὀφειλέτης εἰμί. / 我 都 欠 他 們 的 債 。 / am I obligated. / का कर्जदार हूं। / soy deudor. / اني مديون
+---

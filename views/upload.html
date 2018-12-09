@@ -1,0 +1,46 @@
+{% extends "page.html" %}
+
+{% block page %}
+
+<div class="wiki">
+<article>
+
+<header>
+    <h1>Upload a Document</h1>
+</header>
+
+<main>
+
+<ul>
+    <li>Note that this will replace the existing article.</li>
+    <li>Your download file will have be called: <tt>{{ user_slug }}_{{ doc_slug }}_########-####.txt</tt>, where the # characters represent date and time stamps.</li>
+</ul>
+
+<form
+{% if doc_slug %}
+    action="/upload/{{ user_slug }}/{{ doc_slug }}"
+{% else %}
+    action="/upload/{{ user_slug }}"
+{% endif %}
+    method="post"
+    enctype="multipart/form-data"
+>
+
+<div class="text-center">
+    <input type="file" name="upload" />
+    <p class="space">
+        <button type="submit" class="feature">
+            <i class="fa fa-upload"></i> Upload
+        </button>
+    </p>
+</div>
+
+</form>
+
+</main>
+
+</article>
+</div>
+
+
+{% endblock %}

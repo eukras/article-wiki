@@ -1,0 +1,17 @@
+Website Fixtures
+
+= Mostly you'll use this to edit the introductory text on your user page.
+
+$ SLUG = fixtures
+
+Your /fixtures/ are text elements that are used to customise this
+website's pages. If you can see this page, that means you own it and can
+edit it.
+
+* `author` is the text for your user page.
+* `editor` is the template used when you open a blank ^[editor].
+
+^ /editor
+
+` Author
+` Editor

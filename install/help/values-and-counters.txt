@@ -1,0 +1,40 @@
+Values and Counters
+
+In @[index-page] we saw how document information could be supplied with /settings/. In @[character-blocks] we saw how they can be used to control wiki behaviour. The same syntax lets users store their own values in variables.
+
+~ Values. ~ Any values created with a `$ setting = value` statements can be echoed back with a `$\[setting]` statement.
+
+DEMO ---
+$ word = Bird
+$ date = 1 Jan 2017
+$ website = https://article.wiki
+
++ $[word] is the word!
+
+; $[website]
+; $[date]
+---
+
+Values set in your `index.txt` can be used in all other sections. Values can be changed at any point throughout your document, although this only affects the remainder of that section.
+
+DEMO ---
+$ name = Smith
+
+~ $[name]. ~ Hello. My
+name is $[name].
+
+$ name = Jones
+
+~ $[name]. ~ I'm $[name].
+Good to meet you.
+---
+
+~ Counters. ~ If a value, say `\$[f]`, is an integer, you can increase it by one and display the new value by writing `\$[f++]`. If unset, the first number will be one. Counters have been used throughout this document to count tables, images, figures, and so on.
+
+DEMO ---
+| $[x++] | $[y++] | $[z++]
+| $[x++] | $[y++] | $[z++]
+| $[x++] | $[y++] | $[z++]
+
+= Table $[t++]. = A different counter in each column.
+---

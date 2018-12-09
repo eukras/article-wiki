@@ -1,0 +1,119 @@
+#btn-edit { display: none; }
+
+@media screen and (max-width: 1024px) {
+
+    #editor {
+        a.button, button {
+            i { display: none; }
+        }
+    }
+
+}
+
+@media screen and (max-width: 768px) {
+
+    #page {
+        margin: 0;
+        padding: 0; 
+        width: 100%;
+        max-width: 100%;
+    }
+
+    #page .wiki {
+        padding: 2rem;
+    }
+
+    /**
+    h2 {
+        background-color: steelblue;
+        color: white;
+        padding: .7rem;
+    }
+     **/
+
+    #editor {
+        a.button, button {
+            i {
+                display: none;
+            }
+        }
+    }
+
+    button.button-edge {
+        right: -3.04rem;
+        i {
+            display: none;
+        }
+    }
+
+    main, #page {
+        @include box-shadow(0, 0, 0, white);
+    }
+
+    .columns-x2, .columns-x3 {
+        column-count: 1;
+    }
+
+    .article-list {
+        grid-template-columns: 100%
+    }
+
+    #editor {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-gap: 0;
+    }
+
+    #editor.mode-edit {
+        /* Small-screen: Only four buttons */
+        #btn-back { display: inline; }
+        #btn-help { display: inline; }
+        #btn-copy { display: inline; }
+        #btn-cleanup { display: none; }
+        #btn-preview { display: inline; }
+        #btn-edit { display: none; }
+        #btn-print { display: none; }
+        #btn-delete { display: none; }
+        #btn-save { display: none; }
+        /* Only one page area */
+        textarea { display: block; }
+        main { display: none; }
+    }
+
+    #editor.mode-preview {
+        /* Small-screen: Only four buttons */
+        #btn-back { display: none; }
+        #btn-help { display: none; }
+        #btn-copy { display: none; }
+        #btn-cleanup { display: none; }
+        #btn-preview { display: none; }
+        #btn-edit { display: inline; }
+        #btn-print { display: inline; }
+        #btn-delete { display: inline; }
+        #btn-save { display: inline; }
+        /* Only one page area */
+        textarea { display: none; }
+        main {
+            display: block;
+            grid-area: unquote("2 / 1 / 3 / 5");
+        }
+    }
+
+    .wiki-demo {
+        grid-template-columns: 1fr;
+        grid-gap: 0;
+
+        .wiki-demo-source {
+            border-left: 1.5pt solid white;
+            border-right: 0;
+            padding-left: 1rem;
+            padding-right: 0;
+        }
+        .wiki-demo-output {
+            border-left: 1.5pt dotted black;
+            border-right: 0;
+            padding-left: 1rem;
+            padding-right: 0;
+        }
+    }
+
+}

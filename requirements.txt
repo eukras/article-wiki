@@ -1,0 +1,17 @@
+beaker
+bleach
+bottle
+bottle_utils
+click
+cssselect
+html-parser
+Jinja2
+lxml
+Pygments
+python-dotenv
+python-slugify
+redis
+roman
+sortedcontainers
+WebTest
+wheel

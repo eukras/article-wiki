@@ -1,0 +1,22 @@
+Collaboration
+
+Plain text documents are very well suited to version control systems
+that store the full history of a document's edits, and these in turn are very
+well suited for collaborative writing. They were originally made for
+collaborating on software. The best known version control system is /git/,
+which was made to manage the source code of the Linux operating system for its
+large and widely distributed team of programmers. However, any /Git
+Repository/ can be used to store any file. 
+
+There are several well-known providers of free Git repositories. ^[Github] or
+^[BitBucket] are good choices. While BitBucket is more commercial than
+community driven, it offers free /[private] repositories (as of late 2016). The
+main requirement for using these is that a document's main editor must know how
+to accept, reject, or merge changes that have been submitted by other users;
+this is done in the Git repository, not in =[White Room], but white room can be
+directed to update from your repository and write back to it. Anyone needing a
+collaborative writing tool, with a full version history, at little or no cost,
+may wish to look into this.
+
+^ http://github.com
+^ http://bitbucket.com

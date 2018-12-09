@@ -1,0 +1,20 @@
+Links and Footnotes
+
+The wiki will format `\^[this text]` into a link or footnote using the next /contextual link/ in this section. A contextual link is just a character block that begins with a `^` character. See @[character-blocks] for more. Contextual links allows URLs to stay near to the text in which they are used, but without disrupting the flow of that text or affecting its readability.
+
+Links and footnotes will both have footnote markers added, since, for the benefit of print readers, links will also be displayed as footnotes. To avoid gaps in formatting, footnote markers will follow any [trailing punctuation: punctuation, trailing].
+
+DEMO ---
+. This is a ^[link].
+. This is a ^[footnote].
+
+. Text continues...
+
+^ http://example.org
+^ Footnote goes here.
+---
+
+Footnotes will appear at the end of the full document in which they appear. References can be entered after each paragraph, or at any convenient point in the same section, including at the end, so long as they appear in the same order as the links they will be matched with. When there are many links, it may be more convenient to list them after each paragraph, but this is a matter of personal preference.
+
+~ Links in text. ~ URLs and email addresses will be turned into links automatically, without footnoting: http://example.org, hello@example.org. If you ever want to enter a link and have it /not/ be recognized, you can use
+@ [backslashes] in the protocol (`https://`) or on the `@` character to prevent them being matched.

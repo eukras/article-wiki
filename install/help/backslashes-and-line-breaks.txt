@@ -1,0 +1,22 @@
+Backslashes and Line Breaks
+
+The wiki formatter will preserve any character that is /backslashed/, rather than allow it to affect the formatting. That's how the wiki markup in @[square-brackets] was entered.
+
+DEMO ---
+. \*[Bold Text] vs. *[Bold Text]
+. \"quotes\" vs. "quotes"
+---
+
+Note that backslashing doesn't allow `<`, `>` or `&` characters to be inserted into the wiki's HTML output, however:
+
+DEMO ---
+. </br> vs. \</br\> 
+. &lt;/br&gt; vs. \&lt;/br\&gt;
+---
+
+In some wiki formatting conventions a backslash at the end of a line indicates a line break. In $[wiki], however, we use the control characters for aligning paragraphs. See @[alignment] for more.
+
+DEMO ---
+. Line 1
+. Line 2
+---

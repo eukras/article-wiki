@@ -1,0 +1,31 @@
+=======
+INSTALL
+=======
+
+Python environment:
+
+```bash
+cd root_dir  # <-- whereever this INSTALL file is.
+virtualenv --python=python3 .venv
+source .venv/bin/activate
+python --version  # <-- should see e.g. 3.5+
+pip install -r requirements.txt -r requirements-dev.txt
+pip freeze  # <-- to see dependencies
+pytest lib/
+pytest test_app.py
+```
+
+Persistent Redis database in Docker:
+
+```bash
+bash install/redis.docker.sh
+```
+
+Run the app for dev purposes. Note that this is not an efficient way to run the
+app online; suggest Nginx, uWsgi, and Supervisor.
+
+```bash
+vim .env  # <-- set WEB_HOST
+python command.py load-fixtures  # <-- load initial docs.
+python app.py
+```

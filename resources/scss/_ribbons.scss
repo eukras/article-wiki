@@ -1,0 +1,23 @@
+/**
+ *  Adapted https://codepen.io/eode9/pen/twkKm
+ */
+
+.wiki-ribbon {
+    position: fixed;
+    width: 3.5em;
+    top: 4em;
+    right: -10px;
+    border-top: solid 2px white;
+    border-left: solid 2px white;
+    border-bottom: solid 2px white;
+    border-right: none;
+    padding-left: 1em;
+    text-align: left;
+    line-height: 40px;
+    font-family: $fontSans;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #f0f0f0;
+    background: #1b9;
+}

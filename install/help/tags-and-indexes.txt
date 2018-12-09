@@ -1,0 +1,21 @@
+Tags and Indexes
+
+Here are some examples of #[tags], #[tags], and more #[tags]. The wiki text for that last sentence reads `\#[tags]` three times. In Article Wiki, tags are how you make #[indexes: index] that work both online and in print.
+
+Tag and index markers are visibly distinct from link and footnote markers by being marked as letters rather than numbers. As with footnotes, tag and index markers will follow any #[trailing punctuation: punctuation, trailing] for the sake of smoothness.
+
+Clicking on any tag's marker takes you to the index at the end of the document, where you can find back-links to all the occurrences of that tag in the document, making it easy to follow themes, esp. with ?[Tab] and ?[Return] in a browser. A document being printed from a browser does not have reliable page numbers, so the wiki will provide the section number as context. This makes the tags easy to find even without page numbering.
+
+There are two important modifiers you can add to tags. Use an /alias/ when you want to tag a synonym, or to consistently tag singular forms as plurals, or vice-versa; the alias will appear in the text instead. Aliases are added at the front of a tag, separated by a colon: `\#[alias:tag]`. Use a /sub-tag/ when you want to add a second level to the indexing: `\#[tags, examples]`.
+
+DEMO ---
+* Case-sensitivity (`%`)
+* * #[tags] #[Tags], %[tags], %[Tags]
+
+* Aliases (`:`) and subtags (`,`)
+* * #[tag:tags]
+* * #[tags, use of]
+* * #[tag:tags, use of]
+---
+
+Items can be tagged for the writer as much as the reader, for example to mark work #todo. Also note the shortcut `%` which is like `#` except that it preserves capitalisation in the index.

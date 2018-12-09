@@ -1,0 +1,11 @@
+Hidden Comments
+
+The `%` character hides a comment line. This can also be used in the title paragraph if you don't want the title to be visible, say if writing a letter.
+
+DEMO ---
+* * *
+
+% This text will not be displayed.
+
+* * *
+---

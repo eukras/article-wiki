@@ -1,0 +1,3 @@
+Adding Information
+
+The most interesting and useful kinds of wiki formatting are those that manage information -- links, footnotes, indexes, bibliographies, and more. Data handling is a central part of Article Wiki's design.

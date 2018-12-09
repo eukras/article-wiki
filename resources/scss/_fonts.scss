@@ -1,0 +1,20 @@
+/**
+ * Supply local override font for greek-extended characters.
+ */
+
+@font-face {
+    font-family: 'Greek';
+    src: url("/static/GFSDidot.otf") format("opentype");
+    font-style: normal;
+    font-weight: normal;
+    unicode-range: U+0370-03FF;
+    /* unicode-range: "U+03??, U+1F??"; */
+}
+
+/**
+ * Fix valign of FA list icons.
+ */
+
+.fa-li {
+    top: 0.30em;
+}

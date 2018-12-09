@@ -1,0 +1,53 @@
+{% extends "page.html" %}
+
+{% block page %}
+
+<div class="wiki">
+
+    <header>
+        <h1>Login</h1>
+    </header>
+
+    <form method="post" action="/login">
+
+        <div id="login">
+
+            {% if message %}
+            <div class="wiki-error">
+                {{ message }}
+            </div>
+            {% endif  %}
+
+            <div class="space">
+                <input type="text" name="username" placeholder="Username" />
+            </div>
+
+            <div class="space">
+                <input type="password" name="password" placeholder="Password" />
+            </div>
+
+            <div class="space text-center">
+                <button type="submit" class="feature">
+                    <i class="fa fa-user"></i> Login
+                </button>
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+
+<script>
+
+$(document).ready(function() {
+    $('input[name="username"]').focus();
+});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,81 @@
+To Do
+
+LEFT (70%) ---
+| ?[+++]   | Urgent + Important + Easy
+| ?[SPIKE] | Requires pre-work or proof-of-concept
+| ?[HOW?]  | Needs a clearer concept to proceed
+---
+
+
+- Next
+
+* Subtotals in TOC
+* Expand GRID to system of 12s. ?[+++]
+* `$ published = no`
+* `$ editors = x@y.z` -- ?
+* `SET ($context) ---`, displayed immediately after 
+
+
+- Site
+
+* ^[HTTPS]. ?[+++]
+* Identifier string: base64(author,path,file)
+* Link: Edit --> edit/$identifier
+* Or just upload-download a composite .txt? Or a .zip/.tgz? ?[++-]
+* User identification is by email; authentication is by edit key (or password). ?[+++]
+
+^ https://jaredquinn.info/2016/05/no-excuses-left-for-plaintext-http/
+
+
+- Git
+
+* Decision: Run completely from Git, pulling into local Redis? ?[YES]
+
+
+- Style and Correctness
+
+* Use symbol footnotes in `index.txt` ?[--~]
+* Allow footnotes to appear at the end of each section. `\$ WIKI.footnotes = end-of-section`
+* Add aliases to citations. ?[-++]
+
+
+- Wiki
+
+* Auto-generated list of character blocks. ?[+++]
+* Auto-generated list of built-in function blocks. ?[+++]
+* Fix the word counting. Respect use pf variables?--YES. ?[++!]
+* `library.txt` for directory containing only document folders. Its outlines must be document sub-directories. ?[-+~]
+* `library.json`, `index.json` -- purely for caching ?[--~]
+* Overall refactor into smaller logical units; `wiki.py` and `html.py` are too complex. ?[---] 
+* * Full-document tests; maybe make a canonical render of `/help?` ?[-+-] 
+* * More systematic test suite to accompany breakdowns. ?[---]
+* DEMO blocks can have their footnotes and indexes collide with the parent document. Easily worked around in documentation. ?[--?]
+* Target word counts in TOC with percentage completed. ?[--+]
+* |[FEATURE] Labels?? Maybe just auto-index captions? ?[HOW?]
+* Error summary at the start of the document and section, or after editing. ?[+++]
+* Function block pipes. (Format wrappers have mostly fixed this.) ?[--?]
+* Common styles for function blocks (e.g. 'compact, 2column'). ?[--?]
+* Data blocks and `<<<` pipes. ?[--*]
+* Add 'sum' and percent format options to TABLE? Plus format config for currency, percent? ?[--+]
+* Activate a module on demand... ?[HOW?]
+* Bible references linker (require activate module). ?[--*]
+* Change 'GREEK' to 'UNICODE' module. Post-processors in plugins? Or just diversify Unicode with Gentium, say? ?[--?]
+
+
+- Plugins
+
+* Auto-generated list of plugin examples + options. ?[+++]
+* For complete docs, Every plugin has a doc file that can be loaded in the playground for editing. ?[+++]
+* Add function that lists other functions? Maybe `TABLE () <<< \$[WIKI!function-list]` ?[++-]
+* Fix GRAPH labels; add pie chart; proper demo (or omit). ?[-++]
+
+
+- Typography + Markup
+
+* Auto-generated list of typographic markup. ?[+++]
+* Auto-generated list of brackets markup. ?[+++]
+* Nesting format characters? ?[---]
+* =[LaTeX]-style long arrows for `-\->`? ?[--+]
+* Inline functions. Processed before anything. Can use a backslash? `[\\echo{OK};] ?[HOW?]
+* * Will filters be sufficient? e.g. `\(C)\$[date|year]` or `\(C)\$[year?date]` ?[HOW?]
+

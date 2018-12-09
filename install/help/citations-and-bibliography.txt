@@ -1,0 +1,45 @@
+Citations and Bibliography
+
+While bibliographies can be formatted entirely manually, or with footnotes, there are often better way to work with references. In $[wiki], bibliographies can be added at the end of each section, or in a single `biblio.txt` file, or both.
+
+When adding references in a section (rather than in `biblio.txt`), separate them from the body of your text with a dividing line containing only underscores (10 works well). Citations appear in round brackets by default, but these can be hidden with a leading minus character.
+
+DEMO ---
+
+
++ Citation Examples
+
+See ~[Hays 1996] or ~[-Hays 2005].
+
+* ~[Hays 2005, p.26]
+* ~[Hays, /Conversion/, p.32]
+* See ~[-Hays, /Moral Vision/, p.63].
+* ~[ibid, pp.30-32]
+
+For future development...
+
+* ~[loc. cit.]
+* ~[Hays, op. cit., p.67]
+
+
+_____
+
+Hays, Richard B. 1996. The Moral Vision of the New Testament. 1st edition. San Francisco: HarperOne.
+Hays, Richard B. 2005. The Conversion of the Imagination: Paul as Interpreter of Israel’s Scripture. Grand Rapids, Mich.: William B. Eerdmans.
+---
+
+Your bibliography sections should contain /only/ bibliography lines. This
+allows easy export from bibliographical software. In ^[Zotero], for instance,
+use the export option "Create Bibliography from Items", selecting your
+preferred citation style and "Output to clipboard". Then just paste it
+into your bibliography block or file. 
+
+^ https://www.zotero.org/
+
+Note that when a citation simply reads `\@[ibid]`, it will be indexed to the
+previous citation (though /op. cit./ does not track previous works, or /loc.cit./ previous references).
+
+The main thing to remember with cross-references is that the first heading or
+bibliography entry to match /all/ the words in the reference will be used.
+Headings will be checked first. Any punctuation or markup will be ignored for
+the purpose of cross-referencing. See @[cross-references] for more.

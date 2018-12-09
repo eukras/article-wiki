@@ -1,0 +1,54 @@
+Square Brackets
+
+Most inline markup consists of a single control character in front of a set of square brackets, for example `\*[bold]` for *[bold] text. In the simplest and most common cases it is easier just to type `\*bold\*` and get the same effect, but the square brackets handle complex cases better and can be visually clearer in plain text.
+
+! Character ! Wiki Text ! Formatting ! Shorthand
+| `/` | `\/[Italic]` | /[Italic] | `\/Italic\/`
+| `*` | `\*[Bold]` | *[Bold] | `\*Bold\*`
+| `_` | `\_[Underline]` | _[Underline] | `\_Underline\_`
+| `\`` | `\`[Monospace]` | `[Monospace] | `\`Monospace\``
+| `|` | `\|[Marker]` | |[Marker] | `|Marker|`
+| `;` | `\;[Sans Serif]` | ;[Sans Serif]
+| `,` | `\?[Keystrokes]` | ?[Keystrokes]
+| `=` | `\=[Small Caps]` | =[Small Caps]
+| `+` | `\+[Inserted]` | +[Inserted]
+| `-` | `\-[Deleted]` | -[Deleted]
+| `,` | `Superscript\'[2]` | Superscript'[2]
+| `'` | `Subscript\,[2]` | Subscript,[2]
+| `{` | `x \{[Float Left] x` | x {[Float Left] x
+| `}` | `x \}[Float Right] x` | x }[Float Right] x
+
+= Table $[t++]. = Formatting Control Characters
+
+~ Shorthand. ~ It may seem strange to offer a /shorthand/ version of markup that saves only one character. However, it seems psychologically significant when writing, it has a lighter impact on readability in the most common 90% of cases, and it is more intuitive for writers familiar with how other wikis work. The bracket syntax is enormously more powerful, however:
+
+~ Stacking. ~ You can stack the control characters in brackets. Writing
+` \*\;\_[bold sans-serif underline]` will produce *;_[bold sans-serif underline] text, for example. Up to five symbols can be stacked in this way, although that seldom helps the readability of the text. Square brackets are also used to add /information/, not only formatting, to text. However, it is not possible to combine formatting and informational control characters by stacking. See @[adding-information] for more.
+
+| `*/_\[bold italic underline]` | */_[bold italic underline]
+| `}|\[Floating Marker] x x` | }|[Floating Marker] x x
+
+= Table $[t++]. = Examples of stacking
+
+: ! : You can't presently nest brackets or shorthand inside other brackets. This is on the #[To Do] list.
+
+| `$` | `\$[AUTHOR]` | $[AUTHOR]
+| `$` | `\$[n++], \$[n++], \$[n++]` | $[n++], $[n++], $[n++]
+| `^` | `\^[Link]` | ^[Link]
+| `^` | `\^[Footnote]` | ^[Footnote]
+| `#` | `\#[Index]` | #[Index]
+| `%` | `\%[Index]` | %[Index] (case-sensitive)
+| `@` | `\@[cross-references]` | @[cross-references]
+| `@` | `\@[-cross-references]` | @[-cross-references]
+| `~` | `\~[Author 2000, p.26]` | ~[Author 2000, p.26]
+| `~` | `\~[Author, \/Title\/, p.32]` | ~[Author, /Title/, p.32]
+
+^ http://example.org
+^ Footnote
+
+= Table $[t++]. = Information Control Characters
+
+
+_____
+
+Author. 2000. /Book Title/. City: Publisher.

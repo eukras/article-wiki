@@ -1,0 +1,28 @@
+Quotes and Captions
+
+DEMO ---
+> Simple quotes and citations work like email quotes. 
+= Citation goes here
+---
+
+You will have seen that captions (`=`) are formatted differently
+depending on what they follow. One following the title will be read by
+the wiki as a summary. One following a table will be formatted as a
+table caption; see @[formatting-tables].
+
+A pull quote can be created by putting it inside a `FEATURE` block (and
+usually a `FLOAT` block as well); see @[function-blocks] for more.
+
+DEMO +++
+CENTER (70%) ===
+FEATURE ---
+> At the still point, there the dance is.
+= T. S. Eliot
+---
+===
++++
+
+
+- Future development
+
+* Allow captions with `~` and allow an inline &lsquo; `~` &rsquo; separator, both with the effect of `~\[citation]` markup; see @[citations].

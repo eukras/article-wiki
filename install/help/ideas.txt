@@ -1,0 +1,23 @@
+Ideas
+
++ Glossaries
+
+{{{
+This is a :definition.
+
+: definition : the meaning of a term.
+}}}
+
+* Conflicts with using `:` for justification.
+
++ Questions
+
+{{{
+? Questions
+/ Answer 1 
+/ Answer 2 [CORRECT]
+/ Answer 3 [Hint: check the meaning of blah.]
+}}}
+
+A way of formatting question sheets. `?` lines are numbered with their own
+counter. `/` lines are (a), (b), etc.

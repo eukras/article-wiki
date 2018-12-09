@@ -1,0 +1,9 @@
+Subheadings
+
+Major and minor subheadings are indicated with `+` and `-` respectively.
+
+DEMO ---
++ Major Subheading
+
+- Minor Subheading
+---

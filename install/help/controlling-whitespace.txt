@@ -1,0 +1,23 @@
+Controlling Whitespace
+
+When you want to preserve text exactly, use VERBATIM. For the same effect, but with wiki formatting, use TEXT, with or without the 'verse' option.
+
+DEMO ===
+VERBATIM ---
+1 2  3   *[4]    5
+    Excuse me stewardess,
+        I speak jive.
+---
+
+TEXT ---
+1 2  3   *[4]    5
+    Excuse me stewardess,
+        I speak jive.
+---
+
+TEXT (verse) ---
+1 2  3   *[4]    5
+    Excuse me stewardess,
+        I speak jive.
+---
+===

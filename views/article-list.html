@@ -1,0 +1,36 @@
+{% if article_list|length > 0 %}
+<div class="article-list">
+    {% for article in article_list %}
+    <div class="article">
+        <h4 class="article-title">
+            <a href="/read/{{ article.user }}/{{ article.slug }}" class="balance-text">
+                {% if article.title == "" %}
+                    Untitled
+                {% else  %}
+                    {{ article.title }}
+                {% endif  %}
+            </a>
+        </h4>
+        {% if article.summary != "" %}
+        <div class="article-summary balance-text">
+            {{ article.summary }}
+        </div>
+        {% endif %}
+        <div class="article-details">
+            {% if 'date' in article %}
+                {{ article.date }}
+            {% endif %}
+            {% if 'word_count' in article %}
+                {% if 'date' in article and article.word_count != '0' %}
+                    &middot;
+                {% endif %}
+                {% if article.word_count != '0' %}
+                    {% set words = article.word_count | int %}
+                    {{ '{:,}'.format(words) }} <i>w.</i>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

@@ -1,0 +1,16 @@
+New Article
+
+= Summary Line goes here
+
+$ AUTHOR = Author Name / email@example.org.au
+$ DATE = 31 Dec 2029
+
+
++ Abstract
+
+> Abstract
+
+` Introduction
+` Part One
+` Part Two
+` Conclusion

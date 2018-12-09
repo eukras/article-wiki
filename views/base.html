@@ -1,0 +1,54 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ page_title | default('Untitled') }}</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{ config.PUBLIC_DIR }}/main.css" media="all" />
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans+Condensed:400,400i,600,600i|IBM+Plex+Serif:400,400i,600,600i|IBM+Plex+Mono:400,400i,600,600i" rel="stylesheet">
+    {% block header_tags %}
+    {% endblock %}
+</head>
+{% if theme %}
+<body class="{{ theme }}">
+{% else %}
+<body class="theme-default">
+{% endif %}
+
+{% block content %}
+{% endblock %}
+
+{% if config.ENVIRONMENT != "prod" %}
+<div class="wiki-ribbon no-print">{{ config.ENVIRONMENT }}</div>
+{% endif %}
+
+<div id="browser-not-supported" class="modal">
+    <div class="modal-cover">
+    </div>
+    <div class="modal-message">
+        <h2 class="balance-text">Your browser is not supported.</h2>
+        <p class="balance-text">You'll need a modern browser that supports 'grid' layout.</p>
+        <div class="modal-button">
+            <a class="button" target="_blank" href="https://caniuse.com/#search=grid">
+                <i class="fa fa-info-circle"></i> Like What?
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="side-nav bottom-menu no-print" style="display: none;">
+    <div id="progress">0%</div>
+</div> 
+
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+<script src="{{ config.PUBLIC_DIR }}/common.js"></script>
+
+{% block javascripts %}
+{% endblock %}
+
+</html>

@@ -1,0 +1,52 @@
+{% extends "page.html" %}
+
+{% block page %}
+
+<div class="wiki">
+
+<header>
+
+<hgroup>
+    <h1>{{ title_html|safe }}</h1>
+    {% if summary_html != "" %}
+    <summary>{{ summary_html|safe }}</summary>
+    {% endif %}
+</hgroup>
+
+{{ content_html|safe }}
+
+</header>
+
+{% if changes_list|length > 0 %}
+
+<h2>Latest Changes ({{ changes_list|length }})</h2>
+
+{% with article_list=changes_list %}
+{% include 'article-list.html' %}
+{% endwith %}
+
+{% endif %}
+
+{% if published_articles|length > 0 %}
+
+<h2>Published Articles ({{ published_articles|length }})</h2>
+
+{% with article_list=published_articles %}
+{% include 'article-list.html' %}
+{% endwith %}
+
+{% endif %}
+
+{% if unpublished_articles|length > 0 %}
+
+<h2>Unpublished Articles ({{ unpublished_articles|length }})</h2>
+
+{% with article_list=unpublished_articles %}
+{% include 'article-list.html' %}
+{% endwith %}
+
+{% endif %}
+
+</div> <!-- .wiki -->
+
+{% endblock %}

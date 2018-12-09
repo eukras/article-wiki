@@ -1,0 +1,37 @@
+Spacers and Dividers
+
+Some patterns of one to three characters have special meaning when used as a paragraph; they create spaces and dividers. Tilde symbols create vertical space, up to four lines worth for four tildes.
+
+DEMO ===
+Single space...
+
+~ 
+
+To here. Quadruple space...
+
+~ ~ ~ ~
+
+To here.
+===
+
+Otherwise, asterisks, periods, dashes, equals and at symbols can be used to make dividers. Lines made with three characters will be full-width. Best used sparingly!
+
+DEMO ===
+* 
+
+* * *
+
+-
+
+- - -
+
+. . .
+
+= = =
+
+@
+
+@ @ @
+===
+
+A full-width divider in a `CENTER` block takes the width of that block, if finer width control is needed. Note the tildes for spacing.

@@ -1,0 +1,20 @@
+Diagrams
+
+Some standard function blocks allow the formatting of diagrams and figures, where a common-sense text representation exists.
+
+~ Graphs. ~ By which I mean Diagrams, not Charts. ^[GraphViz] or 'Dot' syntax can be used to draw simple graphs or digraphs (with arrows) from within the wiki. This appears in HTML as SVG data within an image tag, which allows it to scale automatically.
+
+^ http://graphviz.org
+
+DEMO +++
+DOT ---
+digraph "Cardinal Virtues" {
+    Wisdom -> Fortitude
+    Wisdom -> Temperance
+    Fortitude -> Justice
+    Temperance -> Justice
+}
+---
+
+= Figure $[f++]. = The Four Cardinal Virtues.
++++

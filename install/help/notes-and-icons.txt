@@ -1,0 +1,13 @@
+Notes and Icons
+
+DEMO ---
+' Side notes ' will appear in a right-floated block only a few words wide.
+
+Text placed after a side note or marker will continue as normal, while the note is floated to the right. Don't put them too close together or they will stack on top of each other. 
+
+" Block notes " appear as their own paragraphs, but in a much smaller font. Repeating the leading character will give them a title (this works for side notes also). These are intended as notes to the author. 
+
+: i : Icon blocks can use any FontAwesome icon, as well as the normal icon shortcuts.
+---
+
+For a list of the normal icon shortcuts, see @[icons].

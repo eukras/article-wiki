@@ -1,0 +1,721 @@
+
+//  -----------------
+//  Vertical rhythm...
+//  -----------------
+
+// Variables
+
+html {
+  font-family: $font;
+  font-size: 0.9rem;
+  line-height: 160%;
+}
+
+//  -----------------
+//  Regular
+//  -----------------
+
+.clear {
+    clear: both;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+a {
+    color: black;
+    text-decoration: none;
+}
+
+a.bibliography {
+    font-size: $fontSmall;
+}
+
+a.unmarked {
+    font-family: inherit;
+    font-style: inherit;
+    font-size: inherit;
+}
+
+.opposite {
+    color: black;
+    text-decoration: none;
+    font-family: $fontSans;
+}
+
+a:hover { 
+    color: blue;
+    text-decoration: none;
+    border-bottom: dotted 1pt black;
+}
+
+.side-nav a:hover {
+    text-decoration: none;
+    border-bottom: none;
+}
+
+.wiki { 
+    padding: 3rem 7rem 3rem 7rem;
+}
+
+p {
+    margin: 0;
+}
+
+.indent {
+    padding-left: 2.4rem;
+}
+
+.indent-hanging { 
+    padding-left: 2.4rem;
+    text-indent: -2.4rem;
+}
+ 
+.indent-first-line {
+    text-indent: 2.4rem;
+}
+
+.indent-none {
+    text-indent: 0;
+}
+
+p:not([class]) + p:not([class]), 
+p:not([class]) + p.side-note + p:not([class]),
+p.indent + p:not([class]), 
+p.indent + p.side-note + p:not([class]),
+p.indent-none + p:not([class]),
+p.indent-none + p.side-note + p:not([class]) { 
+    text-indent: 2.4em;
+}
+
+p.space, 
+blockquote,
+ul, ol, dl { 
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.note {
+    font-family: $fontSans;
+    font-size: $fontXXSmall;
+    border: dotted 1px black;
+    border-radius: $borderRadius;
+    margin: 1rem 0;
+    padding: 1rem;
+    line-height: 1rem;
+}
+
+.wiki-note {
+    font-family: $fontSans;
+    font-size: $fontXXSmall;
+    border: solid 2pt red;
+    border-radius: $borderRadius;
+    margin: 1rem 0;
+    padding: 1rem;
+    line-height: 1rem;
+}
+
+aside {
+    font-family: $fontSans;
+    font-size: $fontXXSmall;
+    float: right;
+    width: 30%;
+    border-left: dotted 1px black;
+    padding-left: 1rem;
+    margin-left: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.box-dotted {
+    border: dotted 1pt black;
+    border-radius: $borderRadius;
+    padding: 0 1rem;
+    margin: 1rem 0;
+}
+
+.vpad { 
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+ul > ul, ol > ol {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.center { 
+    text-align: center;
+}
+
+.fleuron, .divider {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.fleuron img {
+    width: 2.5rem;
+}
+
+.divider img {
+    width: 5rem;
+}
+
+.swash {
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+}
+
+.swash img {
+    width: 12rem;
+}
+
+.float-left { 
+    float: left;
+}
+
+.space-left {
+    margin-left: 1rem;
+}
+
+.float-right { 
+    float: right;
+}
+
+.space-right {
+    margin-right: 1rem;
+}
+
+.compact { 
+    font-family: $fontSans;
+    font-size: $fontXXSmall;
+    margin: 1rem 0;
+    text-align: justify;
+}
+
+.compact p {
+    line-height: 1rem;
+}
+
+.space { 
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.text-large {
+    font-size: $fontMedium;
+}
+
+.big-space {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.block-center { 
+    width: 40rem;
+    margin: 0 auto;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    text-wrap: balanced;
+    margin-top: 0;
+    padding-top: 0.7rem;
+    margin-bottom: 0;
+    padding-bottom: 0.3rem;
+    margin-top: 1rem;
+}
+
+h1, h2, h4, h5, h6 {
+	font-weight: bold;
+}
+
+h3 {
+    font-style: italic;
+}
+
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    font-size: inherit;
+}
+
+
+h1:first-child, h2:first-child, h3:first-child,
+h4:first-child, h5:first-child, h6:first-child {
+    margin-top: 0;
+}
+
+h2 {
+    font-size: $fontLarge;
+    text-align: center;
+    margin: 1rem 0;
+    padding: 0.5rem 0;
+    border-top: dotted 1px black;
+    border-bottom: dotted 1px black;
+}
+
+h3 {
+    font-size: $fontMedium;
+    font-weight: normal;
+    font-style: italic;
+    margin: 0;
+}
+
+h4 { 
+    font-size: $fontSmall;
+}
+
+h5 { 
+    font-size: $fontXSmall;
+}
+
+h6 { 
+    font-size: $fontXXSmall;
+}
+
+mark { 
+    padding: none;
+    background-color: inherit;
+}
+
+cite {
+    font-style: normal;
+}
+
+span.dropcap {
+    float: left;
+    font-weight: bold;
+    padding-top: 3px;
+    padding-right: 8px;
+    padding-left: 0px;
+}
+
+sub, sup {
+    font-family: $fontSans;
+    font-size: $fontXXSmall;
+    vertical-align: baseline;
+    position: relative;
+}
+
+sub {
+    bottom: -0.6em;
+}
+
+sup {
+    top: -0.6em;
+    padding-left: .2em;
+    padding-right: .2em;
+}
+
+img { 
+    max-width: 100%;
+    max-height: 30em;
+}
+
+blockquote { 
+    border: none;
+    padding: 0 2.4rem 0 2.4rem;
+    margin: 1rem 0;
+    font-size: $fontXSmall; 
+}
+
+blockquote + blockquote { 
+    margin-top: -0.5rem;
+}
+
+p.caption {
+    font-size: $fontXSmall;
+    padding: 0 2.4rem 0 2.4rem ;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+blockquote + p.caption {
+    text-align: right;
+    padding: 0;
+    margin: -1rem 2.4rem 1rem 2.4rem;
+    font-size: $fontXSmall; 
+}
+
+.wiki-feature {
+    blockquote {
+        text-align: center;
+        font-weight: bold;
+        font-size: $fontLarge;
+        margin: 1rem;
+        padding: 0;
+    }
+    .caption {
+        text-align: center;
+        font-style: italic;
+        font-size: $fontMedium;
+        margin: 0 2.4rem 1rem 2.4rem;
+    }
+}
+
+.columns-x2 {
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;
+    -webkit-column-gap: 1.5rem;
+    -moz-column-gap: 1.5rem;
+    column-gap: 1.5rem;
+}
+
+.columns-x3 {
+    -webkit-column-count: 3;
+    -moz-column-count: 3;
+    column-count: 3;
+    -webkit-column-gap: 1.5rem;
+    -moz-column-gap: 1.5rem;
+    column-gap: 1.5rem;
+}
+
+.column-rule {
+    -webkit-column-rule: dotted 1px black;
+    -moz-column-rule: dotted 1px black;
+    column-rule: dotted 1px black;
+}
+
+.columns-min-width {
+    -webkit-column-width: 12em;
+    -moz-column-width: 12em;
+    column-width: 12em;
+}
+
+hr {
+    border: 0;
+    border-bottom: 4pt solid black;
+    margin: 1rem 0;
+}
+
+hr.div-dotted { 
+    border-bottom: dotted 0.8pt black;
+}
+
+hr.div-solid { 
+    border-bottom: solid 0.8pt black;
+}
+
+hr.div-thick { 
+    border-bottom: solid 3pt black;
+}
+
+hr.div-center { 
+    margin: 1rem 40%;
+}
+
+hr.div-left { 
+    width: 30%;
+    max-width: 8rem;
+    text-align: left;
+}
+
+hr.div-center { 
+    width: 4em;
+}
+
+hr.div-wide { 
+    width: 100%;
+}
+
+pre { 
+    font-family: $fontMono;
+    font-size: $fontXXSmall;
+    background-color: inherit;
+    border: none;
+    margin: 0.5rem 0;
+    padding: 0.5rem 1rem 0.5rem 0;
+    overflow: auto;
+
+    /**
+     * ---------------------------------------------------
+     * https://www.garron.me/en/bits/wrap-pre-firefox.html
+     * ---------------------------------------------------
+     */
+
+    white-space: pre-wrap;       /* css-3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+pre.verse { 
+    font-family: $font;
+    margin-left: 2.4rem;
+}
+
+var { 
+    float: none;
+    color: white;
+    background-color: black;
+    font-family: $fontSans;
+    font-size: $fontXSmall;
+    font-style: inherit;
+    font-weight: bold;
+    border: solid 1pt black;
+    border-radius: 3pt;
+    padding: 0 4pt;
+    white-space: nowrap;
+}
+
+kbd {
+    padding: 1pt 5pt;
+    font-family: $fontMono;
+    font-size: $fontXSmall;
+    border-radius: 3pt;
+    border: dotted 1pt black;
+    background-color: white;
+    color: black;
+    white-space: nowrap;
+}
+
+mark {
+    padding: 0;
+}
+
+tt { 
+    font-family: $fontMono;
+    margin-right: 0.2rem;
+    margin-left: 0.2rem;
+    border-radius: 0.3rem;
+    font-size: $fontXSmall;
+}
+
+td tt { 
+    border-left: none;
+    border-right: none;
+    padding-right: 0;
+    padding-left: 0;
+    margin-right: 0;
+    margin-left: 0;
+}
+
+dl dt {
+    font-weight: normal;
+}
+
+dl dd {
+    padding-left: 2.4rem;
+}
+
+ins {
+    text-decoration: none;
+    border-bottom: 1px dotted black;
+}
+
+del {
+    text-decoration: line-through;
+}
+
+
+.table-wrapper {
+    border: dotted 1pt black;
+    border-radius: $borderRadius;
+    padding: 0 1rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+}
+
+table { 
+    width: 100%;
+    max-width: 100%;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-size: inherit;
+}
+
+.show-onmouseover-parent {
+    display: none;
+}
+
+.show-parent:hover .show-onmouseover-parent {
+    display: block;
+}
+
+thead tr {
+    border-bottom: solid .4rem white;
+}
+
+tbody td {
+    vertical-align: top;
+    padding: 1px .3rem;
+}
+
+.highlight {
+    padding-left: .6rem;
+    padding-right: .6rem;
+    color: #fff;
+    font-weight: bold;
+    background-color: #000;
+    border-radius: 3pt;
+}
+
+small {
+    font-size: $fontSmall;
+}
+
+.large { 
+    font-size: $fontLarge;
+}
+
+.small-caps {
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: .08rem;
+}
+
+.small-caps span {
+    font-size: 1.2em;
+    font-style: normal;
+    padding-right: 0.1em;
+}
+
+.header { 
+    font-family: $fontSans;
+    text-align: center;
+    font-size: 2.0rem;
+    margin-bottom: 3rem;
+}
+.header .title,
+.header h1 { 
+    font-size: 3.5rem;
+    font-weight: bold;
+}
+.header .author { 
+    margin-top: 2rem;
+}
+.header .email { 
+    font-family: $fontMono;
+}
+.header .email a { 
+    font-color: inherit;
+    text-decoration: none;
+}
+.header .date { 
+    margin-top: 1rem;
+}
+
+ol ol { 
+    list-style: lower-alpha; 
+}
+
+ol ol ol { 
+    list-style: lower-roman; 
+}
+
+ol ol ol ol { 
+    list-style: lower-greek; 
+}
+
+ol ol ol ol ol { 
+    list-style: upper-alpha; 
+}
+
+ol ol ol ol ol ol { 
+    list-style: upper-roman; 
+}
+
+ol ol ol ol ol ol ol { 
+    list-style: upper-greek; 
+}
+
+ul.dashes {
+    list-style-type: none;
+}
+
+ul.dashes > li:before {
+    content: "–"; /* en dash here */
+    position: absolute;
+    margin-left: -1.1em; 
+}
+
+ul.checkboxes {
+    list-style: none;
+    padding: 0px;
+}
+
+ul.checkboxes li {
+    padding-left: 5.0rem;
+    text-indent: -5rem;
+}
+
+ul.checkboxes li:before
+{
+    content: '\2751';
+    margin: 0 1em;    /* any design */
+}
+
+/**
+ * Mixins
+ *
+ */
+
+.no-widows {
+    widows: 2;
+}
+
+
+/*
+ * Icon List
+ *
+ */
+
+div.icon-block {
+
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-left;
+
+    div.icon {
+        padding: 0.5em;
+    }
+
+    div.text {
+        font-family: $fontSans;
+        font-size: $fontXSmall;
+        padding: 0.5em;
+    }
+}
+
+/*
+ * Glosses
+ *
+ */
+
+div.gloss { 
+    display: flex;
+    flex-direction: row;
+    justify-contents: flex-left;
+    flex-wrap: wrap;
+    align-contents: top;
+    margin: 0; 
+
+    div.phrase {
+        padding: .2rem 1rem .2rem 0;    
+
+        div.source {
+            padding-top: .4rem;
+            padding-bottom: .1rem;
+            font-size: $fontSmall;
+            float: none;
+            sub, sup {
+                font-family: $fontSans;
+                font-size: $fontXXSmall;
+            }
+        }
+
+        div.translation {
+            font-size: $fontXSmall;
+            float: none;
+            sub, sup {
+                font-family: $fontSans;
+                font-size: $fontXXSmall;
+            }
+        }
+    }
+}

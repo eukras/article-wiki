@@ -1,0 +1,23 @@
+Icons
+
+Any of the hundreds of freely usable ^[Font Awesome] icons can be included by prefixing the `:` symbol to an icon's name, e.g.
+
+* `\:twitter` --> :twitter
+* `\:facebook-square` --> :facebook-square
+* `\:envelope` --> :envelope
+
+Some single-character shortcuts are also provided:
+
+^ https://fontawesome.com/icons?m=free
+
+DEMO ===
+TABLE (cccc) ---
+:_ , :n , :y , :f
+:* , :! , :? , :i
+:+ , :- , :h , :t 
+:u , :d , :l , :r
+:U , :D , :L , :R
+---
+
+= Table $[t++]. = Single-character abbreviations for commonly used icons.
+===

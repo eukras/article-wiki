@@ -1,0 +1,31 @@
+Character Blocks
+
+Character Blocks are paragraphs formatted by a single control character at the start of the first line: It must be the first character and it must be followed by a space.
+
+| `+ -` | Major and Minor Subheadings
+| `> =` | Block quote; Caption/Citation
+| `* # _` | Lists: Bullets, Numbers, Checkboxes/Icons
+| `! |` | Simple Tables: Headers, Cells
+| `. ; ,` | Align: Left, Centre, Right
+| `: ~` | Indents: Block, Hanging
+| `( )` | Float: Left, Right
+| `' " %` | Aside and Note (visible), Comment (hidden)
+| `/` | Translation (interlinear glosses)
+| `\`` | Document outlines (in `index.txt`)
+
+= Table $[t++]. = Summary of Control Characters.
+
+~ Leaders. ~ Asides and Hanging Indent characters (`' ~`) can be repeated once to delimit an inline title (see below). This line is a hanging indent with a leader.
+
+~ Recursion. ~ List characters (`* #`), can be repeated to indent them further ( see below).
+
+~ Context. ~ Captions (`=`) format differently depending upon the kind of block that they follow, whether tables, quotes or anything similar.
+
+~ Line wrapping. ~ Paragraphs and Character blocks are turned into a single line in the wiki, so the author needn't manage the line endings. It is assumed that any editing program will wrap lines automatically.
+
+DEMO ---
+* This is a continuing
+line
+* This is a continuing
+line also.
+---

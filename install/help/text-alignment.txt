@@ -1,0 +1,35 @@
+Text Alignment
+
+The `LEFT`, `CENTER` and `RIGHT` function blocks allow blocks of text to be aligned. To write a well formatted letter, for example:
+
+DEMO +++
+RIGHT ---
+. Some Fine Locality
+. In Yonder Province
+
+. Dec. 1656
+---
+
+. Addressee
+. Locality
+. State
+
+; *_[RE: IMPORTANT]
+
+Dear sir, 
+
+I would have written you a shorter letter, but I did not have the time.
+
+~
+
+RIGHT ---
+. Yours etc.,
+. 
+. 
+. ..........................
+
+. Blaise Pascal
+---
++++
+
+If you wanted to align the right-blocks perfectly, you could write `RIGHT (30%)` to give them both a fixed width. Also, to write a letter in the editor, remember to comment out the title line (use `%`) so it isn't visible.

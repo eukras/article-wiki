@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if user_slug != "_" and doc_slug != "_" and part_slug != "_" %}
+<form method="POST" method="/edit/{{ user_slug }}/{{ doc_slug }}/{{ part_slug }}">
+{% else %}
+<form method="POST">
+{% endif %}
+
+    <div id="editor" class="mode-{% if is_preview is sameas true %}preview{% else %}edit{% endif %}">
+
+        <!-- Grid: Eight buttons -->
+
+        {% if doc_slug == 'fixtures' and part_slug == 'author' %}
+        <a id="btn-back" class="button" tabindex="1" href="/user/{{ user_slug }}"><i class="fa fa-arrow-left"></i> <span>Back</span></a>
+        {% elif doc_slug == 'fixtures' and part_slug == 'homepage' %}
+        <a id="btn-back" class="button" tabindex="1" href="/"><i class="fa fa-arrow-left"></i> <span>Back</span></a>
+        {% elif user_slug != '_' and doc_slug == '_' %}
+        <a id="btn-back" class="button" tabindex="1" href="/user/{{ user_slug }}"><i class="fa fa-arrow-left"></i> <span>Back</span></a>
+        {% elif user_slug != '_' and doc_slug != '_' %}
+        <a id="btn-back" class="button" tabindex="1" href="/read/{{ user_slug }}/{{ doc_slug }}"><i class="fa fa-arrow-left"></i> <span>Back</span></a>
+        {% else %}
+        <a id="btn-back" class="button" tabindex="1" href="/"><i class="fa fa-home"></i> <span>Home</span></a>
+        {% endif %}
+
+        <a id="btn-help" class="button" target="_blank" tabindex="2" href="/help"><i class="fa fa-question-circle"></i> <span>Help</span></a>
+
+        <button id="btn-copy" tabindex="3" type="button" onclick="$('textarea').select();document.execCommand('copy');"><i class="fa fa-copy"></i> <span>Copy</span></button>
+
+        <button id="btn-cleanup" class="button" tabindex="4" onclick="$('textarea').val(cleanupText($('textarea').val())); return false;"><i class="fa fa-bolt"></i> <span>Cleanup</span></button>
+
+        <button id="btn-preview" tabindex="5" type="submit" name="they_selected_preview" value="they_selected_preview"><i class="fa fa-eye"></i> <span>Preview</span></button>
+
+        {# See static/common.js for onclick action #}
+        <a id="btn-edit" class="button" tabindex="6" href="#"><i class="fa fa-arrow-left"></i> <span>Edit</span></a>
+
+        <a id="btn-print" class="button" tabindex="7" href="javascript: window.print();"><i class="fa fa-print"></i> <span>PDF</span></a>
+
+        {% if user_slug == '_' or doc_slug == '_' %}
+        <button id="btn-delete" class="button" tabindex="8" disabled="DISABLED"><i class="fa fa-times"></i> <span>Delete</span></a>
+        {% else %} 
+        <a id="btn-delete" class="button" tabindex="8" href="/delete/{{ user_slug }}/{{ doc_slug }}/{{ part_slug }}" onclick="return confirm('Confirm delete?');" ><i class="fa fa-times"></i> <span>Delete</span></a>
+        {% endif %} 
+
+        <button id="btn-save" tabindex="9" type="submit" {% if user_slug == '_' and doc_slug == '_' %} disabled="DISABLED" {% endif %} name="they_selected_save" value="they_selected_save"><i class="fa fa-save"></i> <span>Save</span></button> 
+
+        <!-- Grid: Two main page areas --> 
+
+        <textarea tabindex="4" name="content" class="editor">{{ source }}</textarea>
+
+        <main>
+            {{ preview }}
+        </main>
+
+    </div>
+
+</form>
+
+{% endblock %}
+
+
+{% block javascripts %}
+
+<script>
+
+$(document).ready(function() {
+    $('textarea').focus();
+});
+
+</script>
+
+{% endblock %}

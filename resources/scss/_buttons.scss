@@ -1,0 +1,113 @@
+/**
+ * Bootstrap-like buttons for grayscale
+ * All navs are button lists.
+ *
+ */
+
+nav.button-list {
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+}
+
+@media print {
+    nav.button-list {
+        display: none;
+    }
+}
+
+a.button, input[type="submit"], button {
+    font-family: $fontSans;
+    font-size: $fontXSmall;
+    background-image: linear-gradient($buttonGradient, $pageColor);
+    color: #4da3a9;
+    border: 1px solid white;
+    border-left: 1px dotted $buttonBorderColor;
+    padding: 0.3rem 1.3rem;
+    text-align: center;
+    user-select: none;
+    user-drag: none;
+    -webkit-user-drag: none;
+    cursor: pointer;
+    outline: none; 
+
+    i.fa {
+        padding-right: 4px;
+    }
+}
+
+a.button:hover, input[type="submit"]:hover, button:hover {
+    /* no change */
+}
+
+a.button:active, input[type="submit"]:active, button:active {
+    color: $black;
+    background-image: linear-gradient($buttonGradientActive, $pageColor);
+}
+
+a.button[disabled="DISABLED"], button[disabled="DISABLED"] {
+    cursor: not-allowed;
+    color: $lightGray;
+    background-image: linear-gradient($lightGray, $pageColor);
+}
+
+input[type="file"] {
+    text-align: center;
+    margin: 1rem;
+    width: 60%;
+    padding: 3rem;
+    border: dashed 1px $black;
+}
+
+/*
+ * Slight gradients for edge links in header and footer.
+ *
+ */
+
+.button-list-header a.button,
+.button-list-header button {
+    /* same */
+}
+
+.button-list-footer a.button,
+.button-list-footer button {
+    background-image: linear-gradient($pageColor, $buttonGradient);
+}
+
+.button-list-footer a.button:active,
+.button-list-footer button:active {
+    background-image: linear-gradient($pageColor, $buttonGradientActive);
+}
+
+/*
+ * Button goes on edge of paper.
+ *
+ */
+a.button.button-edge,
+button.button-edge {
+    transform: rotate(90deg);
+    background-image: linear-gradient($buttonGradient, $pageColor);
+    right: -8.65rem;
+    position: relative;
+    border-right: 1px dotted $midGray;
+    border-bottom: 0px solid white;
+    top: 2.6rem;
+}
+
+a.button.button-edge:active,
+button.button-edge:active {
+    background-image: linear-gradient($buttonGradientActive, $pageColor);
+}
+
+/*
+ * Big center buttons are marked as features
+ *
+ */
+
+a.button.feature,
+button.feature {
+    font-size: $fontSmall;
+    border-radius: $borderRadius;
+    border: 2px solid $lightGray;
+    margin-top: 1rem;
+}

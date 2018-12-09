@@ -1,0 +1,9 @@
+Extras
+
+Some standard features. Those which exist as /functions/ can be used as a model to extend the software by adding function blocks of your own.
+
+
+- Future development
+
+* Music formatting with Lilypond format.
+* Mathematical formula with LaTeX format.

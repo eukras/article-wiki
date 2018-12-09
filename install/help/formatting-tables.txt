@@ -1,0 +1,50 @@
+Formatting Tables
+
+We've seen in @[character-blocks] that simple tables are easily arranged with `!` and `|`. We can control their positioning and width with `CENTER` and similar functions. This covers many simple cases.
+
+DEMO +++
+CENTER (80%) ---
+! Header ! Header
+| Data goes here | Data goes here
+| Data goes here | Data goes here
+---
+
+= Table $[t++]. = A simple table block. 
++++
+
+But this has obvious limitations. We would normally obtain data in CSV format, so why not just use that instead of reformatting?
+
+~ CSV Tables. ~ If I wanted to display some ^[CSV] data in a table, but without fiddly reformatting everytime the data had to be updated, I could use the `TABLE` function to format the data, with formatting instructions ^[given as arguments].
+
+^ Comma Separated Value files.
+^ AsciiDoc has previously used this same approach.
+
+DEMO ===
+TABLE (crl$, headers) ---
+ID, First Name, Last Name, Salary
+123, Felicity, Masters, 160000
+7, Clive, Warner, 45000
+---
+
+= Table $[t++]. = Tables from CSV data.
+===
+
+: ! : $[wiki] does not support more complex table features such as row or column spans. Some more complex formatting can be done with grids.
+
+~ Grids. ~ For really large tables. For clarity it expects `===` as the row divider and `---` as the column divider.
+
+DEMO :::
+GRID +++
+Ut enim ad minim veniam.
+
+Quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+---
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+===
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+---
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
++++
+
+= Table $[t++]. = A `GRID` of square areas.
+:::

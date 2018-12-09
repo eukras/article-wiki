@@ -1,0 +1,51 @@
+Alignment Blocks
+
+Unlike regular paragraphs, aligns and floats have space above and below
+them. Repeat the control character to start a new line without spacing.
+
+DEMO ---
+. Left aligned text
+. with no indents
+. on following lines.
+
+; Centered text.
+
+, Right aligned text.
+
+~ A hanging indent, meaning that wrapped lines will be indented. 
+
+: A block indent. Wrapped lines are also indented.
+---
+
+These basic formatting ideas can be used in a few more sophisticated
+ways:
+
+DEMO ---
+~ Hanging Indent. ~ Giving a hanging indent a /leader/ will make it into a minor heading.
+
+( ($[l++])
+, Floating left marker.
+
+) ($[l++])
+. Floating right marker.
+
+( ($[l++])
+; Simple Equation'[2]
+
+. Definition title
+: ... with the definition here.
+. Definition title
+: ... with the definition here.
+---
+
+Note that Article Wiki doesn't presently support mathematical formulas;
+the plan is to render inline SVG from `\\LaTeX()` code, but this is not
+a high priority.
+
+Finally, adding a /leader/ to a blocked indent will turn it into an
+/icon block/, which can be useful for notes or documentation. (See
+@[icons] for the names and shortcuts of the /Font Awesome/ icons.)
+
+DEMO ---
+: i : This is an important notification, with a special icon to grab attention. 
+---

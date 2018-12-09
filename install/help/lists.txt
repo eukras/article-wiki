@@ -1,0 +1,40 @@
+Lists
+
+Lists have a very simple syntax, whose behaviour can be modified with settings, for example to set the numbering or continue from before.
+
+DEMO ---
+# List (Ordered)
+# # List
+# # # List 
+# # # # List 
+# List
+
+* List (Unordered)
+* * List
+* * * List 
+
+$ NUMBERING = continue
+
+# This continues the previous
+top-level list number
+# after an interruption.
+
+$ NUMBERING = 9
+
+# Whereas this starts a list
+# from a new number.
+
+_ Buy milk
+_ Return books to library
+_ Write wiki software
+---
+
+See @[icons] for the kind of symbols you can use with check-boxes.
+
+To-do lists default to showing checkboxes as the list markers. However, these can be changed by putting an icon at the start of any line.
+
+DEMO ---
+_ To do
+_ :y Done
+_ :n Won't do
+---

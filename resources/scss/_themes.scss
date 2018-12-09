@@ -1,0 +1,17 @@
+@media screen {
+
+    body.theme-classic {
+
+        background-color: #2d2606;
+
+        a.button, input[type="submit"], button {
+            color: #968534;
+        }
+
+        #page {
+            @include box-shadow(0, 20px, 5px, black);
+        }
+
+    }
+
+}

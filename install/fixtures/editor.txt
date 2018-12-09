@@ -1,0 +1,25 @@
+Write something
+
+Use this test page to experiment with ^[wiki formatting].
+
+^ /help
+
+
++ Thought for the day
+
+> It seems that perfection is attained not when there is nothing more to add, but when there is nothing more to remove.
+= ~[de Saint Exupéry, /Terre des Hommes/, p.60]
+
+
+- A little subheading
+
+* Try bullet lists and quotations.
+* Try ^[footnotes], #[index:indexes], and citations (see above).
+* Try floats, alignment, columns, tables.
+
+^ Here's a footnote!
+
+
+_____
+
+de Saint Exupéry, Antoine. 1939. Terre des Hommes. Paris: Éditions Gallimard.

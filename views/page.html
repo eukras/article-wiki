@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div id="page">
+
+{% if header_buttons %}
+<nav id="top-of-page" class="button-list button-list-header no-print no-preview">
+    {% for button in header_buttons %}
+    <a id="button-{{ button.icon }}" class="button" href="{{ button.href }}">
+        <i class="fa fa-{{ button.icon }}"></i>
+        {{ button.name }}
+    </a>
+    {% endfor %}
+</nav>
+{% endif %}
+
+{% block page %}
+
+<!-- REPLACE MEEEEEEE -->
+
+{% endblock %}
+
+<div class="top-of-page">
+    <a href="#top-of-page">
+        <i class="fa fa-5x fa-arrow-circle-up"></i>
+    </a>
+</div>
+
+{% if footer_buttons %}
+<nav class="button-list button-list-footer no-print no-preview">
+    {% for button in footer_buttons %}
+    <a id="button-{{ button.icon }}" class="button" href="{{ button.href }}">
+        <i class="fa fa-{{ button.icon }}"></i>
+        {{ button.name }}
+    </a>
+    {% endfor %}
+    <button id="button-themes" class="button">
+        <i class="fa fa-bolt"></i>
+        Theme
+    </a>
+</nav>
+{% endif %}
+
+</div>
+
+{% endblock %}
