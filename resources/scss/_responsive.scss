@@ -92,15 +92,15 @@
         grid-gap: 0;
 
         .wiki-demo-source {
-            border-right: 4pt solid #444;
+            border-right: 0.1rem dotted black;
             border-right: 0;
-            padding-left: 1rem;
+            padding-left: 2rem;
             padding-right: 0;
         }
         .wiki-demo-output {
-            border-left: 4pt dotted #444;
+            border-left: 0.1rem dotted black;
             border-right: 0;
-            padding-left: 1rem;
+            padding-left: 2rem;
             padding-right: 0;
         }
     }

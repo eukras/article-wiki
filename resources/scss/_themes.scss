@@ -104,6 +104,9 @@
 
         .wiki-demo, .wiki-demo-wide {
             .wiki-demo-source {
+                border-right: none;
+                padding-right: 0;
+
                 pre {
                     padding: 0.4rem 1rem;
                     background-color: black;

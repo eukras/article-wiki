@@ -225,8 +225,12 @@ section.depth-3 {
     grid-gap: 1em;
 
     .wiki-demo-source {
-        border-right: 4pt dotted #444;
-        padding-right: 1rem;
+        border-right: .1rem dotted black;
+        padding-right: 2rem;
+
+        pre {
+            padding: 0;
+        }
     }
     .wiki-demo-output {
         padding-left: 1rem;
@@ -247,7 +251,7 @@ section.depth-3 {
         padding-right: 0;
     }
     .wiki-demo-output {
-        border-left: 4pt dotted #444;
+        border-left: 0.1rem dotted black;
         padding-left: 2.4rem;
         padding-right: 0;
         article {
