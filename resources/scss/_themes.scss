@@ -1,17 +1,150 @@
 @media screen {
 
-    body.theme-classic {
+    html.theme-dark {
 
-        background-color: #2d2606;
+        $fg: #889;
+        $bg: #050509;
+        $hl: #67679e;
+
+        color: $fg;
+        background-color: $bg;
+
+        body {
+            background-color: $bg;
+            background-blend-mode: soft-light;
+        }
 
         a.button, input[type="submit"], button {
-            color: #968534;
+            color: #aaa;
         }
+
+        a {
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        a:hover { 
+            color: #ddd;
+            text-decoration: none;
+        }
+
+        #page, #editor {
+            color: $fg;
+            background-color: $bg;
+        }
+
+        #editor textarea {
+            color: $fg;
+        }
+
+        #editor textarea::-webkit-scrollbar, 
+        #editor main::-webkit-scrollbar {
+            width: 1em;
+        }
+
+        #editor textarea::-webkit-scrollbar-track, 
+        #editor main::-webkit-scrollbar-track {
+            background.color: black;
+        }
+
+        #editor textarea::-webkit-scrollbar-thumb, 
+        #editor main::-webkit-scrollbar-thumb {
+            background-color: #334;
+        }
+
+        #editor textarea::-webkit-resizer,
+        #editor textarea::-webkit-corner {
+            display: none;
+        }
+
 
         #page {
-            @include box-shadow(0, 20px, 5px, black);
+            border: 0.1rem solid rgba(128, 128, 128, 0.3);
         }
 
+        h2 {
+            border-top: dotted 0.1rem rgba(128, 128, 128, 0.3);
+            border-bottom: dotted 0.1rem rgba(128, 128, 128, 0.3);
+        }
+
+        h1, h2, h3, h4, h5, h6, .fa {
+            color: $hl;
+        }
+
+        hr.div-solid {
+            border-bottom: 0.1rem dotted rgba(128, 128, 128, 0.3);
+        }
+
+        ins {
+            text-decoration: none;
+            border-bottom: 1px dotted $fg;
+            color: lightgreen;
+        }
+        del {
+            color: indianred;
+            border-bottom: 1px dotted $fg;
+        }
+
+        tt, textarea {
+            background-color: black;
+        }
+
+        tt, td tt {
+            padding: 0 0.3rem;
+        }
+
+        var { 
+            border: 1pt solid $hl;
+            color: $hl;
+        }
+        kbd {
+            border: 1pt dotted $fg;
+            color: inherit;
+        }
+
+        .wiki-demo, .wiki-demo-wide {
+            .wiki-demo-source {
+                pre {
+                    padding: 0.4rem 1rem;
+                    background-color: black;
+                }
+            }
+        }
+
+        aside {
+            border-left: 0.1rem dotted $fg;
+        }
+
+        .note, .box-dotted {
+            border: 0.1rem dotted $fg;
+        }
+
+    }
+
+    html.theme-readable {
+        font-size: 30pt;
+        line-height: 40pt;
+    }
+
+    html.theme-compact {
+        font-size: 9pt;
+        line-height: 13pt;
+        font-family: $fontFamilySansSerif;
+    }
+
+}
+
+@media print {
+
+    html.theme-readable {
+        font-size: 14pt;
+        line-height: 20pt;
+    }
+
+    html.theme-compact {
+        font-size: 9pt;
+        line-height: 13pt;
+        font-family: $fontFamilySansSerif;
     }
 
 }

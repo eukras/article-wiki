@@ -1,5 +1,0 @@
-@mixin box-shadow($offset, $blur, $spread, $color) {
-  -webkit-box-shadow: $offset $offset $blur $spread $color;
-  -moz-box-shadow: $offset $offset $blur $spread $color;
-  box-shadow: $offset $offset $blur $spread $color;
-}

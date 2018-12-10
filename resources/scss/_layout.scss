@@ -1,7 +1,9 @@
 /**
- * ------------------------------------------------------------------------
  * Article Wiki; page layout.
- * ------------------------------------------------------------------------
+ * 
+ * All layout is for Day theme; other themes are modified 
+ * in _themes.scss. As far as possible, all CSS will inherit 
+ * or modify the figures set in #page.
  *
  */
 
@@ -9,22 +11,28 @@
     line-height: 150%;
 }
 
-body {
-    font-family: $font;
-    font-size: $bodyFont;
-    color: black;
-    background-color: #a0b8a0;
+html {
+    font-family: $fontFamilySerif;
+    font-size: $fontSize;
+    line-height: 150%;
+    color: #222;
+    background-color: #A0b8A0;
 }
 
-.top-of-page {
-    text-align: center;
-    margin-bottom: 6rem;
-    
-    a, a:hover, a:active, a:visited {
-        color: #a0b8a0;
-        border-bottom: none;
-        opacity: 0.5;
-    }
+#page, #editor  {
+    background-color: #f8f8f8;
+}
+
+body {
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-image: none;  /* see common.js */
+}
+
+a, button {
+    border: none;
+    background: none;
 }
 
 article {
@@ -49,7 +57,6 @@ form {
 @media screen {
 
     body { 
-        background-color: #A0b8A0;
         padding: 0;
         margin: 0;
     }
@@ -76,13 +83,13 @@ form {
             padding: 1rem;
             border: none;
             outline: none;
+            background: inherit;
         }
 
         main {
             grid-area: unquote("2 / 5 / 3 / 9");
             padding: 2rem;
             overflow: auto;
-            background-color: $white;
             article {
                 margin-top: 0;
             }
@@ -100,18 +107,20 @@ form {
     }
 
     #page { 
-        background-color: $white;
         width: 56rem;
         max-width: 90%;
         margin: 2rem auto;
         padding: 0;
-        @include box-shadow(0, 20px, 5px, #9bad9b);
     }
 
 }
 
 
 @media print {
+
+    html {
+        font-size: 10pt;
+    }
 
     body {
         margin: 3em;
@@ -133,15 +142,14 @@ form {
             width: auto;
             margin: 0;
             padding: 0;
-            @include box-shadow(0, 0, 0, none);
         }
     }
 
     #page {
+        background-color: white;
         width: auto;
         margin: 0;
         padding: 0;
-        @include box-shadow(0, 0, 0, none);
     }
 
     div.wiki {
@@ -152,8 +160,7 @@ form {
 
     var {
         border: 2px solid black;
-        color: $black;
-        background-color: $pageColor;
+        color: black;
     }
 }
 
@@ -174,7 +181,7 @@ h2 + table.table-of-contents {
 
 td.word-count { 
     text-align: right;
-    font-size: $fontXXSmall;
+    font-size: $fontSizeMinus2;
 }
 
 header {
@@ -184,7 +191,7 @@ header {
 }
 
 header summary {
-    font-size: $fontLarge;
+    font-size: $fontSizePlus1;
     margin-bottom: 2rem;
 }
 
@@ -218,7 +225,7 @@ section.depth-3 {
     grid-gap: 1em;
 
     .wiki-demo-source {
-        border-right: 1.5pt dotted black;
+        border-right: 4pt dotted #444;
         padding-right: 1rem;
     }
     .wiki-demo-output {
@@ -236,12 +243,11 @@ section.depth-3 {
     grid-gap: 0;
 
     .wiki-demo-source {
-        border-left: 1px solid white;
-        padding-left: 2.4rem;
+        padding-left: 0;
         padding-right: 0;
     }
     .wiki-demo-output {
-        border-left: 1.5pt dotted black;
+        border-left: 4pt dotted #444;
         padding-left: 2.4rem;
         padding-right: 0;
         article {
@@ -267,41 +273,37 @@ section.depth-3 {
     display:table;                      /* Actually FF 20+ */
 }
 
-h1 {
-    font-family: $font;
-}
-
 h1 + summary {
     margin-top: none;
 }
 
 section.depth-1 h1, header h1 {
-    font-size: $fontXXLarge;
+    font-size: $fontSizePlus3;
 }
 
 section.depth-2 h1 {
-    font-size: $fontXLarge;
+    font-size: $fontSizePlus2;
 }
 
 section.depth-3 h1 {
-    font-size: $fontLarge;
+    font-size: $fontSizePlus1;
 }
 
 section.depth-4 h1,
 footer h1 {
-    font-size: $fontSmall;
+    font-size: $fontSize
 }
 
 section.depth-5 h1 {
-    font-size: $fontSmall;
+    font-size: $fontSizeMinus1;
 }
 
 section.depth-6 h1 {
-    font-size: $fontSmall;
+    font-size: $fontSizeMinus1;
 }
 
 footer {
-    font-size: $fontXSmall;
+    font-size: $fontSizeMinus1;
 }
 
 
@@ -316,13 +318,13 @@ footer {
 
     input {
         width: 100%;
-        font-family: $fontSans;
-        font-size: 13.3333px;
-        background: $white;
-        border: 1px solid $midGray;
+        font-family: $fontFamilySansSerif;
+        font-size: $fontSizePlus1;
+        border: 1px solid rgba(128, 128, 128, 0.5);
+        background: none;
+        color: inherit;
         border-radius: $borderRadius;
         padding: 0.3rem 0.6rem;
-        color: $black;
         cursor: pointer;
     }
 }
@@ -333,16 +335,15 @@ footer {
  */
 
 #progress {
-    font-family: $fontSans;
-    text-align: center;
+    font-family: $fontFamilySansSerif
 }
 
 .side-nav { 
     position: fixed;
     text-decoration: none;
-    color: $lightGray;
-    font-size: $fontXSmall;
+    font-size: $fontSizeMinus1;
     padding: 1em;
+    opacity: 0.4;
 }
 
 .bottom-menu {
@@ -350,19 +351,22 @@ footer {
     right: 0;
 }
 
+/*
+ * Back-to-the-top button.
+ *
+ */
 
-/* Logo unused, but may need it again. */
-
-.article-wiki-logo {
-    margin: 1rem auto;
-    padding: 3rem 0;
-    width: 4rem;
+.top-of-page {
+    text-align: center;
+    margin-bottom: 6rem;
+    opacity: .5;
+    
+    a, a:hover, a:active, a:visited {
+        color: #a0b8a0;
+        border-bottom: none;
+        opacity: 0.5;
+    }
 }
-
-.article-wiki-logo svg {
-    width: 100%;
-}
-
 
 /**
  * Articles list for home and user pages.
@@ -384,20 +388,20 @@ footer {
     text-align: center;
 }
 .article-title {
-    font-size: $fontMedium;
+    font-size: $fontSize;
     font-style: bold;
 }
 .article-summary {
     margin-bottom: 1rem;
-    font-size: $fontSmall;
+    font-size: $fontSizeMinus1;
 }
 .article-details {
     margin-top: .5em;
-    font-size: $fontXSmall;
+    font-size: $fontSizeMinus1;
 }
 
 
-/* CSS Modal notice */
+/* CSS Modal notice if no grid support. */
 
 .modal {
 

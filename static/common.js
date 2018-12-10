@@ -88,28 +88,10 @@ function cleanupText(s) {
 
 function setSvgBackground()
 {
-    if ($('body').hasClass('theme-default')) {
-        svg = makeBokehSvg()
-        var encodedData = window.btoa(svg);
-        var url = 'data:image/svg+xml;base64,' + encodedData;
-        document.body.style.backgroundRepeat = "no-repeat";
-        document.body.style.backgroundAttachment = "fixed";
-        document.body.style.backgroundColor = "#A0b8A0";
-        document.body.style.backgroundImage = "url(" + url + ")";
-        document.body.style.backgroundSize = "cover";
-    } else if ($('body').hasClass('theme-classic')) {
-        svg = makeHoundstoothSvg()
-        var encodedData = window.btoa(svg);
-        var url = 'data:image/svg+xml;base64,' + encodedData;
-        document.body.style.backgroundPosition = "top center";
-        document.body.style.backgroundRepeat = "repeat";
-        document.body.style.backgroundAttachment = "scroll";
-        document.body.style.backgroundColor = "#584a07";
-        document.body.style.backgroundImage = "url(" + url + ")";
-        document.body.style.backgroundSize = "auto";
-    } else {
-        /* nothing */
-    }
+    svg = makeBokehSvg()
+    var encodedData = window.btoa(svg);
+    var url = 'data:image/svg+xml;base64,' + encodedData;
+    document.body.style.backgroundImage = "url(" + url + ")";
 }
 
 function randInt(min, max) {
@@ -227,7 +209,7 @@ function makeHoundstoothSvg()
 //  ----------------------------------------
 
 function getThemes() {
-    return ['default', 'classic'];
+    return ['default', 'dark']; //  [, 'readable', 'compact'];
 }
 
 function getThemeClasses() {
@@ -238,17 +220,17 @@ function getThemeClasses() {
 
 function cycleTheme() {
     classes = getThemeClasses();
-    body = $('body');
+    html = $('html');
     for (i = 0; i < classes.length; i++) {
-        if (body.hasClass(classes[i])) {
-            body.removeClass(classes[i]);
+        if (html.hasClass(classes[i])) {
+            html.removeClass(classes[i]);
             new_theme = classes[(i + 1) % classes.length];
-            body.addClass(new_theme);
+            html.addClass(new_theme);
             $.cookie('article-wiki-theme', new_theme, {'path': '/'});
             setSvgBackground()
             return;
         }
     }
-    body.addClass(classes[0]);  // <-- If no matches, use first theme
+    html.addClass(classes[0]);  // <-- If no matches, use first theme
     setSvgBackground()
 }

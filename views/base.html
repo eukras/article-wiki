@@ -1,4 +1,4 @@
-<html lang="en">
+<html lang="en" class="{% if theme %}{{ theme }}{% else %}theme-default{% endif %}">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
@@ -11,11 +11,7 @@
     {% block header_tags %}
     {% endblock %}
 </head>
-{% if theme %}
-<body class="{{ theme }}">
-{% else %}
-<body class="theme-default">
-{% endif %}
+<body>
 
 {% block content %}
 {% endblock %}

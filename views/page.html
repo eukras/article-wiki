@@ -5,7 +5,7 @@
 <div id="page">
 
 {% if header_buttons %}
-<nav id="top-of-page" class="button-list button-list-header no-print no-preview">
+<nav class="button-list button-list-header no-print no-preview">
     {% for button in header_buttons %}
     <a id="button-{{ button.icon }}" class="button" href="{{ button.href }}">
         <i class="fa fa-{{ button.icon }}"></i>
@@ -21,8 +21,8 @@
 
 {% endblock %}
 
-<div class="top-of-page">
-    <a href="#top-of-page">
+<div class="top-of-page no-print no-preview">
+    <a href="#top">
         <i class="fa fa-5x fa-arrow-circle-up"></i>
     </a>
 </div>
@@ -36,7 +36,7 @@
     </a>
     {% endfor %}
     <button id="button-themes" class="button">
-        <i class="fa fa-bolt"></i>
+        <i class="fa fa-adjust"></i>
         Theme
     </a>
 </nav>

@@ -23,13 +23,6 @@
         padding: 2rem;
     }
 
-    /**
-    h2 {
-        background-color: steelblue;
-        color: white;
-        padding: .7rem;
-    }
-     **/
 
     #editor {
         a.button, button {
@@ -44,10 +37,6 @@
         i {
             display: none;
         }
-    }
-
-    main, #page {
-        @include box-shadow(0, 0, 0, white);
     }
 
     .columns-x2, .columns-x3 {
@@ -103,13 +92,13 @@
         grid-gap: 0;
 
         .wiki-demo-source {
-            border-left: 1.5pt solid white;
+            border-right: 4pt solid #444;
             border-right: 0;
             padding-left: 1rem;
             padding-right: 0;
         }
         .wiki-demo-output {
-            border-left: 1.5pt dotted black;
+            border-left: 4pt dotted #444;
             border-right: 0;
             padding-left: 1rem;
             padding-right: 0;
