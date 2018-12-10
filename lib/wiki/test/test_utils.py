@@ -7,6 +7,7 @@ from .context import lib  # noqa: F401
 from lib.wiki.utils import \
     compose, \
     html_escape, \
+    one_line, \
     pluralize, \
     split_options, \
     trim
@@ -43,6 +44,16 @@ def test_split_options():
     assert split_options('(,)') == []
     assert split_options('') == []
     assert split_options('x, y 3') == ['x', 'y 3']
+
+
+def test_one_line():
+    text = trim("""
+        Sentence.    Sentence!
+        Sentence; sentence. Sentence
+        sentence.
+    """)
+    normalised = "Sentence. Sentence! Sentence; sentence. Sentence sentence."
+    assert one_line(text) == normalised
 
 
 def test_trim():

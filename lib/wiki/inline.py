@@ -38,7 +38,7 @@ class Inline(object):
 
     def __init__(self):
         """
-        Find 'em.
+        Marshall several formatting classes.
         """
         chars = "".join(list(self.inline_format_characters.keys()))
         self.pattern = re.compile(
@@ -47,7 +47,7 @@ class Inline(object):
         self.shorthand = Shorthand()
         self.icons = Icons()
 
-    def process(self, text):
+    def process(self, text: str) -> str:
         """
         Simple non-recursive parser to match *[...] patterns,
         but now with recursively combining characters.
@@ -78,18 +78,20 @@ class Inline(object):
                 _ = length
         return out
 
-    def typography(self, text):
+    def typography(self, text: str) -> str:
         """
-        A simple replace of all common typographical shortcuts,
-        and add links.
-        """
-        text = html_escape(text)
-        for regex, replace in self.get_markup_tuples():
-            text = regex.sub(replace, text)
-        text = self.shorthand.replace(text)
-        text = self.icons.replace(text)  # <-- Better method
+        Replace of all common typographical shortcuts, and add links. Add a
+        tiny bit of extra space after sentences.
 
-        return text
+        Sentence handling has been removed here due to glitching.
+        """
+        _ = html_escape(text)
+        for regex, replace in self.get_markup_tuples():
+            _ = regex.sub(replace, _)
+        _ = self.shorthand.replace(_)
+        _ = self.icons.replace(_)
+        _ = space_sentences(_)
+        return _
 
     def get_markup_tuples(self):
         """
@@ -217,6 +219,30 @@ class Inline(object):
 # ----------------
 # Module functions
 # ----------------
+
+
+def space_sentences(text: str) -> str:
+    """
+    Add an extra thin space after sentences; may not catch all cases.
+    This is better done with NLTK, but would require rewriting the Inline
+    module; using a clunky interim solution.
+    """
+    def repl(match) -> str:
+        abbrevs = ['mr', 'st', 'mrs', 'ms', 'dr',
+                   'ltd', 'jr', 'sr', 'sq'
+                   'inc', 'co',
+                   'p.a', 'a.m', 'p.m',
+                   'a.s.a.p', 'r.s.v.p',
+                   'i.e', 'e.g', 'etc'
+                   ]
+        tail, punctuation, head = match.groups()
+        if punctuation == '.' and tail.lower() in abbrevs:
+            return tail + punctuation + " " + head
+        else:
+            return tail + punctuation + "&nbsp; " + head
+
+    return re.sub(r'(\w+)([!?.]["\']?)\s+(\w)', repl, text)
+
 
 def strip_markup(content):
     """

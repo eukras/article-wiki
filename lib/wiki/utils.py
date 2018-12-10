@@ -5,10 +5,6 @@ Some functions that are widely used.
 import random
 import re
 
-from textwrap import shorten, wrap
-
-from slugify import slugify
-
 from lib.wiki.placeholders import strip_placeholder_delimiters
 
 from functools import reduce

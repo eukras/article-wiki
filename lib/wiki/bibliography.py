@@ -234,15 +234,6 @@ def collate_bibliography(parts):
     return create_unique_labels(lines)
 
 
-def get_sentences(text):
-    """
-    Split a string into sentences. A sentence in quotes is still a sentence.
-    """
-    sentences = re.findall(r"[^\.\?\!\:]*[\.\?\!\:][\"\'\s]*", text)
-    trimmed_sentences = [_.strip() for _ in sentences if _ != ""]
-    return trimmed_sentences
-
-
 def split_label(entry):
     """
     Take a bibliography entry and return a tuple of author-year labels, and the
@@ -256,6 +247,15 @@ def split_label(entry):
         if match_author_year:
             head, tail = ' '.join(sentences[:2]), ' '.join(sentences[2:])
     return head, tail
+
+
+def get_sentences(text):
+    """
+    Split a string into sentences. A sentence in quotes is still a sentence.
+    """
+    sentences = re.findall(r"[^\.\?\!\:]*[\.\?\!\:][\"\'\s]*", text)
+    trimmed_sentences = [_.strip() for _ in sentences if _ != ""]
+    return trimmed_sentences
 
 
 def create_unique_labels(lines):

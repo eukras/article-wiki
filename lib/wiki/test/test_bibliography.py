@@ -23,6 +23,12 @@ def test_nonempty_lines():
     assert nonempty_lines(content) == ['This is a test.'] * 2
 
 
+def test_get_sentences():
+    arg = "RE: Hi. There? You!"
+    out = ['RE:', 'Hi.', 'There?', 'You!']
+    assert get_sentences(arg) == out
+
+
 def test_split_bibliography():
     content = trim("""
         This is the body.
@@ -40,12 +46,6 @@ def test_split_bibliography():
     assert split_bibliography(content) == [
         "This is the body.", "This is the bibliography."
     ]
-
-
-def test_get_sentences():
-    arg = "RE: Hi. There? You!"
-    out = ['RE:', 'Hi.', 'There?', 'You!']
-    assert get_sentences(arg) == out
 
 
 def test_split_label():

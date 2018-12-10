@@ -4,7 +4,7 @@ Inline handles all inline markup. It is applied within Blocks.
 
 from .context import lib  # noqa: F401
 
-from lib.wiki.inline import Inline
+from lib.wiki.inline import Inline, space_sentences
 
 
 def test_brackets():
@@ -32,9 +32,6 @@ def test_inline():
 
 
 def test_typography():
-    """
-    General typographic features.
-    """
     test = Inline()
     assert "x&mdash;x &ndash; x &rarr; x &larr; x &copy; &trade;" == \
         test.typography("x --- x -- x --> x <-- x (C) (TM)")
@@ -48,10 +45,12 @@ def test_typography():
         test.typography("(4EM)")
 
 
+def test_space_sentence():
+    assert space_sentences("OK. Good.") == "OK.&nbsp; Good."
+    assert space_sentences("Mr. Smith.") == "Mr. Smith."
+
+
 def test_apostrophes():
-    """
-    Fiddly as usual.
-    """
     test = Inline()
     assert '&lsquo;X&rsquo;' == \
         test.process("'X'")
