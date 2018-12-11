@@ -383,6 +383,7 @@ footer {
     display: grid;
     grid-template-columns: 45% 45%;
     grid-gap: 10%;
+    grid-row-gap: 0;
 }
 .article {
     display: inline-block;
