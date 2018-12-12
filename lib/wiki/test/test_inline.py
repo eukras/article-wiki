@@ -48,6 +48,7 @@ def test_typography():
 def test_space_sentence():
     assert space_sentences("OK. Good.") == "OK.&nbsp; Good."
     assert space_sentences("Mr. Smith.") == "Mr. Smith."
+    assert space_sentences('“<i>Wow</i>.” Oh?') == '“<i>Wow</i>.”&nbsp; Oh?'
 
 
 def test_apostrophes():

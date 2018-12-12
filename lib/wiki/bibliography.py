@@ -165,7 +165,6 @@ class Bibliography(object):
         # if len(self.citations) == 0:
         # return ""
         # else:
-
         return html.render(
             single_page=self.outline.single_page(),
             entries=self.entries,

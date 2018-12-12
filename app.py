@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# vim: set fileencoding: UTF8 :
 
 """
 Article Wiki: A web reader and editor for long articles.
@@ -60,7 +59,12 @@ if "pytest" in sys.modules:
 
 # Redis, Jinja
 data = Data(config)
-views = JinjaTemplates(loader=PackageLoader('app', 'views'))
+views = JinjaTemplates(
+    loader=PackageLoader('app', 'views'),
+    trim_blocks=True,
+    lstrip_blocks=True,
+    keep_trailing_newline=True
+)
 
 # Sessions
 bottleApp = bottle.app()
@@ -115,12 +119,12 @@ def get_login():
 def has_authority_for_user(user_slug: str):
     """Check the logged-in user has authority for the specified user."""
     login = get_login()
-    if not login:
-        return False
-    return any([
-        login['is_admin'] in ['True', True],
-        user_slug == login['username']
-    ])
+    if isinstance(login, dict):
+        return any([
+            login['is_admin'] in ['True', True],
+            user_slug == login['username']
+        ])
+    return False
 
 
 def require_login():
@@ -140,6 +144,15 @@ def require_authority_for_user(user_slug: str):
 def require_authority_for_admin():
     """Die if not authorised as admin."""
     require_authority_for_user(config['ADMIN_USER'])
+
+
+def is_published(user_slug, doc_slug):
+    """Check in metadata whether document is publicly visible"""
+    metadata = data.userDocumentMetadata_get(user_slug, doc_slug)
+    if isinstance(metadata, dict):
+        if metadata.get('publish', 'NO') == 'YES':
+            return True
+    return False
 
 
 @bottle.get('/login')
@@ -218,7 +231,8 @@ def show_editor(source: str,
                 user_slug: str = '',
                 doc_slug: str = '',
                 part_slug: str = '',
-                is_preview: bool = False):
+                is_preview: bool = False,
+                can_be_saved: bool = False):
     """
     Common renderer for /editor and /edit/user_slug/doc_slug/part_slug.
     """
@@ -248,6 +262,7 @@ def show_editor(source: str,
         preview=html,
         source=escape(text),
         is_preview=is_preview,
+        can_be_saved=can_be_saved
     )
 
 
@@ -311,9 +326,10 @@ def static_files(file_name):
 @bottle.error(HTTP_BAD_REQUEST)
 def error400(error: bottle.HTTPError):
     logging.exception(error.body)
-    header_buttons = [home_button(), back_button()],
+    header_buttons = [home_button(), back_button()]
     template = views.get_template('error.html')
-    return template.render(header_buttons=header_buttons,
+    return template.render(title="Error - Bad Request",
+                           header_buttons=header_buttons,
                            config=config,
                            message=error.body)
 
@@ -321,9 +337,10 @@ def error400(error: bottle.HTTPError):
 @bottle.error(HTTP_UNAUTHORIZED)
 def error401(error: bottle.HTTPError):
     logging.exception(error.body)
-    header_buttons = [home_button(), login_button(), back_button()],
+    header_buttons = [home_button(), login_button(), back_button()]
     template = views.get_template('error.html')
-    return template.render(header_buttons=header_buttons,
+    return template.render(title="Error - Unauthorised Access",
+                           header_buttons=header_buttons,
                            config=config,
                            message=error.body)
 
@@ -331,9 +348,10 @@ def error401(error: bottle.HTTPError):
 @bottle.error(HTTP_NOT_FOUND)
 def error404(error: bottle.HTTPError):
     logging.exception(error.body)
-    header_buttons = [home_button(), back_button()],
+    header_buttons = [home_button(), back_button()]
     template = views.get_template('error.html')
-    return template.render(header_buttons=header_buttons,
+    return template.render(title='Error - Not Found',
+                           header_buttons=header_buttons,
                            config=config,
                            message=error.body)
 
@@ -433,8 +451,10 @@ def user_page(user_slug):
     if login and login['username'] == user_slug:
         header_buttons += [
             new_article_button(user_slug),
-            edit_button(user_slug, 'fixtures', 'author')
         ]
+    header_buttons += [
+        edit_button(user_slug, 'fixtures', 'author')
+    ]
 
     footer_buttons = []
     if config['ARTICLE_WIKI_CREDIT'] == 'YES':
@@ -470,6 +490,9 @@ def user_page(user_slug):
     })
     wiki = Wiki(settings)
     document = data.userDocument_get(user_slug, 'fixtures')
+    if not document:
+        msg = "User '{:s}' not found."
+        bottle.abort(HTTP_NOT_FOUND, msg.format(user_slug))
     if 'author' in document:
         text = document['author']
     else:
@@ -509,14 +532,12 @@ def read_document(user_slug, doc_slug):
     """
 
     header_buttons = [home_button()]
-    if has_authority_for_user(user_slug):
-        header_buttons += [edit_button(user_slug, doc_slug, 'index')]
+    header_buttons += [edit_button(user_slug, doc_slug, 'index')]
 
-    footer_buttons = [
-        biblio_button(user_slug, doc_slug),
-        download_button(user_slug, doc_slug),
-        upload_button(user_slug, doc_slug)
-    ]
+    footer_buttons = [biblio_button(user_slug, doc_slug)]
+    if has_authority_for_user(user_slug):
+        footer_buttons += [upload_button(user_slug, doc_slug)]
+    footer_buttons += [download_button(user_slug, doc_slug)]
 
     settings = Settings({
         'config:user': user_slug,
@@ -558,9 +579,14 @@ def edit_part(user_slug, doc_slug, part_slug=None):
     """
     Open the editor to make changes to a doc_part
     """
-    require_authority_for_user(user_slug)
-
+    if not has_authority_for_user(user_slug):
+        if not is_published(user_slug, doc_slug):
+            msg = "Document '{:s}/{:s}' not found."
+            bottle.abort(HTTP_NOT_FOUND, msg.format(user_slug, doc_slug))
     if doc_slug == '_' and part_slug == 'index':
+        if not has_authority_for_user(user_slug):
+            msg = "You must be logged in to add a new document."
+            bottle.abort(HTTP_UNAUTHORIZED, msg)
         part_text = trim("""
             ARTICLE_TITLE
 
@@ -572,14 +598,16 @@ def edit_part(user_slug, doc_slug, part_slug=None):
 
             > ARTICLE_SUMMARY
 
-            % NOTE: Create new article sections by adding them
-            %       to the Table of Contents here:
+            % Comment: Create new article sections by adding them
+            % to the Table of Contents here:
 
             ` Part One
             ` ` Section A
             ` Part Two
         """)
-        return show_editor(part_text, user_slug, doc_slug, part_slug)
+        return show_editor(part_text, user_slug, doc_slug, part_slug,
+                           is_preview=False,
+                           can_be_saved=has_authority_for_user(user_slug))
     else:
         doc_parts = data.userDocument_get(user_slug, doc_slug)
         if not doc_parts:
@@ -587,7 +615,10 @@ def edit_part(user_slug, doc_slug, part_slug=None):
             bottle.abort(HTTP_NOT_FOUND, msg.format(user_slug, doc_slug))
         if part_slug in doc_parts:
             part_text = doc_parts[part_slug]
-            return show_editor(part_text, user_slug, doc_slug, part_slug)
+            return show_editor(part_text, user_slug, doc_slug, part_slug,
+                               is_preview=False,
+                               can_be_saved=has_authority_for_user(user_slug)
+                               )
         else:
             params = bottle.request.query.decode()
             title = params['title'] if 'title' in params else 'New Section'
@@ -609,7 +640,10 @@ def edit_part(user_slug, doc_slug, part_slug=None):
 
                 ^ Footnote goes here
                 """.format(title))
-            return show_editor(default, user_slug, doc_slug, part_slug)
+            can_be_saved = has_authority_for_user(user_slug)
+            return show_editor(default, user_slug, doc_slug, part_slug,
+                               is_preview=False,
+                               can_be_saved=can_be_saved)
 
 
 @bottle.post('/edit/<user_slug>/<doc_slug>/<part_slug>')
@@ -624,8 +658,11 @@ def post_edit_part(user_slug, doc_slug, part_slug):
         msg = "Blank document and part '_/_' not supported."
         bottle.abort(HTTP_BAD_REQUEST, msg)
 
+    if 'they_selected_save' in bottle.request.forms:
+        require_authority_for_user(user_slug)
     if 'content' not in bottle.request.forms:
         bottle.abort(HTTP_BAD_REQUEST, "Form data was missing.")
+
     new_text = clean_text(bottle.request.forms.content)
 
     # Default slugs unless we change them
@@ -660,7 +697,7 @@ def post_edit_part(user_slug, doc_slug, part_slug):
 
         new_doc_slug = document.save(pregenerate=True)
         if old_doc_slug != new_doc_slug:
-            # delete old 
+            # delete old
             old_doc = Document(data)
             old_doc.load(user_slug, old_doc_slug)
             old_doc.delete()
@@ -680,7 +717,8 @@ def post_edit_part(user_slug, doc_slug, part_slug):
                        document.user_slug,
                        document.doc_slug,
                        new_part_slug,
-                       is_preview)
+                       is_preview,
+                       can_be_saved=has_authority_for_user(user_slug))
 
 
 @bottle.get('/delete/<user_slug>/<doc_slug>/<part_slug>')

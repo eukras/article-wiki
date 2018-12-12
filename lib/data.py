@@ -18,6 +18,15 @@ Objects:
     - userDocumentMetadata: for homepage summary (hash)
     - userDocumentLastChanged: (list) trimmed to 10
     - userDocumentCache: key
+
+Using this object as a context manager will execute all the operations in that
+group atomically:
+
+with data as _:
+    _.userDocument_delete(user_slug, doc_slug)
+    _.userDocumentSet_delete(user_slug, doc_slug)
+    _.userDocumentMetadata_delete(user_slug, doc_slug)
+    _.userDocumentCache_delete(user_slug, doc_slug)
 """
 
 import os
@@ -371,6 +380,8 @@ class Data(object):
         """
         Like userDocument_list, but returns a hash of
         {doc_slugs: userDocument}
+
+        @todo: Restrict downloads to visible documents.
         """
         self.require_not_in_context_manager()
         return {
