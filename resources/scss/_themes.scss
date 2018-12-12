@@ -102,6 +102,14 @@
             color: inherit;
         }
 
+        .gloss {
+            .source {
+                b {
+                    color: $hl;
+                }
+            }
+        }
+
         .wiki-demo, .wiki-demo-wide {
             .wiki-demo-source {
                 border-right: none;
