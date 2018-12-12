@@ -10,7 +10,7 @@ There are two ways to do this: The easy way that anyone can use...
 test, for extra points!), push it back to the repository as a single
 commit, and file a pull request. 
 
-^ http://github.com/eukras/whiteroom
+^ http://github.com/eukras/article-wiki
 
 This is also the way to submit suggested #[bug fixes] and improvements to
-=[White Room] itself. 
+=[Article Wiki] itself. 

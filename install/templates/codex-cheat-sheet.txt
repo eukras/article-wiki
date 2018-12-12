@@ -2,7 +2,7 @@ Codex Cheat Sheet
 
 For more options, see the ^[Help] page, but note you can always click the `Edit` button at the top of any section to see exactly how it was produced.
 
-^ http://whiteroom.wiki/help
+^ http://chapman.wiki/help
 
 ~
 

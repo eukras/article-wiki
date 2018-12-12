@@ -1,7 +1,7 @@
 """
-White Room Wiki: Backslashes
+Article Wiki: Backslashes
 
-In White Room Wiki, backslashed characters are never processed by the wiki
+In Article Wiki, backslashed characters are never processed by the wiki
 formatting. They are replaced wih markers before wiki formatting happens, and
 restored, without the backslashes, to the final HTML.
 """

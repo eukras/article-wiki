@@ -1,7 +1,7 @@
 """
-White Room Wiki: Verbatim
+Article Wiki: Verbatim
 
-In White Room Wiki, verbatim text (nowiki, nomarkup) is indicated with double
+In Article Wiki, verbatim text (nowiki, nomarkup) is indicated with double
 curly brackets. e.g. {{ _underline_ }}, which will NOT be underlined.
 """
 

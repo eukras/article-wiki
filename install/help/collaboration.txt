@@ -13,7 +13,7 @@ There are several well-known providers of free Git repositories. ^[Github] or
 community driven, it offers free /[private] repositories (as of late 2016). The
 main requirement for using these is that a document's main editor must know how
 to accept, reject, or merge changes that have been submitted by other users;
-this is done in the Git repository, not in =[White Room], but white room can be
+this is done in the Git repository, not in =[Article Wiki], but white room can be
 directed to update from your repository and write back to it. Anyone needing a
 collaborative writing tool, with a full version history, at little or no cost,
 may wish to look into this.

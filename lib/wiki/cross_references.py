@@ -1,5 +1,5 @@
 """
-WhiteRoom Wiki.
+Article Wiki.
 
 Cross References placeholders.
 """

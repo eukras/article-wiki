@@ -1,6 +1,6 @@
 Functions and Extensions
 
-Most customization in =[White Room] will mean adding new function blocks. See
+Most customization in =[Article Wiki] will mean adding new function blocks. See
 @[function-blocks] or @[standard-plugins] for examples of these, plus
 ^[/plugins] for an auto-generated list. 
 

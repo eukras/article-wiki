@@ -1,5 +1,5 @@
 """
-Plugin for 12-column grid patterns in White Room
+Plugin for 12-column grid patterns in Article Wiki
 """
 
 from lib.wiki.renderer import verbatim

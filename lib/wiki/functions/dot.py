@@ -1,5 +1,5 @@
 """
-Plugin for DOT blocks in WhiteRoom; generate as HTML containing SVG.
+Plugin for DOT blocks in Article Wiki; generate as HTML containing SVG.
 
 @see test_dot.py
 """

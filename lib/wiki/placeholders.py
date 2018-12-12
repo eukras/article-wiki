@@ -1,5 +1,5 @@
 """
-White Room Wiki: Placeholders.
+Article Wiki: Placeholders.
 """
 
 import re

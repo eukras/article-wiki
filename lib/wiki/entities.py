@@ -1,5 +1,5 @@
 """
-White Room Wiki: Entities in HTML... allow direct usage in wiki.
+Article Wiki: Entities in HTML... allow direct usage in wiki.
 
 Detect HTML Entities before wiki processing, remove them, and then put them
 back afterward, as HTML.

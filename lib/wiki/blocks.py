@@ -1,5 +1,5 @@
 """
-WhiteRoom Wiki: Module for identifying and processing text blocks.
+Article Wiki: Module for identifying and processing text blocks.
 
 The BlockList must:
 

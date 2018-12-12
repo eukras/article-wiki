@@ -1,5 +1,5 @@
 """
-White Room Wiki.
+Article Wiki.
 
 Citation placeholders replace ((Citations)) with links to the correct
 bibliography element.

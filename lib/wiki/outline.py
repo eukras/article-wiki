@@ -1,5 +1,5 @@
 """
-WhiteRoom Wiki.
+Article Wiki.
 
 Outline manager: provide ordered iteration of document parts, also store wiki
 processing errors.

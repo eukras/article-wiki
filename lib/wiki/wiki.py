@@ -45,7 +45,7 @@ from lib.wiki.verbatim import Verbatim
 
 class Wiki(object):
     """
-    The simple block-based WhiteRoom.Wiki parser, designed for academic
+    The simple block-based Article Wiki parser, designed for academic
     writing.
     """
 

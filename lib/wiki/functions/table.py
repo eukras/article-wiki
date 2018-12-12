@@ -1,5 +1,5 @@
 """
-Plugin for TABLE blocks in WhiteRoom; generate HTML from CSV
+Plugin for TABLE blocks in Article Wiki; generate HTML from CSV
 
 @see test_table.py
 """

@@ -3,8 +3,8 @@ Development
 Developers can get themselves set up in the following manner; this is for
 Ubuntu or Debian but should be easy to adapt as needed.
 
-| Install:       | `git clone ht\tps://github.com.au/eukras/whiteroom`
-|                | `cd whiteroom`
+| Install:       | `git clone ht\tps://github.com.au/eukras/article-wiki`
+|                | `cd article-wiki`
 | Info:          | `vim README.md`
 | Dependencies:  | `apt-get install python pip mysql`
 |                | `pip install -r requirements.txt`
