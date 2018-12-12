@@ -72,6 +72,13 @@ and add some micro-caching.
 
 And view http://localhost (or as specified).
 
+Then add security certificates. 
+
+```bash
+apt-get install certbot python-certbot-nginx
+certbot --nginx -d example.com
+```
+
 # Add Supervisor (or systemd) -- TODO
 
 Note this will require ENV.dist to be effectively provided in the
