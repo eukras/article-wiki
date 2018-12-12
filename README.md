@@ -2,10 +2,15 @@
 
 A Python web app for wiki-based humanities writing.
 
-| Author | Nigel Chapman <nigel@chapman.id.au>
-| Technologies | Python , Redis
-| Version | v.0.1.0 (pre-beta, single user)
-| License | GPL v.3
+* Author: Nigel Chapman <nigel@chapman.id.au>
+* Technologies: Python , Redis
+* Version: v.0.1.0 (pre-beta, single user)
+* License: GPL v.3
+
+see:
+
+* `INSTALL.md` for setup instructions, esp. Redis.
+* `install/help.pdf` for the Wiki formatting guide
 
 
 # Implementation
@@ -28,13 +33,6 @@ SUM:                            92           2216           3086           7106
 
 # Tools
 
-| app.py | Web Application
-| console.py | Interactive Developer Shell
-| command.py | Administrative Tools
-
-
-# See Also
-
-* `install/README.md` for setup instructions, esp. Redis.
-* `install/help.pdf` for the Wiki formatting guide
-* `install/development.pdf` for the Wiki development guide
+* app.py: Web Application
+* console.py: Interactive Developer Shell
+* command.py: Administrative Tools

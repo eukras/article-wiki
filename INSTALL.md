@@ -53,6 +53,7 @@ Set correct server name in install/etc/nginx/sites-enabled/default, add HTTPS
 if required, then:
 
 ```bash
+vim install/etc/nginx/sites-enabled/default  # <-- set server_name, etc
 sudo apt-get install nginx
 sudo cp install/etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/default
 sudo service nginx restart

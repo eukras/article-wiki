@@ -1,3 +1,5 @@
+# The Makefile is partly for usability and partly for documenting processes.
+
 check: lint test
 
 clean:
