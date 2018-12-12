@@ -37,13 +37,13 @@
 
         <a id="btn-print" class="button" tabindex="7" href="javascript: window.print();"><i class="fa fa-print"></i> <span>PDF</span></a>
 
-        {% if user_slug == '_' or doc_slug == '_' %}
-        <button id="btn-delete" class="button" tabindex="8" disabled="DISABLED"><i class="fa fa-times"></i> <span>Delete</span></a>
-        {% else %} 
+        {% if can_be_saved == true %}
         <a id="btn-delete" class="button" tabindex="8" href="/delete/{{ user_slug }}/{{ doc_slug }}/{{ part_slug }}" onclick="return confirm('Confirm delete?');" ><i class="fa fa-times"></i> <span>Delete</span></a>
+        <button id="btn-save" tabindex="9" type="submit" name="they_selected_save" value="they_selected_save"><i class="fa fa-save"></i> <span>Save</span></button> 
+        {% else %} 
+        <button id="btn-delete" class="button" tabindex="8" disabled="DISABLED"><i class="fa fa-times"></i> <span>Delete</span></a>
+        <button id="btn-save" type="button" tabindex="9" disabled="DISABLED" name="they_selected_save" value="they_selected_save"><i class="fa fa-save"></i> <span>Save</span></button> 
         {% endif %} 
-
-        <button id="btn-save" tabindex="9" type="submit" {% if user_slug == '_' and doc_slug == '_' %} disabled="DISABLED" {% endif %} name="they_selected_save" value="they_selected_save"><i class="fa fa-save"></i> <span>Save</span></button> 
 
         <!-- Grid: Two main page areas --> 
 

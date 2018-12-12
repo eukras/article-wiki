@@ -35,14 +35,17 @@ a.button, input[type="submit"], button {
     }
 }
 
+a.button:hover, input[type="submit"]:hover, button:hover {
+    background-image: none;
+}
+
 a.button:active, input[type="submit"]:active, button:active {
-    background-image: linear-gradient(rgba(128, 128, 128, 0.2), rgba(128, 128, 128, 0));
+    background-image: linear-gradient(rgba(128, 128, 128, 0.3), rgba(128, 128, 128, 0));
 }
 
 a.button[disabled="DISABLED"], button[disabled="DISABLED"] {
+    opacity: 0.5;
     cursor: not-allowed;
-    color: rgba(128, 128, 128, 0.3);
-    background-image: linear-gradient(rgba(128, 128, 128, 0.1), rgba(128, 128, 128, 0.2));
 }
 
 
@@ -68,8 +71,12 @@ input[type="file"] {
         background-image: linear-gradient(rgba(128, 128, 128, 0), rgba(128, 128, 128, 0.1));
     }
 
+    a.button:hover, button:hover {
+        background-image: none;
+    }
+
     a.button:active, button:active {
-        background-image: linear-gradient(rgba(128, 128, 128, 0), rgba(128, 128, 128, 0.2));
+        background-image: linear-gradient(rgba(128, 128, 128, 0), rgba(128, 128, 128, 0.3));
     }
 }
 
@@ -87,9 +94,14 @@ button.button-edge {
     top: 2.6rem;
 }
 
+a.button.button-edge:hover,
+button.button-edge:hover {
+    background-image: none;
+}
+
 a.button.button-edge:active,
 button.button-edge:active {
-    background-image: linear-gradient(rgba(128, 128, 128, 0.2), rgba(128, 128, 128, 0));
+    background-image: linear-gradient(rgba(128, 128, 128, 0.3), rgba(128, 128, 128, 0));
 }
 
 /*

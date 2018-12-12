@@ -114,6 +114,12 @@
             }
         }
 
+        .wiki-demo-wide {
+            .wiki-demo-output {
+                border-left: 0.1rem dotted $hl;
+            }
+        }
+
         aside {
             border-left: 0.1rem dotted $fg;
         }

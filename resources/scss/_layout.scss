@@ -83,6 +83,7 @@ form {
             padding: 1rem;
             border: none;
             outline: none;
+            resize: none;
             background: inherit;
         }
 
@@ -247,7 +248,7 @@ section.depth-3 {
     grid-gap: 0;
 
     .wiki-demo-source {
-        padding-left: 0;
+        padding-left: 2rem;
         padding-right: 0;
     }
     .wiki-demo-output {
