@@ -696,11 +696,11 @@ def post_edit_part(user_slug, doc_slug, part_slug):
     if okay_to_save:
 
         new_doc_slug = document.save(pregenerate=True)
-        if old_doc_slug != new_doc_slug:
-            # delete old
-            old_doc = Document(data)
-            old_doc.load(user_slug, old_doc_slug)
-            old_doc.delete()
+
+        old_doc = Document(data)
+        if old_doc.load(user_slug, old_doc_slug):
+            if old_doc.doc_slug != new_doc_slug:
+                old_doc.delete()
 
         # Special redirects when editing fixtures
         uri = '/read/{:s}/{:s}'.format(user_slug, new_doc_slug)

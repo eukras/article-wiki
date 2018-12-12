@@ -108,6 +108,8 @@ class Document(object):
             Whether load was successful.
         """
         parts = self.data.userDocument_get(user_slug, doc_slug)
+        if not isinstance(parts, dict):
+            return False
         self.set_parts(user_slug, doc_slug, parts)
         return len(self.parts) > 0
 
