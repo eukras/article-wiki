@@ -11,21 +11,19 @@ cloc:
 css: resources/scss/*.scss
 	pyscss -o static/main.css resources/scss/main.scss
 
-env: 
-	set -a && source .env && set +a
-
 lint:
 	flake8
 
 push: clean test
-	# aws s3 sync static/ s3://static.article-wiki.wiki/
+	# Unnecessary, retainedas example
+	# aws s3 sync static/ s3://static.chapman.wiki/
 
 run: test
 	python app.py
 
 redis:
-	sudo docker run \
-		--name article-wiki-redis \
+	docker run \
+		--name aw-redis \
 		-v /docker/article-wiki-redis:/data \
 		-p 6379:6379 \
 		-d redis \
@@ -35,4 +33,8 @@ tags:
 	tags -R --exclude .venv
 
 test:
-	pytest
+	pytest lib
+	pytest test
+
+uwsgi: 
+	uwsgi uwsgi.ini
