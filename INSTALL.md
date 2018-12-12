@@ -64,6 +64,16 @@ and add some micro-caching.
 
 And view http://localhost (or as specified).
 
-# Add Supervisor/Systemd
+# Add Supervisor (or systemd)
 
-TBC
+Note this will require ENV.dist to be effectively provided in the conf.
+
+```bash
+[program:...]
+environment = 
+    SITE=domain1,
+    DJANGO_SETTINGS_MODULE=foo.settings.local,
+    DB_USER=foo,
+    DB_PASS=bar
+command = ...
+```
