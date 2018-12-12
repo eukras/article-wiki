@@ -17,6 +17,14 @@ pytest lib/  # <-- unit tests
 pytest test/  # <-- web tests
 ```
 
+Currently, using a locale hack for currency formatting in tables; until fixed,
+some systems may need:
+
+```bash
+sudo apt-get install locales
+sudo locale-gen en_CA.UTF-8
+```
+
 You'll need a Redis server; customise localhost:6379 in .env if needed. To run
 one in Docker with persistent storage, use the Makefile: 
 
@@ -28,8 +36,8 @@ Run the app for dev purposes. Note that this is not an efficient way to run the
 app online; suggest Nginx, uWsgi, and Supervisor.
 
 ```bash
-vim .env  # <-- Defaults to localhost:8080
-set -a && source .env && set +a
+vim ENV.dist  # <-- Defaults to localhost:8080
+set -a && source ENV.dist && set +a
 python command.py load-fixtures  # <-- Load initial docs.
 python app.py
 ```
@@ -64,9 +72,10 @@ and add some micro-caching.
 
 And view http://localhost (or as specified).
 
-# Add Supervisor (or systemd)
+# Add Supervisor (or systemd) -- TODO
 
-Note this will require ENV.dist to be effectively provided in the conf.
+Note this will require ENV.dist to be effectively provided in the
+supervisor.conf.
 
 ```bash
 [program:...]
