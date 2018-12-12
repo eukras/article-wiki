@@ -14,6 +14,15 @@ A web app for writing long, structured articles using wiki markup.
 * Help page is at: https://chapman.wiki/read/eukras/help
 
 
+## Screenshots
+
+![Article screenshot](media/screenshots/article.png)
+
+![Editor screenshot](media/screenshots/editor.png)
+
+Images are of v.0.1.1. Note also the 'Theme' button in the footer for low-light reading or editing.
+
+
 ## Prerequisites, Installation, Tests, Deployment
 
 * See [INSTALL.md](INSTALL.md) to get up and running.
