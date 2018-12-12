@@ -1,5 +1,0 @@
-Nigel Chapman
-
-$ EMAIL = nigel@chapman.id.au
-
-I'm just meee.
