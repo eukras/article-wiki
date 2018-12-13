@@ -9,9 +9,10 @@
         color: $fg;
         background-color: $bg;
 
-        body {
+        div#background {
             background-color: $bg;
-            background-blend-mode: soft-light;
+            background-blend-mode: hard-light;
+            opacity: 0.25;
         }
 
         a.button, input[type="submit"], button {

@@ -91,7 +91,7 @@ function setSvgBackground()
     svg = makeBokehSvg()
     var encodedData = window.btoa(svg);
     var url = 'data:image/svg+xml;base64,' + encodedData;
-    document.body.style.backgroundImage = "url(" + url + ")";
+    $("#background").css('background-image', "url(" + url + ")");
 }
 
 function randInt(min, max) {
@@ -134,7 +134,7 @@ function diagonalPoints(num_points, y_height)
     return points;
 }
 
-function makeCircle(x, y, radius, h, s, v, opacity)
+function drawOneCircle(x, y, radius, h, s, v, opacity)
 {
     var _ = ''
     if (radius < 3) {
@@ -161,7 +161,7 @@ function makeCircle(x, y, radius, h, s, v, opacity)
     return _;
 }
 
-function drawCircle(num_points, sizes)
+function drawCircles(num_points, sizes)
 {
     var y_height = randInt(3, 7);
     var points = diagonalPoints(num_points, y_height);
@@ -170,7 +170,7 @@ function drawCircle(num_points, sizes)
         var p = points[i], hsv = randHsv();
         var x = p[0], y = p[1], radius = randItem(sizes);
         var h = hsv[0], s = hsv[1], v = hsv[2], opacity = hsv[3];
-        _ += makeCircle(x, y, radius, h, s, v, opacity);
+        _ += drawOneCircle(x, y, radius, h, s, v, opacity);
     }
     return _;
 }
@@ -185,8 +185,8 @@ function makeBokehSvg()
     _ += '</filter>';
     _ += '</defs>';   
 
-    _ += drawCircle(randInt(30, 40), sizes=[3, 3, 3, 4, 5]);
-    _ += drawCircle(randInt(45, 65), sizes=[1, 1, 1, 1, 1, 1, 1, 2, 2]);
+    _ += drawCircles(randInt(30, 40), sizes=[3, 3, 3, 4, 5]);
+    _ += drawCircles(randInt(45, 65), sizes=[1, 1, 1, 1, 1, 1, 1, 2, 2]);
  
     _ += '</svg>';
 
