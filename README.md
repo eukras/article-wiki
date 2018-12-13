@@ -5,7 +5,7 @@ A web app for writing long, structured articles using wiki markup.
 * Author: Nigel Chapman <nigel@chapman.id.au>
 * Technologies: Python , Redis
 * Version: v.0.1.1 (pre-beta, single user only)
-* License: GPL v.3; see [LICENSE.md](LICENSE.md).
+* License: GPL v.3; see [LICENSE.txt](LICENSE.txt).
 
 
 ## Getting Started 
@@ -44,6 +44,9 @@ CSS                              1              0              0              1
 SUM:                            92           2216           3086           7106
 -------------------------------------------------------------------------------
 ```
+
+Stats are from v.0.1.0.
+
 
 ## Contributing
 
