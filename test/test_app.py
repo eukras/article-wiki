@@ -30,9 +30,6 @@ if "pytest" in sys.modules:
     config['REDIS_DATABASE'] = config['REDIS_TEST_DATABASE']
 
 data = Data(config)  # <-- DB 1 for tests
-data.redis.flushdb()
-data.login_create(config['ADMIN_USER'], config['ADMIN_USER_PASSWORD'])
-load_fixtures()
 
 test = AppTester(app.bottleApp)
 
@@ -68,6 +65,10 @@ HTTP_NOT_FOUND = 404
 # 0. UTILITIES
 # ------------
 
+def reset_database():
+    data.redis.flushdb()
+    data.login_create(config['ADMIN_USER'], config['ADMIN_USER_PASSWORD'])
+    load_fixtures()
 
 def do_logout():
     test.get(LOGOUT_URI)
@@ -93,6 +94,14 @@ def match_link(uri):
 # ---------------------------
 # 1. NAVIGATION WITHOUT LOGIN
 # ---------------------------
+
+def test_nothing():
+    """
+    Pytest executes test functions in order. Resetting the DB at the start of
+    this test file allows `pytest` to run the WebTests with a clean dataset.
+    """
+    reset_database();
+    assert True
 
 
 def test_homepage():
