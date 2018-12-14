@@ -107,7 +107,7 @@ def get_login():
     token = bottle.request.get_cookie(
         cookie_name,
         secret=cookie_secret,
-        # digestmod=hashlib.sha256  # <-- Needs bottle 0.13
+        # digestmod=hashlib.sha256  # <-- Needs bottle 0.13, see pytest.ini
     )
     if isinstance(token, str):
         user = data.login_get(token)
@@ -196,7 +196,8 @@ def do_login():
             cookie_name,
             token,
             secret=cookie_secret,
-            # digestmod=hashlib.sha256,  # <-- Needs Bottle 0.13
+            # digestmod=hashlib.sha256,  # <-- Needs Bottle 0.13,
+            #                                  see pytest.ini
             path='/',
             httponly=True
         )
@@ -216,7 +217,7 @@ def do_logout():
     token = bottle.request.get_cookie(
         cookie_name,
         secret=cookie_secret,
-        # digestmod=hashlib.sha256  # <-- Needs bottle 0.13
+        # digestmod=hashlib.sha256  # <-- Needs bottle 0.13, see pytest.ini
     )
     data.login_delete(token)
     bottle.response.delete_cookie(cookie_name, path='/')
@@ -234,7 +235,7 @@ def show_editor(source: str,
                 is_preview: bool = False,
                 can_be_saved: bool = False):
     """
-    Common renderer for /editor and /edit/user_slug/doc_slug/part_slug.
+    Common renderer for /playground and /edit/user_slug/doc_slug/part_slug.
     """
     settings = Settings({
         'config:user': user_slug,
@@ -266,10 +267,11 @@ def show_editor(source: str,
     )
 
 
-@bottle.get('/editor')
+@bottle.get('/playground')
 def editor():
     """
-    Set up wiki editor with welcome content.
+    Show a wiki demo editor that can be used without a login, but has no option
+    to save content.
     """
     source = ""
     if 'template' in bottle.request.query:
@@ -286,7 +288,9 @@ def editor():
     else:
         user_slug, doc_slug = '_', '_'
         part_slug = '_'
-    return show_editor(source, user_slug, doc_slug, part_slug)
+    return show_editor(source, user_slug, doc_slug, part_slug,
+                       is_preview=False,
+                       can_be_saved=False)
 
 
 @bottle.post('/editor')
@@ -299,7 +303,9 @@ def editor_post():
     else:
         source = ''
     is_preview = 'they_selected_preview' in bottle.request.forms
-    return show_editor(source, '_', '_', is_preview=is_preview)
+    return show_editor(source, '_', '_', '_',
+                       is_preview=is_preview,
+                       can_be_saved=False)
 
 
 # -------
@@ -403,7 +409,7 @@ def home_page():
     # Single user mode means the admin user's homepage is the site home page.
     if config['SINGLE_USER'] == "YES":
         bottle.redirect('/user/{:s}'.format(data.admin_user))
-    header_buttons = [editor_button(), help_button()]
+    header_buttons = [playground_button(), help_button()]
     login = get_login()
     if login:
         header_buttons += [user_button(login['username'])]
@@ -412,7 +418,7 @@ def home_page():
                 edit_button(login['username'], 'fixtures', 'homepage')
             ]
     else:
-        header_buttons += [login_button(), editor_button()]
+        header_buttons += [login_button(), playground_button()]
     article_list = data.userDocumentLastChanged_list()
 
     #  Show <admin-user>/fixtures/homepage:
@@ -446,7 +452,7 @@ def user_page(user_slug):
     """
     Show <user_slug>/fixtures/author + user documents.
     """
-    header_buttons = [login_or_logout_button(), editor_button()]
+    header_buttons = [login_or_logout_button(), playground_button()]
     login = get_login()
     if login and login['username'] == user_slug:
         header_buttons += [
@@ -458,7 +464,7 @@ def user_page(user_slug):
 
     footer_buttons = []
     if config['ARTICLE_WIKI_CREDIT'] == 'YES':
-        footer_buttons += [article_wiki_button()]
+        footer_buttons += [source_button()]
     footer_buttons += [help_button()]
     if has_authority_for_user(user_slug):
         footer_buttons += [export_archive_button(user_slug)]
@@ -886,10 +892,10 @@ def help_button() -> dict:
     }
 
 
-def editor_button() -> dict:
+def playground_button() -> dict:
     return {
-        'name': 'Editor',
-        'href': '/editor',
+        'name': 'Playground',
+        'href': '/playground',
         'icon': 'pencil'
     }
 
@@ -950,9 +956,9 @@ def export_archive_button(user_slug: str) -> dict:
     }
 
 
-def article_wiki_button() -> dict:
+def source_button() -> dict:
     return {
-        'name': 'Article Wiki',
+        'name': 'Source',
         'href': 'http://github.com/eukras/article-wiki',
         'icon': 'github'
     }
