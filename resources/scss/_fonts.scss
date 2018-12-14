@@ -7,12 +7,11 @@
     src: url("/static/GFSDidot.otf") format("opentype");
     font-style: normal;
     font-weight: normal;
-    unicode-range: U+0370-03FF;
-    /* unicode-range: "U+03??, U+1F??"; */
+    unicode-range: U+0370-03FF;  /* Greek */
 }
 
 /**
- * Fix valign of FA list icons.
+ * Fix valign of FontAwesome list icons.
  */
 
 .fa-li {
