@@ -27,7 +27,7 @@ from lib.wiki.utils import trim
 config = load_env_config()
 if "pytest" in sys.modules:
     logging.info("Running in PyTest: Reconfiguring to use test database.")
-    config['REDIS_DATABASE'] = "1"
+    config['REDIS_DATABASE'] = config['REDIS_TEST_DATABASE']
 
 data = Data(config)  # <-- DB 1 for tests
 data.redis.flushdb()
@@ -44,14 +44,20 @@ if config['SINGLE_USER'] != 'YES':
 # COMMON DATA
 # -------------
 
+ADMIN_USER = config['ADMIN_USER']  # <-- v.0.1.0, SINGLE_USER mode
 
-editor_uri = '/editor'
-help_uri = '/help'
-home_uri = '/'
-login_uri = '/login'
-logout_uri = '/logout'
-admin_home_uri = '/user/{:s}'.format(config['ADMIN_USER'])
-admin_help_uri = '/read/{:s}/help'.format(config['ADMIN_USER'])
+USER_URI = '/user/{:s}'
+EDIT_URI = '/edit/{:s}/{:s}/{:s}'
+READ_URI = '/read/{:s}/{:s}'
+
+HOME_URI = '/'
+EDITOR_URI = '/editor'
+HELP_URI = '/help'
+LOGIN_URI = '/login'
+LOGOUT_URI = '/logout'
+
+ADMIN_HOME_URI = USER_URI.format(ADMIN_USER)
+ADMIN_HELP_URI = READ_URI.format(ADMIN_USER, 'help')
 
 HTTP_OK = 200
 HTTP_REDIRECT = 302
@@ -64,20 +70,20 @@ HTTP_NOT_FOUND = 404
 
 
 def do_logout():
-    test.get(logout_uri)
+    test.get(LOGOUT_URI)
 
 
 def do_login_as_admin():
-    login_page = test.get(login_uri)
+    login_page = test.get(LOGIN_URI)
     form = login_page.form
     form['username'] = config['ADMIN_USER']
     form['password'] = config['ADMIN_USER_PASSWORD']
     _ = form.submit()
     assert _.status_int == HTTP_REDIRECT  # Redirect
-    assert _.headers['location'].endswith(home_uri)
+    assert _.headers['location'].endswith(HOME_URI)
 
 
-def a_href(uri):
+def match_link(uri):
     """
     XPath to match an a.href attribute
     """
@@ -92,34 +98,30 @@ def a_href(uri):
 def test_homepage():
     """Main landing page."""
     do_logout()
-    _ = test.get(home_uri)
+    _ = test.get(HOME_URI, status=HTTP_REDIRECT)
     if config['SINGLE_USER'] == 'YES':
-        assert _.status_int == HTTP_REDIRECT
-        assert _.headers['location'].endswith(admin_home_uri)
+        assert _.headers['location'].endswith(ADMIN_HOME_URI)
     else:
-        assert _.status_int == HTTP_REDIRECT
-        assert _.headers['location'].endswith(home_uri)
+        assert _.headers['location'].endswith('/')
 
 
 def test_admin_user_page():
     """List admin user's articles, incl. link to help."""
     do_logout()
-    _ = test.get(admin_home_uri)
-    assert _.status_int == HTTP_OK
+    _ = test.get(ADMIN_HOME_URI, status=HTTP_OK)
     nav_links = [
-        admin_help_uri,
-        editor_uri,
-        login_uri,
+        ADMIN_HELP_URI,
+        EDITOR_URI,
+        LOGIN_URI,
     ]
     for href in nav_links:
-        assert _.lxml.xpath(a_href(href))
+        assert _.lxml.xpath(match_link(href))
 
 
 def test_editor_page():
     """Editor page has buttons, textarea and main"""
     do_logout()
-    _ = test.get(editor_uri)
-    assert _.status_int == HTTP_OK
+    _ = test.get(EDITOR_URI, status=HTTP_OK)
     assert _.lxml.xpath("//textarea")
     assert _.lxml.xpath("//main")
 
@@ -127,24 +129,21 @@ def test_editor_page():
 def test_help_page():
     # Help page (with standard lengthy content)
     do_logout()
-    _ = test.get(help_uri)
-    assert _.status_int == HTTP_REDIRECT
-    assert _.headers['location'].endswith(admin_help_uri)
-    _ = _.follow()  # <-- New response
-    assert _.status_int == HTTP_OK
+    _ = test.get(HELP_URI, status=HTTP_REDIRECT)
+    assert _.headers['location'].endswith(ADMIN_HELP_URI)
+    _ = _.follow(status=HTTP_OK)  # <-- New response
     assert _.lxml.xpath("count(//section)") > 30
 
 
 def test_bad_login_fails():
-    login_page = test.get(login_uri)
+    login_page = test.get(LOGIN_URI)
     form = login_page.form
     form['username'] = "Bad Username"
     form['password'] = "Wrong Password"
-    _ = form.submit()
-    assert _.status_int == HTTP_REDIRECT
-    assert _.headers['location'].endswith(login_uri)
+    _ = form.submit(status=HTTP_REDIRECT)
+    assert _.headers['location'].endswith(LOGIN_URI)
 
-    # Issue with flash messaging in this test.
+    # TODO: Solve issue with flash messaging in this test.
     # __ = _.follow()
     # assert __.status_int == HTTP_OK
     # assert "Login failed" in __
@@ -159,19 +158,18 @@ def test_admin_user_page_with_login():
 
     do_login_as_admin()
 
-    _ = test.get(admin_home_uri)
-    assert _.status_int == HTTP_OK
+    _ = test.get(ADMIN_HOME_URI, status=HTTP_OK)
     nav_links = [
         # header_buttons
-        "/edit/{:s}/fixtures/author".format(config['ADMIN_USER']),
-        "/edit/{:s}/_/index".format(config['ADMIN_USER']),  # <-- New article
-        editor_uri,
-        logout_uri,
+        EDIT_URI.format(ADMIN_USER, 'fixtures', 'author'),
+        EDIT_URI.format(ADMIN_USER, '_', 'index'),  # <-- New article
+        EDITOR_URI,
+        LOGOUT_URI,
         # footer_buttons
-        "/export-archive/{:s}".format(config['ADMIN_USER']),
+        "/export-archive/{:s}".format(ADMIN_USER),
     ]
     for href in nav_links:
-        assert _.lxml.xpath(a_href(href))
+        assert _.lxml.xpath(match_link(href))
 
 
 def test_create_index():
@@ -192,14 +190,14 @@ def test_create_index():
         ` Part One
         ` Part Two
         """)
-
+    doc_slug = 'test-article'
     clicks_on_preview = {
         'content': index,
         'they_selected_preview': 'YES',
     }
-    edit_uri = '/edit/{:s}/_/index'.format(data.admin_user)
-    _ = test.post(edit_uri, clicks_on_preview)
-    assert _.status_int == HTTP_OK
+
+    uri = EDIT_URI.format(ADMIN_USER, '_', 'index')
+    _ = test.post(uri, clicks_on_preview, status=HTTP_OK)  # Preview
     assert _.lxml.xpath("count(//h1)") == 1
 
     clicks_on_save = {
@@ -207,34 +205,30 @@ def test_create_index():
         'they_selected_save': 'YES',
     }
 
-    new_uri = "/read/{:s}/test-article".format(config['ADMIN_USER'])
-    edit_uri = '/edit/{:s}/_/index'.format(config['ADMIN_USER'])
+    uri = EDIT_URI.format(ADMIN_USER, '_', 'index')
+    new_uri = READ_URI.format(ADMIN_USER, 'test-article')
 
-    _ = test.post(edit_uri, clicks_on_save)
-    assert _.status_int == HTTP_REDIRECT
+    _ = test.post(uri, clicks_on_save, status=HTTP_REDIRECT)  # Save
     assert _.headers['location'].endswith(new_uri)
 
     # Page should have article and links.
-    _ = test.get(new_uri)
-    assert _.status_int == HTTP_OK
+    _ = test.get(new_uri, status=HTTP_OK)
     assert "Test Article" in _
     assert "My important message!" in _
     assert "Author Name" in _
     nav_links = [
-        admin_home_uri,
-        "/edit/{:s}/test-article/index".format(config['ADMIN_USER']),
-        "/edit/{:s}/test-article/biblio".format(config['ADMIN_USER']),
-        "/upload/{:s}/test-article".format(config['ADMIN_USER']),
-        "/download/{:s}/test-article".format(config['ADMIN_USER']),
+        ADMIN_HOME_URI,
+        EDIT_URI.format(ADMIN_USER, doc_slug, 'index'),
+        EDIT_URI.format(ADMIN_USER, doc_slug, 'biblio'),
+        "/upload/{:s}/{:s}".format(ADMIN_USER, doc_slug),
+        "/download/{:s}/{:s}".format(ADMIN_USER, doc_slug),
     ]
     for href in nav_links:
-        assert _.lxml.xpath(a_href(href))
+        assert _.lxml.xpath(match_link(href))
 
     # Check Latest Changes on the user page has the new article.
 
-    _ = test.get(admin_home_uri)
-    assert _.status_int == HTTP_OK
-
+    _ = test.get(ADMIN_HOME_URI, status=HTTP_OK)
     assert 'Test Article' in _
     assert 'My important message!' in _
     assert '31 December 1999' in _
@@ -260,22 +254,20 @@ def test_rename_article():
 
     old_part = 'test-article'
     new_part = 'test-article-renamed'
-    edit_uri = '/edit/{:s}/{:s}/index'.format(config['ADMIN_USER'], old_part)
-    old_uri = '/read/{:s}/{:s}'.format(config['ADMIN_USER'], old_part)
-    new_uri = '/read/{:s}/{:s}'.format(config['ADMIN_USER'], new_part)
 
-    _ = test.post(edit_uri, clicks_on_save)
-    assert _.status_int == HTTP_REDIRECT
+    uri = EDIT_URI.format(ADMIN_USER, old_part, 'index')
+    old_uri = READ_URI.format(ADMIN_USER, old_part)
+    new_uri = READ_URI.format(ADMIN_USER, new_part)
+
+    _ = test.post(uri, clicks_on_save, status=HTTP_REDIRECT)
     assert _.headers['location'].endswith(new_uri)
 
-    _ = test.get(old_uri)
-    assert _.status_int == HTTP_NOT_FOUND
+    _ = test.get(old_uri, status=HTTP_NOT_FOUND)
+    _ = test.get(new_uri, status=HTTP_OK)
 
-    _ = test.get(new_uri)
-    assert _.status_int == HTTP_OK
-
-    _ = test.get(admin_home_uri)
-    assert _.lxml.xpath(a_href(new_uri))
+    # New URI must be linked in Latest Changes.
+    _ = test.get(ADMIN_HOME_URI)
+    assert _.lxml.xpath(match_link(new_uri))
 
 
 def test_create_part():
@@ -283,48 +275,43 @@ def test_create_part():
     do_login_as_admin()
 
     part_one = trim("""
-        Part One
+        Test Article
 
         The text for today.
+
+        ` Part One
         """)
     clicks_on_save = {
         'content': part_one,
         'they_selected_save': 'YES',
     }
 
-    part_slug = 'test-article-renamed'
-    edit_uri = '/edit/{:s}/{:s}/_'.format(config['ADMIN_USER'], part_slug)
-    page_uri = '/read/{:s}/{:s}'.format(config['ADMIN_USER'], part_slug)
+    new_slug = 'test-article'
 
-    _ = test.post(edit_uri, clicks_on_save)
-    assert _.status_int == HTTP_REDIRECT
+    uri = EDIT_URI.format(ADMIN_USER, '_', 'index')
+    new_uri = READ_URI.format(ADMIN_USER, new_slug)
 
-    _ = test.get(page_uri)
-    assert _.status_int == HTTP_OK
-    assert _.lxml.xpath(a_href('#1_part-one'))
+    _ = test.post(uri, clicks_on_save, status=HTTP_REDIRECT)
+    assert _.headers['location'].endswith(new_uri)
 
+    part_one = trim("""
+        Part One
 
-def test_part_renaming():
+        ^[Example Link]
 
-    do_login_as_admin()
-
-    part_one_renamed = trim("""
-        Part One Renamed
-
-        Ahoy!
+        ^ https://example.com
         """)
     clicks_on_save = {
-        'content': part_one_renamed,
+        'content': part_one,
         'they_selected_save': 'YES',
     }
 
-    part_slug = 'test-article-renamed'
-    edit_uri = '/edit/{:s}/{:s}/part-one'.format(config['ADMIN_USER'],
-                                                 part_slug)
-    page_uri = '/read/{:s}/{:s}/'.format(config['ADMIN_USER'], part_slug)
+    uri = EDIT_URI.format(ADMIN_USER, 'test-article', '_')
+    new_uri = READ_URI.format(ADMIN_USER, new_slug)
 
-    _ = test.post(edit_uri, clicks_on_save)
-    _ = test.get(page_uri)
+    _ = test.post(uri, clicks_on_save, status=HTTP_REDIRECT)
+    assert _.headers['location'].endswith(new_uri)
 
-    assert _.status_int == HTTP_OK
-    assert _.lxml.xpath(a_href('#1_part-one-renamed'))
+    _ = test.get(new_uri, status=HTTP_OK)
+    assert 'Example Link' in _
+    assert 'https://example.com' in _

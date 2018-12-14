@@ -55,7 +55,7 @@ HTTP_NOT_FOUND = 404
 config = load_env_config()
 if "pytest" in sys.modules:
     logging.info("Running in PyTest: Reconfiguring to use test database.")
-    config['REDIS_DATABASE'] = "1"
+    config['REDIS_DATABASE'] = config['REDIS_TEST_DATABASE']
 
 # Redis, Jinja
 data = Data(config)

@@ -64,6 +64,7 @@ def load_env_config() -> dict:
         'REDIS_HOST',
         'REDIS_PORT',
         'REDIS_DATABASE',
+        'REDIS_TEST_DATABASE',
         'WEB_HOST',
         'WEB_HOST_PORT',
         'UPLOAD_LIMIT_KB',
@@ -72,8 +73,9 @@ def load_env_config() -> dict:
     for key in env_required:
         config[key] = os.environ.get(key, None)
         if config[key] is None:
-            msg = "Config missing ({:s}); try `source .env && python app.py`."
-            raise RuntimeError(msg.format(key))
+            cmd = "set -a && source ENV.dist && set +a"
+            msg = "Env vars missing ({:s}); try '{:s}'."
+            raise RuntimeError(msg.format(key, cmd))
 
     # Extras
     config['SITE'] = "https://" + config['WEB_HOST']
