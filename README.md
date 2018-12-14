@@ -1,17 +1,21 @@
 # Article Wiki
 
-A web app for writing long, structured articles using wiki markup.
+## Long-form humanities writing in plain text.
 
-* Author: Nigel Chapman <nigel@chapman.id.au>
-* Technologies: Python , Redis
+Article Wiki is a web app for writing long, structured articles using wiki
+markup. It lets you work in plain text on any device, with footnotes,
+bibliographies, and indexes that don't clutter up your text.
+
+* Author: Nigel Chapman, nigel@chapman.id.au.
+* Technologies: Python, Redis.
 * Version: v.0.1.1 (pre-beta, single user only)
 * License: GPL v.3; see [LICENSE.txt](LICENSE.txt).
 
 
 ## Getting Started 
 
-* Try it out at: https://chapman.wiki
-* Help page is at: https://chapman.wiki/read/eukras/help
+* Running my website: https://chapman.wiki
+* A help page and demo of all wiki features: https://chapman.wiki/read/eukras/help
 
 
 ## Screenshots
@@ -20,7 +24,8 @@ A web app for writing long, structured articles using wiki markup.
 
 ![Editor screenshot](media/screenshots/editor.png)
 
-Images are of v.0.1.1. Note also the 'Theme' button in the footer for low-light reading or editing.
+* Images are of v.0.1.1.
+* See also the 'Theme' button in the footer for low-light reading or editing.
 
 
 ## Prerequisites, Installation, Tests, Deployment
@@ -50,6 +55,6 @@ Stats are from v.0.1.0.
 
 ## Contributing
 
-Please get in touch if you have questions about using or adapting the software.
-Bug reports can be filed on GitHub. If you add anything interesting, point me
-to a demo, or submit a pull request. 
+Questions about using or adapting the software are welcome.  Bug reports can be
+filed on GitHub. If you add anything interesting, point me to a demo, or submit
+a pull request. 
