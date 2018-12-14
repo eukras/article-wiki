@@ -34,10 +34,6 @@ from lib.wiki.functions.base import \
     Text, \
     Verbatim, \
     Wrapper
-from lib.wiki.functions.code import \
-    Code
-from lib.wiki.functions.dot import \
-    Dot
 from lib.wiki.functions.grid import \
     Grid
 from lib.wiki.functions.table import \
@@ -123,8 +119,8 @@ class BlockList(object):
         ]}
 
         functions = {_.__name__.upper(): _ for _ in [
-            Code,
-            Dot,
+            # Code,
+            # Dot,
             Grid,
             Table,
             Text,

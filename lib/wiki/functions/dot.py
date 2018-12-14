@@ -1,7 +1,10 @@
 """
 Plugin for DOT blocks in Article Wiki; generate as HTML containing SVG.
 
-@see test_dot.py
+Status:
+    - This is presently unused; a good example of how plugins can utilise 
+      system services (so: easy to expand to lilypond or similar text-to-svg
+      integrations). 
 """
 
 import subprocess

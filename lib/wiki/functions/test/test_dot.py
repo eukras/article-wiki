@@ -5,7 +5,7 @@ from lib.wiki.renderer import Html
 from lib.wiki.utils import trim
 
 
-def test_simplest_graph():
+def DISABLED_test_simplest_graph():  # <-- Restore when Dot() is added again.
     """
     Minimal sanity check.
     """

@@ -1,5 +1,9 @@
 """
 Functions module 'code' for wiki.functions.
+
+Status:
+    - This is presently unused; it can be integrated when a framework for
+      requiring external language libraries is decided upon.
 """
 
 __author__ = "Nigel Chapman <nigel@chapman.id.au>"
