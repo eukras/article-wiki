@@ -40,7 +40,7 @@ a.button:hover, input[type="submit"]:hover, button:hover {
 }
 
 a.button:active, input[type="submit"]:active, button:active {
-    background-image: linear-gradient(rgba(128, 128, 128, 0.3), rgba(128, 128, 128, 0));
+    background-image: linear-gradient(rgba(128, 128, 128, 0.25), rgba(128, 128, 128, 0));
 }
 
 a.button[disabled="DISABLED"], button[disabled="DISABLED"] {
@@ -76,7 +76,7 @@ input[type="file"] {
     }
 
     a.button:active, button:active {
-        background-image: linear-gradient(rgba(128, 128, 128, 0), rgba(128, 128, 128, 0.3));
+        background-image: linear-gradient(rgba(128, 128, 128, 0), rgba(128, 128, 128, 0.25));
     }
 }
 
@@ -101,7 +101,7 @@ button.button-edge:hover {
 
 a.button.button-edge:active,
 button.button-edge:active {
-    background-image: linear-gradient(rgba(128, 128, 128, 0.3), rgba(128, 128, 128, 0));
+    background-image: linear-gradient(rgba(128, 128, 128, 0.25), rgba(128, 128, 128, 0));
 }
 
 /*
