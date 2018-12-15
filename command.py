@@ -13,13 +13,16 @@ import sys
 
 import click
 
-from dotenv import find_dotenv, load_dotenv
 from typing import List
 
 from lib.data import Data, load_env_config
 from lib.document import Document
 from lib.storage import load_dir, save_dir
 
+
+# ------------------------
+# Utility functions.
+# ------------------------
 
 
 def fixtures_list() -> List[str]:
@@ -62,6 +65,21 @@ def save_user_document(data: Data, user_slug: str, doc_slug: str):
     print("Saved: {} ({:d} files)".format(doc_slug, len(dst_dict)))
 
 
+# ------------------------
+# Commands
+# ------------------------
+
+
+def create_admin_user():
+    """
+    Creates an $ADMIN_USER with $ADMIN_USER_PASSWORD.
+    """
+    config = load_env_config()
+    data = get_redis_client()
+    data.user_set(config['ADMIN_USER'], config['ADMIN_USER_PASSWORD'])
+    print("Created user: {:s}".format(config['ADMIN_USER']))
+
+
 def load_fixtures():
     """Puts fixtures dirs into Redis as admin user fixture documents."""
     data = get_redis_client()
@@ -87,11 +105,19 @@ def refresh_metadata():
             document.save()
 
 
+# ------------------------
+# Handle query.
+# ------------------------
+
+
 @click.command()
 @click.argument('command')
 def console(command):
     """Processes console commands."""
-    if command == 'load-fixtures':
+    if command == 'initialize':
+        create_admin_user()
+        load_fixtures()
+    elif command == 'load-fixtures':
         load_fixtures()
     elif command == 'refresh-metadata':
         refresh_metadata()
@@ -99,6 +125,7 @@ def console(command):
         save_fixtures()
     else:
         print("Commands:")
+        print("  - initialize")
         print("  - load-fixtures")
         print("  - refresh_metadata")
         print("  - save-fixtures")
