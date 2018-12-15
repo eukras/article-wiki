@@ -1,5 +1,0 @@
-Standard Plugins
-
-In $[wiki] all functions beyond plain text formatting are implemented as /plugins/, and new ones can be written with a little programming knowledge. See @[writing-plugins] for more. A few examples follow.
-
-: i : Anything that has a well-understood text format and can render into SVG or HTML can be added to the wiki in a similar manner to this. Some of the possibilities include charts and sheet music (with Lilypond).
