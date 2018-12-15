@@ -9,7 +9,6 @@ from lib.wiki.blocks import \
     BlockList, \
     CharacterBlock, \
     Divider, \
-    figure_block, \
     FunctionBlock, \
     get_title_data, \
     list_block, \
@@ -324,27 +323,4 @@ def test_table_block():
         </table>
         """)
     actual = table_block(text, Settings())
-    assert expect == actual
-
-
-def test_figure_block():
-    "Simple table, with headers"
-    text = trim("""
-        @ image.jpg
-        = A Sample Image
-        """)
-    expect = trim("""
-        <figure>
-        <img src="/file/user/document/image.jpg" />
-        <figcaption>A Sample Image</figcaption>
-        </figure>
-        """)
-    actual = figure_block(text, Settings({
-        'config:user': 'user',
-        'config:document': 'document',
-        'config:files': [
-            'diagram.svg',
-            'image.jpg',
-        ]
-    }))
     assert expect == actual

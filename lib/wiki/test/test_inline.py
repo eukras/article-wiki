@@ -26,9 +26,9 @@ def test_inline():
         '+[To boldly] go where -[none] have gone `[before].')
 
     out = '<sup>To boldly</sup> go where <sub>none</sub> ' + \
-          'have gone <kbd>before</kbd>.'
+          'have gone <var>before</var>.'
     assert out == test.process(
-        "'[To boldly] go where ,[none] have gone ?[before].")
+        "'[To boldly] go where ,[none] have gone |[before].")
 
 
 def test_typography():
