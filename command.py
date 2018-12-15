@@ -33,7 +33,7 @@ def fixtures_list() -> List[str]:
 def fixtures_dir(doc_slug: str) -> str:
     """Finds path to the fixtures directory for a document slug."""
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(ROOT_DIR, 'install', doc_slug)
+    return os.path.join(ROOT_DIR, 'install', 'articles', doc_slug)
 
 
 def get_redis_client() -> Data:
