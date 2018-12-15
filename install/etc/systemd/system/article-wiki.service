@@ -12,16 +12,14 @@ TimeoutStartSec=0
 RestartSec=10
 Restart=always
 
+User=ubuntu
 WorkingDirectory=/app
-
-User=www-data
+EnvironmentFile=/app/ENV.vars
+ExecStart=/usr/bin/uwsgi /app/uwsgi.ini
 
 KillSignal=SIGQUIT
 Type=notify
 NotifyAccess=all
-
-# Main process
-ExecStart=/usr/bin/uwsgi /app/uwsgi.ini
 
 [Install]
 WantedBy=multi-user.target

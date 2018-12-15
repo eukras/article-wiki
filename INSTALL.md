@@ -101,24 +101,35 @@ HTTPS from HTTP.
 Running uWsgi in /master/ mode (see `uwsgi.ini`) is reslient to crashes or to
 individual threads being killed, but won't survive a system restart. For that 
 we'll need to switch to system `uwsgi`, and `systemd`, and also provide ENV
-variables to systemd with a `.env` file.
+variables to systemd with a `ENV.vars` file.
 
 ```bash
-cd $root_dir  # <-- location of this INSTALL.txt file.
-cp ENV.dist ENV.vars  # <-- will be used by the article-wiki.service
-vim ENV.vars  # <-- Check
+cd $root_dir  # <-- Location of this INSTALL.txt file.
+cp ENV.dist ENV.vars
+vim ENV.vars  # <-- These values will be used by the article-wiki.service
 pip uninstall uwsgi
-sudo apt-get install uwsgi
+sudo apt-get install uwsgi uwsgi-plugin-python3
 which uwsgi  # <-- Make sure this is used in the service definition:
 vim install/etc/systemd/system/article-wiki.service
-sudo cp install/etc/systemd/system/article-wiki.service etc/systemd/system/article-wiki.service
-systemctl enable article-wiki.service
+sudo cp install/etc/systemd/system/article-wiki.service /etc/systemd/system/article-wiki.service
+sudo systemctl daemon-reload  # <-- To reread the services when they've changed
+sudo systemctl enable article-wiki.service
 ```
 
-Now you can:
+Now the app survives rebooting, and you control it with:
 
 ```bash
-systemctl start article-wiki.service
-systemctl restart article-wiki.service
-journalctl -fu article-wiki.service  # <-- Logs
+sudo service article-wiki start
+sudo service article-wiki status
+sudo service article-wiki restart
+sudo service article-wiki stop
+
+# Or, similarly...
+sudo systemctl start article-wiki.service
+sudo journalctl -fu article-wiki.service  # <-- Logs
 ```
+
+
+# Dockerize Application
+
+... To do!
