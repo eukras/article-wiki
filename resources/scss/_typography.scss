@@ -60,10 +60,18 @@ p {
 .indent-hanging { 
     padding-left: 2.4rem;
     text-indent: -2.4rem;
+
+    .fa {
+        text-indent: 0;
+    }
 }
  
 .indent-first-line {
     text-indent: 2.4rem;
+
+    .fa { 
+        text-indent: 0;
+    }
 }
 
 .indent-none {
