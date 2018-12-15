@@ -1,10 +1,10 @@
 Get Started
 
-To write a document, just open the ^[editor] on any Article Wiki site,
-where you can try out wiki formatting and see the results. The following
-three points will cover most of your writing needs, though there are
-many more features available. See the @[cheat-sheet] for a handy
-reference.
+To write a document, just open the ^[playground] on any Article Wiki
+site, where you can try out wiki formatting and see the results. The
+following three points will cover most of your writing needs, though
+there are many more features available. See the @[cheat-sheet] for a
+handy reference.
 
 =[Firstly], you'll need to know how to lay out text. A single character
 at the start of a line or a paragraph tells you how that block should be

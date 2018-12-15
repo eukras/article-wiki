@@ -3,7 +3,7 @@ How Article Wiki Works
 = Long-form humanities writing in plain text.
 
 $ AUTHOR = Nigel Chapman / nigel@chapman.id.au
-$ DATE = 4 Nov 2018
+$ DATE = 15 December 2018
 $ SLUG = help
 
 $ site = https://chapman.wiki
@@ -24,7 +24,11 @@ CENTER (80%) ---
 | Source code | https://github.com/eukras/article-wiki
 ---
 
-This page demonstrates most of Article Wiki's features.
+This page demonstrates most of Article Wiki's features, starting with
+@[index-page], which provides a Table of Contents. Since page numbers
+have no meaning in a web document, the Table of Contents shows word
+counts instead, on the assumption that long articles are usually written
+to word limits.
 
 ~
 

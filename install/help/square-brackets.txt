@@ -26,7 +26,7 @@ and can be visually clearer in plain text.
 ~ Shorthand. ~ It may seem strange to offer a /shorthand/ version of markup that saves only one character. However, it seems psychologically significant when writing, it has a lighter impact on readability in the most common 90% of cases, and it is more intuitive for writers familiar with how other wikis work. The bracket syntax is enormously more powerful, however:
 
 ~ Stacking. ~ You can stack the control characters in brackets. Writing
-` \*\;\_[bold sans-serif underline]` will produce *;_[bold sans-serif underline] text, for example. Up to five symbols can be stacked in this way, although that seldom helps the readability of the text. Square brackets are also used to add /information/, not only formatting, to text. However, it is not possible to combine formatting and informational control characters by stacking. See @[adding-information] for more.
+` \*\;\_[bold sans-serif underline]` will produce *;_[bold sans-serif underline] text, for example. Up to five symbols can be stacked in this way, although that seldom helps with readability. Square brackets are also used to add /information/, not only formatting, to text. However, it is not possible to combine formatting and informational control characters by stacking. See @[adding-information] for more.
 
 | `*/_\[bold italic underline]` | */_[bold italic underline]
 | `}|\[Floating Marker] x x` | }|[Floating Marker] x x
