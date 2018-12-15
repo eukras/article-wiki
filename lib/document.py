@@ -59,7 +59,8 @@ class Document(object):
 
     def protected_doc_slugs(self):
         """
-        Document slugs that are never to be renamed by editing.
+        Admin pages are defined by doc_slugs that are never to be renamed by
+        editing; or added to the Latest Changes list.
         """
         return ['fixtures', 'templates']
 
@@ -140,8 +141,9 @@ class Document(object):
 
         with self.data as _:
             _.userDocument_set(self.user_slug, new_doc_slug, self.parts)
-            _.userDocumentLastChanged_set(self.user_slug,
-                                          old_doc_slug, new_doc_slug)
+            if old_doc_slug not in self.protected_doc_slugs():
+                _.userDocumentLastChanged_set(self.user_slug,
+                                              old_doc_slug, new_doc_slug)
             _.userDocumentCache_delete(self.user_slug, old_doc_slug)
             _.userDocumentMetadata_delete(self.user_slug, old_doc_slug)
 
