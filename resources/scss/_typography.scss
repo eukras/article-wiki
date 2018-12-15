@@ -415,6 +415,10 @@ hr.div-wide {
     width: 100%;
 }
 
+textarea {
+    font-family: $fontFamilyMonospace;
+}
+
 pre { 
     font-family: $fontFamilyMonospace;
     font-size: $fontSizeMinus2;
