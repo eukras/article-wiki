@@ -105,7 +105,7 @@ and won't survive a system restart. For that we'll need to switch to system
 `ENV.vars` file.
 
 ```bash
-cd $root_dir  # <-- Location of this INSTALL.txt file.
+cd $root_dir  # <-- Location of this INSTALL.md file.
 cp ENV.dist ENV.vars
 vim ENV.vars  # <-- These values will be used by the article-wiki.service
 pip uninstall uwsgi
