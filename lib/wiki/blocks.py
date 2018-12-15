@@ -228,7 +228,7 @@ class BlockList(object):
                                              placeholder="..."))
         if len(self.blocks) > 1:
             if isinstance(self.blocks[1], CharacterBlock):
-                if self.blocks[1].control_character == '=':
+                if self.blocks[1].control_character == Config.caption:
                     summary = one_line(shorten(self.blocks[1].content[2:], 128,
                                                placeholder="..."))
         return title, summary
@@ -249,7 +249,7 @@ class BlockList(object):
                 self.blocks.pop(0)
         if len(self.blocks) > 0:
             _ = self.blocks[0]
-            if isinstance(_, CharacterBlock) and _.control_character == '=':
+            if isinstance(_, CharacterBlock) and _.control_character == Config.caption:
                 summary = _.content[2:]
                 self.blocks.pop(0)
         return (str(shorten(title, 128, placeholder='...')),
@@ -453,8 +453,6 @@ class CharacterBlock(Block):
             html = table_block(content, settings)
         elif _ in Config.glosses:
             html = gloss_block(content, settings)
-        elif _ in Config.figures:
-            html = figure_block(content, settings)
         else:
             html = alert('Unrecognized control character: %s')
         return (html, settings)
@@ -580,8 +578,8 @@ def align_block(content, settings):
             ',': 'text-right',
             ':': 'indent',
             '~': 'indent-hanging',
-            '(': 'float-left',
-            ')': 'float-right',
+            '{': 'float-left',
+            '}': 'float-right',
         }.get(char, '')
         separator = ' %s ' % char
         if char == ':':
@@ -591,10 +589,7 @@ def align_block(content, settings):
             else:
                 out += [tag('div', line, class_name, separator, 'em')]
         elif char in Config.leaders:
-            if char == '=':
-                out += [tag('div', line, class_name, separator, 'b')]
-            else:
-                out += [tag('div', line, class_name, separator, 'i')]
+            out += [tag('div', line, class_name, separator, 'i')]
         else:
             out += [tag('div', line, class_name)]
     if len(out) > 0:
@@ -612,14 +607,14 @@ def heading_block(text, settings):
     Plus:
     " Summary
     """
-    lines = split_to_array(text, prefixes=Config.headers + '=')
+    lines = split_to_array(text, prefixes=Config.headers + Config.caption)
     out = []
     for char, content in lines:
         if char == '+':
             out += [tag('h2', content, "balance-text")]
         elif char == '-':
             out += [tag('h3', content, "balance-text")]
-        elif char == '"':
+        elif char == Config.caption:
             out += [tag('summary', content)]
     if len(out) > 0:
         return "\n".join(out)
@@ -630,7 +625,7 @@ def heading_block(text, settings):
 def note_block(content, settings):
     """
     ' aside (marginal note)
-    ? block note
+    " block note
     """
     lines = split_to_array(content, prefixes=Config.notes)
     char = content[0]
@@ -639,7 +634,7 @@ def note_block(content, settings):
     for char, content in lines:
         if char == "'":
             out += [tag('aside', content, '', separator, 'b')]
-        elif char == '?':
+        elif char == '"':
             out += [tag('p', content, 'note', separator, 'b')]
     if len(out) > 0:
         return "\n".join(out)
@@ -660,12 +655,12 @@ def quote_block(content, settings):
 
     @todo: extract tailing caption and wrap with preceding block.
     """
-    lines = split_to_array(content, prefixes=Config.quotes + '=')
+    lines = split_to_array(content, prefixes=Config.quotes + Config.caption)
     out = []
     for char, content in lines:
         if char == '>':
             out += [tag('blockquote', content)]
-        elif char == '=':
+        elif char == Config.caption:
             out += [tag('p', content, 'caption', ' = ', 'b')]
     if len(out) > 0:
         return "\n".join(out)
@@ -680,7 +675,7 @@ def caption_block(content, settings):
     lines = split_to_array(content, prefixes=Config.caption)
     out = []
     for char, content in lines:
-        if char == '=':
+        if char == Config.caption:
             out += [tag('p', content, 'caption', ' = ', 'b')]
     if len(out) > 0:
         return "\n".join(out)
@@ -779,36 +774,6 @@ def column_block(text, settings):
         html += tag('p', content, 'float-left %s' % bootstrap_class)
     html += "<div style=\"clear: both\"></div>"
     return html
-
-
-def figure_block(text, settings):
-    """
-    Include a file from the directory.
-
-    @ image.jpg
-    = Figure $[f++]. The aforementioned image. @todo
-    """
-    inline = Inline()
-    out = []
-    lines = split_to_array(text, "@=", capture_characters=True)
-    if len(lines) > 0:
-        out += ["<figure>"]
-        for char, content in lines:
-            if char == '@':
-                ext = content.strip().split('.').pop()
-                if ext in ['jpg', 'jpeg', 'png', 'gif', 'svg']:
-                    out += ["<img src=\"%s/%s\" />" % (
-                        settings.get_base_uri('file'), content.strip()
-                    )]
-                else:
-                    out += [alert("Invalid extension: %s" % content)]
-            elif char == '=':
-                out += ["<figcaption>%s</figcaption>" %
-                        inline.process(content)]
-        out += ["</figure>"]
-        return "\n".join(out)
-    else:
-        return ''
 
 
 def gloss_block(text, settings):

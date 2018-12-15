@@ -10,16 +10,15 @@ class Config(object):
     No dependencies.
     """
 
-    nulls = '%^`'          # Produce no output
-    setters = '$'          # Produce no output; change local settings
-    headers = '+-"'        # Headings within a document part
-    quotes = '>='          # Block quotes, pull quotes, captions
-    notes = "'?"           # Aside (margin note), Inline (visible) comment
-    aligns = '.;,:~()'     # Grouped formatting divs
-    lists = '*#_'          # Recursively nested lists, un/ordered
+    nulls = '%^`'          # Produce no output: comments, references, outlines
+    setters = '$'          # Produce no output: settings
+    headers = '+-'         # Headings within a document part
+    quotes = '>'           # Block quotes
+    notes = "'\""          # Aside (margin note), Inline (visible) comment
+    aligns = '.;,:~{}'     # Grouped formatting divs
+    lists = '*#_'          # Recursively nested lists, non-recursive icon lists
     tables = '!|'          # Tables, with format block, with format blocks
     glosses = '/'          # Interlinear translations
-    figures = '@'          # Embed a printable file
     caption = '='          # Attach a caption to the preceding block
 
     captions = '+>!|@'     # Blocks that captions or bylines may follow
@@ -27,11 +26,11 @@ class Config(object):
     # Characters that can be repeated once (with spacing) to define a inline
     # heading (also: u'=', but handled specially):
 
-    leaders = "~'?"
+    leaders = "~'\""
 
     all_control_chars = (
         nulls + setters + headers + quotes + notes + aligns +
-        lists + tables + figures + caption + glosses
+        lists + tables + caption + glosses
         )
 
     dividers = [

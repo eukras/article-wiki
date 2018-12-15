@@ -22,12 +22,9 @@ class Inline(object):
         '*': 'Bold',
         '_': 'Underline',
         '`': 'Teletype',
-        '?': 'Keystrokes',
-        '|': 'Marker (Black on White; Bold)',
+        '|': 'Marker',
         ';': 'Sans-Serif Font',
         '=': 'Small Caps',
-        '!': 'Large text',
-        '.': 'Small text',
         '+': 'Insertion',
         '-': 'Deletion',
         "'": 'Superscript',
@@ -185,18 +182,12 @@ class Inline(object):
             return '<span class="small-caps">%s</span>' % small_caps(content)
         elif char == '`':
             return '<tt>%s</tt>' % content
-        elif char == '?':
-            return '<kbd>%s</kbd>' % content
         elif char == ';':  # sans-serif
             return '<span class="opposite">%s</span>' % content
         elif char == '|':
             return '<var>%s</var>' % content
         # elif char == ';': # script
             # return '<span class="alternate">%s</span>' % content
-        elif char == '!':
-            return '<span class="large">%s</span>' % content
-        elif char == '.':
-            return '<small>%s</small>' % content
         elif char == "'":
             return '<sup>%s</sup>' % content
         elif char == ',':
@@ -209,8 +200,6 @@ class Inline(object):
             return '<span class="pull-left space-right">%s</span>' % content
         elif char == '}':
             return '<span class="pull-right space-left">%s</span>' % content
-        elif char == '(':
-            return '<span class="dropcap">%s</span>' % content
         else:
             return '<tt class="error">%s[%s]</tt>' % (html_escape(char),
                                                       html_escape(content))
