@@ -59,8 +59,15 @@ pip install uwsgi
 uwsgi uwsgi.ini
 ```
 
-Set correct server name in `install/etc/nginx/sites-enabled/default`, add HTTPS
-if required, then:
+If runninmg interactively, stop that with `^C`; if otherwise, use:
+
+```bash
+which uwsgi  # <-- shows /app/.venv/bin/uwsgi
+killall -9 /app/.venv/bin/uwsgi
+```
+
+This needs an webserver front end. Set correct server name in
+`install/etc/nginx/sites-enabled/default`, add HTTPS if required, then:
 
 ```bash
 vim install/etc/nginx/sites-enabled/default  # <-- set server_name, etc
@@ -69,10 +76,10 @@ sudo cp install/etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/default
 sudo service nginx restart
 ```
 
-This will serve the static/ dir from nginx rather than through the Python app,
+This will serve the `static/` dir from nginx rather than through the Python app,
 and add some micro-caching.
 
-And view http://localhost (or as specified).
+You shoudl now be able to view http://localhost (or as specified).
 
 This Nginx default config runs on HTTP, which is terrible practice. Use it just
 for the purpose of authenticating your LetsEncrypt certificates. Certbot will
@@ -89,22 +96,29 @@ Then restart Nginx again, and check that you domain redirects automatically to
 HTTPS from HTTP.
 
 
-# Future: Add Supervisor (or systemd)
+# Managing Article Wiki with Systemd
 
-*TODO*
-
-Your UWSGI app needs to start on system load, and after restarts,
-crashes, or if you kill the process to force it to reload. That probably means
-`supervisor` or `systemd`. Note this will require ENV.dist to be
-effectively provided in the supervisor.conf; there's a non-working
-sample in `etc/supervisor/...`.
+Running uWsgi in /master/ mode (see `uwsgi.ini`) is reslient to crashes or to
+individual threads being killed, but won't survive a system restart. For that 
+we'll need to switch to system `uwsgi`, and `systemd`, and also provide ENV
+variables to systemd with a `.env` file.
 
 ```bash
-[program:...]
-environment = 
-    SITE=domain1,
-    DJANGO_SETTINGS_MODULE=foo.settings.local,
-    DB_USER=foo,
-    DB_PASS=bar
-command = ...
+cd $root_dir  # <-- location of this INSTALL.txt file.
+cp ENV.dist ENV.vars  # <-- will be used by the article-wiki.service
+vim ENV.vars  # <-- Check
+pip uninstall uwsgi
+sudo apt-get install uwsgi
+which uwsgi  # <-- Make sure this is used in the service definition:
+vim install/etc/systemd/system/article-wiki.service
+sudo cp install/etc/systemd/system/article-wiki.service etc/systemd/system/article-wiki.service
+systemctl enable article-wiki.service
+```
+
+Now you can:
+
+```bash
+systemctl start article-wiki.service
+systemctl restart article-wiki.service
+journalctl -fu article-wiki.service  # <-- Logs
 ```
