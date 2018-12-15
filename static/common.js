@@ -1,27 +1,33 @@
 $(document).ready(function() { 
 
     //  Sidebar progress meter.
+    //  Only displayed if we're in the large responsive modes (>768px).
 
     var offset = 220;
     var duration = 500;
 
-    jQuery(window).scroll(function() {
-        if (jQuery(this).scrollTop() > offset) {
-            jQuery('.bottom-menu').fadeIn(duration);
+    $(window).scroll(function() {
+        var scaledPixelWidth = $(document).width();
+        if ($(this).scrollTop() > offset) {
+            if (scaledPixelWidth > 768) {
+                $('.bottom-menu').fadeIn(duration);
+            }
         } else {
-            jQuery('.bottom-menu').fadeOut(duration);
+            $('.bottom-menu').fadeOut(duration);
         }
         //  update bar
         var s = $(window).scrollTop(),
             d = $(document).height(),
             c = window.innerHeight;
-        scrollPercent = Math.round((s / (d-c)) * 100);
+        var scrollPercent = Math.round((s / (d-c)) * 100);
         if (scrollPercent > 99) { 
             $("#progress").fadeOut(duration); 
             $("#progress").text('99%'); 
         } else { 
-            $("#progress").text(scrollPercent + '%'); 
-            $('#progress').fadeIn(duration);
+            if (scaledPixelWidth > 768) {
+                $("#progress").text(scrollPercent + '%'); 
+                $('#progress').fadeIn(duration);
+            }
         }
     });
 
