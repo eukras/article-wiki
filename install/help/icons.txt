@@ -1,6 +1,7 @@
 Icons
 
-Any of the hundreds of freely usable ^[Font Awesome] icons can be included by prefixing the `:` symbol to an icon's name, e.g.
+Any of the hundreds of freely usable ^[Font Awesome] icons can be
+included by prefixing the `:` symbol to an icon's name, e.g.
 
 * `\:twitter` --> :twitter
 * `\:facebook-square` --> :facebook-square
@@ -20,4 +21,6 @@ TABLE (cccc) ---
 ---
 
 = Table $[t++]. = Single-character abbreviations for commonly used icons.
+
+See also @[alignment-blocks] for formatting. 
 ===

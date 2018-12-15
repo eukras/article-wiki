@@ -1,8 +1,14 @@
-Write something
+Article Wiki
 
-Use this test page to experiment with ^[wiki formatting].
+= Welcome to the Playground
 
-^ /help
+$ SLUG = editor
+
+You can use this test page to experiment with wiki formatting. Or make
+one-off documents and print straight to PDF through your browser. Have a
+look at the ^[Help Page] to learn everything about the wiki markup.
+
+^ https://chapman.wiki/read/eukras/help
 
 
 + Thought for the day

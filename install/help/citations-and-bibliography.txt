@@ -1,8 +1,14 @@
 Citations and Bibliography
 
-While bibliographies can be formatted entirely manually, or with footnotes, there are often better way to work with references. In $[wiki], bibliographies can be added at the end of each section, or in a single `biblio.txt` file, or both.
+While bibliographies can be formatted entirely manually, or with
+footnotes, there are often better way to work with references.
+Bibliographies can be added at the end of each section, or in a single
+`biblio.txt` file, or both.
 
-When adding references in a section (rather than in `biblio.txt`), separate them from the body of your text with a dividing line containing only underscores (10 works well). Citations appear in round brackets by default, but these can be hidden with a leading minus character.
+When adding references in a section (rather than in `biblio.txt`),
+separate them from the body of your text with a dividing line containing
+only underscores (10 works well). Citations appear in round brackets by
+default, but these can be hidden with a leading minus character.
 
 DEMO ---
 

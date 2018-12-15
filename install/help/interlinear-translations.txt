@@ -1,6 +1,11 @@
 Interlinear Translations
 
-Glosses or parallels are commonly required in linguistics, but can be difficult to format. Wiki markup suits them well, however. There is no limit on the number of translated phrases that can be stacked together. Unicode font substitution can be applied to different character ranges, but is presently only set up for Greek -- note that the font GFS Didot automatically replaces the body font here:
+Glosses or parallels are commonly required in linguistics, but can be
+difficult to format. Wiki markup suits them well, however. There is no
+limit on the number of translated phrases that can be stacked together.
+Unicode font substitution can be applied to different character ranges,
+but is presently only set up for Greek -- note that the font GFS Didot
+automatically replaces the body font here:
 
 DEMO (wide) ---
 / *[1] Παῦλος καὶ Τιμόθεος / Paul and Timothy, 
@@ -18,12 +23,6 @@ DEMO (wide) ---
 ^ lit. /holy people/, trad. /the saints/
 ^ trad. /bishops and deacons/ 
 ---
-
-
-- Future Development
-
-* Allowing references to be marked would be useful for text indexing. Maybe with `{1}`, and `$ REFERENCE = Phil 1`.
-* Create automatic indexes of textual references, esp. biblical or classical. Possibly with `\?[1 Cor 2:3]`.
 
 
 - Multiline glosses

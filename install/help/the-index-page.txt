@@ -1,8 +1,14 @@
 The Index Page
 
-The most important feature of Article Wiki is its structure, which is like a directory of files rather than one very long file, or a set of pages bound together into a book. These are joined and organised by the table of contents in the `index.txt` file or page.
+The most important feature of Article Wiki is its structure, which is
+like a directory of files rather than one very long file, or a set of
+pages bound together into a book. These are joined and organised by the
+table of contents in the `index.txt` file or page.
 
-If there is no index page, the document parts will be arranged in alphabetical order by their titles, and there will be no front matter (headings, author, abstract, table of contents). Usually, you will want to organise any substantial document into a structure.
+If there is no index page, the document parts will be arranged in
+alphabetical order by their titles, and there will be no front matter
+(headings, author, abstract, table of contents). Usually, you will want
+to organise any substantial document into a structure.
 
 A normal index page looks like this, only wider:
 
@@ -28,11 +34,18 @@ $ DATE = 18 September 2017
 ` Conclusion
 ---
 
-Notice the support for #[multiple authors: author, more than one] (as many as you like), and the word counts appearing in place of page numbers in the table of contents.
+Notice the support for #[multiple authors: author, more than one] (as
+many as you like), and the word counts appearing in place of page
+numbers in the table of contents.
 
 : i : To add a new section to a document, add it to the outline in `index.txt`, and navigate from there.
 
-Because $[wiki] aims to take a document from brainstorming through writing to publication, the index page of each document offers a nested 'outline' list, which is autolinked to new pages in the online editor. The index page can thus be used as an outliner and brainstormer, in which sections can be easily added, arranged, and deleted. Each section corresponds to a file name:
+Because Article Wiki aims to take a document from brainstorming through
+writing to publication, the index page of each document offers a nested
+'outline' list, which is autolinked to new pages in the online editor.
+The index page can thus be used as an outliner and brainstormer, in
+which sections can be easily added, arranged, and deleted. Each section
+corresponds to a file name:
 
 ! Outline ! File in Directory
 | `My Article` | `index`
@@ -47,7 +60,10 @@ Because $[wiki] aims to take a document from brainstorming through writing to pu
 ~ Slugs. ~ The names of the individual page files are turned into
 # [slugs:slug]. This style will be familiar from blog or news URLs, even if the name is unfamiliar. They are made by taking the page titles, converting special characters to plain text, converting to lowercase, removing punctuation and consolidating spaces into a single dash.
 
-This multi-file document format has strengths and weaknesses. Its main disadvantage is that changing your headings means changing your file names. However, the online editor helps with that, and other benefits follow:
+This multi-file document format has strengths and weaknesses. Its main
+disadvantage is that changing your headings means changing your file
+names. However, the online editor helps with that, and other benefits
+follow:
 
 # It's easy to rearrange your document by rearranging your outline.
 # In a wiki designed for long arguments, it is a convenience to be working only on one self-contained part of the argument at a time.

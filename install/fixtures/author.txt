@@ -4,4 +4,7 @@ Nigel Chapman
 
 $ SLUG = author
 
-~ 7 Dec 2018. ~ It's my shiny new web page!
+| 14 Dec 2018. | Article Wiki source code: https://github.com/eukras/article-wiki
+| 7 Dec 2018. | It's my shiny new web page!
+
+~

@@ -1,6 +1,10 @@
 Square Brackets
 
-Most inline markup consists of a single control character in front of a set of square brackets, for example `\*[bold]` for *[bold] text. In the simplest and most common cases it is easier just to type `\*bold\*` and get the same effect, but the square brackets handle complex cases better and can be visually clearer in plain text.
+Most inline markup consists of a single control character in front of a
+set of square brackets, for example `\*[bold]` for *[bold] text. In the
+simplest and most common cases it is easier just to type `\*bold\*` and
+get the same effect, but the square brackets handle complex cases better
+and can be visually clearer in plain text.
 
 ! Character ! Wiki Text ! Formatting ! Shorthand
 | `/` | `\/[Italic]` | /[Italic] | `\/Italic\/`
@@ -9,7 +13,6 @@ Most inline markup consists of a single control character in front of a set of s
 | `\`` | `\`[Monospace]` | `[Monospace] | `\`Monospace\``
 | `|` | `\|[Marker]` | |[Marker] | `|Marker|`
 | `;` | `\;[Sans Serif]` | ;[Sans Serif]
-| `,` | `\?[Keystrokes]` | ?[Keystrokes]
 | `=` | `\=[Small Caps]` | =[Small Caps]
 | `+` | `\+[Inserted]` | +[Inserted]
 | `-` | `\-[Deleted]` | -[Deleted]

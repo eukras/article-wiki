@@ -11,7 +11,7 @@ edit it.
 * `author` is the text for your user page.
 * `editor` is the template used when you open a blank ^[editor].
 
-^ /editor
+^ http://chapman.wiki/read/eukras/help
 
 ` Author
 ` Editor

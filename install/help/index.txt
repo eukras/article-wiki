@@ -6,21 +6,22 @@ $ AUTHOR = Nigel Chapman / nigel@chapman.id.au
 $ DATE = 4 Nov 2018
 $ SLUG = help
 
-$ wiki = Article Wiki
-$ site = https://chapman.id.au
+$ site = https://chapman.wiki
 
 Article Wiki is an open-source writing tool for the humanities. It is
-designed for long, structured arguments in reasonably plain text.
-However, it gives you bibliographies and citations, footnotes and links,
-and lets you construct indexes, all without making the plain text
-unreadable. You can do your writing anywhere you can edit plain text.
-You can download the software, run it yourself, and add new features if
-you have a little programming skill. It is opinionated about layout, but
-always readable online and in print. Try it out!
+designed for long, structured arguments in plain text. However, it gives
+you bibliographies and citations, footnotes and links, and lets you
+construct indexes, all without making the plain text unreadable. This
+means you can do your writing anywhere you can edit plain text,
+including in collaboration or version control systems -- or offline, and
+just paste it in when back online. You can download the software, run it
+yourself, and add new features if you have a little programming skill.
+It is opinionated about layout, but always readable online and in print.
+Try it out!
 
 CENTER (80%) ---
-| Online Editor | :edit | $[site]/editor
-| Source Code | :github | https://github.com/eukras/article-wiki
+| Try it out! | $[site]/playground
+| Source code | https://github.com/eukras/article-wiki
 ---
 
 This page demonstrates most of Article Wiki's features.

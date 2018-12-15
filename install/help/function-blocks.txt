@@ -1,13 +1,22 @@
 Function Blocks
 
-Whenever you encounter some special formatting requirements -- anything past the point where wiki formatting remains a convenience -- then you should expect to find a special /function block/ that lets you enter data in a form that really /is/ convenient, and /just knows/ what to do with it.
+Whenever you encounter some special formatting requirements -- anything
+past the point where wiki formatting remains a convenience -- then you
+should expect to find a special /function block/ that lets you enter
+data in a form that really /is/ convenient, and /just knows/ what to do
+with it.
 
-Functions, like /y = f(x)/, will be familiar from maths, spreadsheets, or programming; function blocks look like that.
+Functions, like /y = f(x)/, will be familiar from maths, spreadsheets,
+or programming; function blocks look like that.
 
 
 + Examples of Functions
 
-In $[wiki] the `BOX` function just puts a box around a section of text. The `COMPACT` function lets you write a digression, or supply a transcript that is not necessarily going to be read, so should occupy minimal space. Because small text reads better in columns, it takes the options `2cols` or `3cols`.
+The `BOX` function just puts a box around a section of text. The
+`COMPACT` function lets you write a digression, or supply a transcript
+that is not necessarily going to be read, so should occupy minimal
+space. Because small text reads better in columns, it takes the options
+`2cols` or `3cols`.
 
 DEMO +++
 BOX ===
@@ -19,13 +28,20 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
 ===
 +++
 
-`COMPACT` is one of a set of core functions implemented within the wiki; these handle alignment, table formatting, and whitespace, among a few other common tasks. If you're curious about how wiki markup is being placed side-by-side with its formatted output in these examples, that's done with a function too, called `DEMO`, wrapped around whatever text is to be displayed.
+`COMPACT` is one of a set of core functions implemented within the wiki;
+these handle alignment, table formatting, and whitespace, among a few
+other common tasks. If you're curious about how wiki markup is being
+placed side-by-side with its formatted output in these examples, that's
+done with a function too, called `DEMO`, wrapped around whatever text is
+to be displayed.
 
-Also, if you have some skill in programming, you can fairly easily write your own functions.
+Also, if you have some skill in programming, you can fairly easily write
+your own functions.
 
 
 + Wrapping Function Blocks
 
-You can use functions inside other functions so long as you use different delimiters for each layer. Try:
+You can use functions inside other functions so long as you use
+different delimiters for each layer. Try:
 
 | `---` | `===` | `>>>` | `+++` | `:::` | `%%%` | `\/\/\/`

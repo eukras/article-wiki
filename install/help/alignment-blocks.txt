@@ -23,13 +23,13 @@ ways:
 DEMO ---
 ~ Hanging Indent. ~ Giving a hanging indent a /leader/ will make it into a minor heading.
 
-( ($[l++])
+{ ($[l++])
 , Floating left marker.
 
-) ($[l++])
+} ($[l++])
 . Floating right marker.
 
-( ($[l++])
+{ ($[l++])
 ; Simple Equation'[2]
 
 . Definition title

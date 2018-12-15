@@ -1,24 +1,32 @@
 Cheat Sheet (Print Me!)
 
-Click the `Edit` button to see how any effect was achieved in an article. This opens that section in the `/editor`. That also lets you print a single section, like this cheat sheet. Remember that a leading backslash will neutralise any formatting character.
+Click the `Edit` button to see how any effect was achieved in an article
+or section. This opens that section in the `/playground`. That also lets
+you print a single section, like this cheat sheet. Remember that a
+leading backslash will neutralise any formatting character.
 
 
 - Character blocks
+
+Note that captions can be added to tables and headings as well as
+quotes.
 
 | `+ -` | Subheadings: Major, Minor
 | `> =` | Block quote; Caption
 | `* # _` | Lists: Bullets, Numbers, Checkboxes/Icons
 | `. ; ,` | Alignment: Left, Centre, Right
-| `: ~` | Block Indents (or icons), Hanging Indents
+| `: ~` | Block Indents, Hanging Indents
 | `{ }` | Float labels: Left, Right
 | `! |` | Simple Tables: Headers, Cells
-| `' ? %` | Aside, Comment (visible), Comment (hidden)
+| `/` | Glosses (usually for Interlinear Translations)
+| `' " %` | Aside, Note (visible), Comment (hidden)
 | `\`` | Document outlines (in index.txt)
 
 
 - Inline Square Brackets
 
-Not these are combinable, and the the first five have shorthand, e.g. `\*bold\*`.
+Not these are combinable, and the the first five have shorthand, e.g.
+`\*bold\*`.
 
 | `\*[bold]`, `\*bold\*` | *[bold], *bold*
 | `/ * _ \` |` | /[Italic], *[Bold], _[Underline], `[Monospace], |[Highlight]
