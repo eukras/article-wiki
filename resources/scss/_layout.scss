@@ -89,6 +89,7 @@ form {
         }
 
         textarea {
+            font-family: $fontFamilyMonospace;
             grid-area: unquote("2 / 1 / 3 / 5");
             padding: 1rem;
             border: none;
