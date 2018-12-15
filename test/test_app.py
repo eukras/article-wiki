@@ -48,7 +48,7 @@ EDIT_URI = '/edit/{:s}/{:s}/{:s}'
 READ_URI = '/read/{:s}/{:s}'
 
 HOME_URI = '/'
-EDITOR_URI = '/editor'
+EDITOR_URI = '/playground'
 HELP_URI = '/help'
 LOGIN_URI = '/login'
 LOGOUT_URI = '/logout'
