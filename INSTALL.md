@@ -2,13 +2,13 @@
 
 ## Basic Development System
 
-Tested on Python 3.5, Redis 5.0, and Ubuntu. The code can be obtained by Git or
-as a `.zip` download. Redis can be installed locally or run in Docker.
-Virtualenv is the only absolute prerequisite.
+Tested on Python 3.5-6, Redis 5.0, and Ubuntu, incl. AWS Ubuntu. The code can
+be obtained by Git or as a `.zip` download. Redis can be installed locally or
+run in Docker.  Virtualenv is the only absolute prerequisite.
 
 ```bash
 sudo apt-get install virtualenv
-cd root_dir  # <-- whereever this INSTALL file is.
+cd root_dir  # <-- whereever this INSTALL.md file is.
 virtualenv --python=python3 .venv
 source .venv/bin/activate
 python --version  # <-- should see e.g. 3.5+
@@ -19,8 +19,8 @@ pytest lib/  # <-- unit tests
 pytest test/  # <-- web tests
 ```
 
-Currently we use a locale hack for currency formatting in tables; until fixed,
-AWS/Ubuntu systems will need this hack:
+Currently using a locale hack for currency formatting in tables; until fixed,
+AWS/Ubuntu systems will need:
 
 ```bash
 sudo apt-get install locales
@@ -35,12 +35,12 @@ make redis
 ```
 
 Run the app for dev purposes. Note that this is not an efficient way to run the
-app online; suggest Nginx, uWsgi, and Supervisor (see below).
+app online; suggest `nginx`, `uwsgi`, and `systemd` (see below).
 
 ```bash
 vim ENV.dist  # <-- Defaults to localhost:8080
-set -a && source ENV.dist && set +a
-python command.py initialize  # <-- Create admin user, load initial docs.
+set -a && source ENV.dist && set +a  # <-- Export all environment vars
+python command.py initialize  # <-- Create admin user, load initial docs
 python app.py
 ```
 
@@ -59,7 +59,7 @@ pip install uwsgi
 uwsgi uwsgi.ini
 ```
 
-If runninmg interactively, stop that with `^C`; if otherwise, use:
+If running interactively, stop that with `^C`; if otherwise, use:
 
 ```bash
 which uwsgi  # <-- shows /app/.venv/bin/uwsgi
@@ -67,7 +67,7 @@ killall -9 /app/.venv/bin/uwsgi
 ```
 
 This needs an webserver front end. Set correct server name in
-`install/etc/nginx/sites-enabled/default`, add HTTPS if required, then:
+`install/etc/nginx/sites-enabled/default` then:
 
 ```bash
 vim install/etc/nginx/sites-enabled/default  # <-- set server_name, etc
@@ -79,11 +79,11 @@ sudo service nginx restart
 This will serve the `static/` dir from nginx rather than through the Python app,
 and add some micro-caching.
 
-You shoudl now be able to view http://localhost (or as specified).
+You should now be able to view http://localhost (or as specified).
 
-This Nginx default config runs on HTTP, which is terrible practice. Use it just
-for the purpose of authenticating your LetsEncrypt certificates. Certbot will
-rewrite your config so you end up with something closer to
+This Nginx default config runs on HTTP, which is insecure. Use it just for the
+purpose of authenticating the LetsEncrypt certificates. Certbot will rewrite
+your config so you end up with something closer to
 `install/etc/nginx/sites-enabled/default-ssl`, which you should then use
 instead.
 
@@ -92,8 +92,8 @@ apt-get install certbot python-certbot-nginx
 certbot --nginx -d example.com
 ```
 
-Then restart Nginx again, and check that you domain redirects automatically to
-HTTPS from HTTP.
+Then restart Nginx again, and check that you domain redirects automatically
+from HTTP to HTTPS.
 
 
 # Managing Article Wiki with Systemd
@@ -119,10 +119,7 @@ sudo systemctl enable article-wiki.service
 Now the app survives rebooting, and you control it with:
 
 ```bash
-sudo service article-wiki start
-sudo service article-wiki status
-sudo service article-wiki restart
-sudo service article-wiki stop
+sudo service article-wiki [start|status|restart|stop]
 
 # Or, similarly...
 sudo systemctl start article-wiki.service
@@ -132,4 +129,4 @@ sudo journalctl -fu article-wiki.service  # <-- Logs
 
 # Dockerize Application
 
-... To do!
+... Next!
