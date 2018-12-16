@@ -92,19 +92,20 @@ apt-get install certbot python-certbot-nginx
 certbot --nginx -d example.com
 ```
 
-Then restart Nginx again, and check that you domain redirects automatically
+Then restart Nginx again, and check that your domain redirects automatically
 from HTTP to HTTPS.
 
 
 ## Managing Article Wiki with Systemd
 
-Running uWsgi in /master/ mode (see `uwsgi.ini`) is reslient to crashes or to
-individual threads being killed, but won't survive a system restart. For that 
-we'll need to switch to system `uwsgi`, and `systemd`, and also provide ENV
-variables to systemd with a `ENV.vars` file.
+Running uWsgi in `master` mode (see `uwsgi.ini`) is reslient to crashes or to
+individual threads being killed, but isn't particularly intuitive to control 
+and won't survive a system restart. For that we'll need to switch to system 
+`uwsgi`, and `systemd`, and also provide ENV variables to systemd with a 
+`ENV.vars` file.
 
 ```bash
-cd $root_dir  # <-- Location of this INSTALL.txt file.
+cd $root_dir  # <-- Location of this INSTALL.md file.
 cp ENV.dist ENV.vars
 vim ENV.vars  # <-- These values will be used by the article-wiki.service
 pip uninstall uwsgi
