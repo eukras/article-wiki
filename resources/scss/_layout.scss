@@ -418,11 +418,11 @@ footer {
 }
 
 
-/* CSS Modal notice if no grid support. */
+/* CSS Modal notice: only deactivated if grid is supported. */
 
 .modal {
 
-    display: none;
+    display: block;
 
     .modal-cover {
         z-index: 1000;
@@ -460,8 +460,8 @@ footer {
 
 }
 
-@supports not (display: grid) {
+@supports (display: grid) {
     .modal {
-        display: block;
+        display: none;
     }
 }
