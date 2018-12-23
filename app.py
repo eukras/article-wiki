@@ -293,7 +293,7 @@ def editor():
                        can_be_saved=False)
 
 
-@bottle.post('/editor')
+@bottle.post('/playground')
 def editor_post():
     """
     The `/editor` will only preview wiki formatting, never save it.
