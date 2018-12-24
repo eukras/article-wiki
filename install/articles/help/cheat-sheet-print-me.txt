@@ -29,7 +29,7 @@ Not these are combinable, and the the first five have shorthand, e.g.
 `\*bold\*`.
 
 | `\*[bold]`, `\*bold\*` | *[bold], *bold*
-| `/ * _ \` |` | /[Italic], *[Bold], _[Underline], `[Monospace], |[Highlight]
+| `/ * _ \` !` | /[Italic], *[Bold], _[Underline], `[Monospace], ![Highlight]
 | `; = { }` | ;[Sans Serif], =[Small Caps], Float left, Float right
 | `+ - ' ,` | +[Inserted], -[Deleted], Superscript'[2], Subscript,[2]
 | `\/\*[bold italic]` | /*[bold italic]

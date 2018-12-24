@@ -51,7 +51,7 @@ LEFT (70%) ---
 * * More systematic test suite to accompany breakdowns. ?[---]
 * DEMO blocks can have their footnotes and indexes collide with the parent document. Easily worked around in documentation. ?[--?]
 * Target word counts in TOC with percentage completed. ?[--+]
-* |[FEATURE] Labels?? Maybe just auto-index captions? ?[HOW?]
+* ![FEATURE] Labels?? Maybe just auto-index captions? ?[HOW?]
 * Error summary at the start of the document and section, or after editing. ?[+++]
 * Function block pipes. (Format wrappers have mostly fixed this.) ?[--?]
 * Common styles for function blocks (e.g. 'compact, 2column'). ?[--?]

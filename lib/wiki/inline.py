@@ -22,7 +22,7 @@ class Inline(object):
         '*': 'Bold',
         '_': 'Underline',
         '`': 'Teletype',
-        '|': 'Marker',
+        '!': 'Marker',
         ';': 'Sans-Serif Font',
         '=': 'Small Caps',
         '+': 'Insertion',
@@ -184,7 +184,7 @@ class Inline(object):
             return '<tt>%s</tt>' % content
         elif char == ';':  # sans-serif
             return '<span class="opposite">%s</span>' % content
-        elif char == '|':
+        elif char == '!':
             return '<var>%s</var>' % content
         # elif char == ';': # script
             # return '<span class="alternate">%s</span>' % content

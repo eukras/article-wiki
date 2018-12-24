@@ -11,7 +11,7 @@ and can be visually clearer in plain text.
 | `*` | `\*[Bold]` | *[Bold] | `\*Bold\*`
 | `_` | `\_[Underline]` | _[Underline] | `\_Underline\_`
 | `\`` | `\`[Monospace]` | `[Monospace] | `\`Monospace\``
-| `|` | `\|[Marker]` | |[Marker] | `|Marker|`
+| `!` | `\![Marker]` | ![Marker] | `|Marker|`
 | `;` | `\;[Sans Serif]` | ;[Sans Serif]
 | `=` | `\=[Small Caps]` | =[Small Caps]
 | `+` | `\+[Inserted]` | +[Inserted]
@@ -29,7 +29,7 @@ and can be visually clearer in plain text.
 ` \*\;\_[bold sans-serif underline]` will produce *;_[bold sans-serif underline] text, for example. Up to five symbols can be stacked in this way, although that seldom helps with readability. Square brackets are also used to add /information/, not only formatting, to text. However, it is not possible to combine formatting and informational control characters by stacking. See @[adding-information] for more.
 
 | `*/_\[bold italic underline]` | */_[bold italic underline]
-| `}|\[Floating Marker] x x` | }|[Floating Marker] x x
+| `}!\[Floating Marker] x x` | }![Floating Marker] x x
 
 = Table $[t++]. = Examples of stacking
 
