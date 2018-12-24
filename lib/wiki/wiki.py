@@ -525,7 +525,7 @@ def match_demo_options(pattern):
     return options
 
 
-def reformat_part(slug, part, width=72):
+def reformat_part(slug, part):
     """
     Normalise the layout of user-entered text. Remove bibliography and Demo
     blocks, process as a Blocklist, then put them back.
@@ -537,7 +537,7 @@ def reformat_part(slug, part, width=72):
         demo_placeholders = Demo(Settings())
         parts_sans_demo_blocks = demo_placeholders.insert({slug: content})
         blocks = BlockList(parts_sans_demo_blocks[slug])
-        out_sans_demo_blocks = blocks.text(width)
+        out_sans_demo_blocks = blocks.text()
         out_parts = demo_placeholders.replace(
             {slug: out_sans_demo_blocks},
             lambda text, slug: text

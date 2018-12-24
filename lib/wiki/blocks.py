@@ -199,17 +199,15 @@ class BlockList(object):
                     found += [_]
         return found
 
-    def text(self, width=72):
+    def text(self):
         """"
         Return canonical wiki text, meaning:
 
         - No trailing whitespace
         - No leading or contiguous whitespace outside function blocks
-        - No line wrapping unless width is set, so that arbitrary width
-        editors (e.g. http://whiteroom.wiki/write) are accommodated.
-        - An extra blank line before headers
+        - No line wrapping.
         """
-        return "\n\n".join([_.text(width) for _ in self.blocks])
+        return "\n\n".join([_.text() for _ in self.blocks])
 
     def title_and_summary(self):
         """
@@ -342,9 +340,9 @@ class Paragraph(Block):
         "Normalize spacing."
         self.content = one_line(text)
 
-    def text(self, width=72):
+    def text(self):
         "For paragraphs there is only one line to wrap."
-        return "\n".join(wrap(self.content, width=width))
+        return self.content
 
     def html(self, renderer, settings):
         "Just wrap in a paragraph tag (with inline formatting)."
@@ -364,7 +362,7 @@ class Divider(Block):
         "Strip and store."
         self.content = text
 
-    def text(self, width=72):
+    def text(self):
         """
         As you were...
         """
@@ -413,7 +411,7 @@ class CharacterBlock(Block):
         self.control_character = text[0]
         self.content = text
 
-    def text(self, width=72):
+    def text(self):
         """
         Leave lines beginning with a control character unwrapped.
         Add an extra blank line before headers.
@@ -485,7 +483,7 @@ class FunctionBlock(Block):
         if issubclass(self.function_class, Wrapper):
             self.blocks = BlockList(self.content)
 
-    def text(self, width=72):
+    def text(self):
         """
         Canonical form is almost the same as required form.
 
@@ -499,7 +497,7 @@ class FunctionBlock(Block):
             line = '%s %s' % (class_name, self.divider * 3)
         parts = [line]
         if issubclass(self.function_class, Wrapper):
-            content = self.blocks.text(width)
+            content = self.blocks.text()
         else:
             content = self.content
         if content != "":
