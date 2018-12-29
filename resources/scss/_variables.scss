@@ -14,3 +14,14 @@ $fontSize: 1rem;
 $fontSizeMinus1: #{$stepDown}rem;
 $fontSizeMinus2: #{$stepDown * $stepDown}rem;
 $fontSizeMinus3: #{$stepDown * $stepDown * $stepDown}rem;
+
+
+//  -------------
+//  Simple mixins
+//  -------------
+
+@mixin box-shadow($top, $left, $blur, $color) {
+  -webkit-box-shadow: $top $left $blur $color;
+  -moz-box-shadow: $top $left $blur $color;
+  box-shadow: $top $left $blur $color;
+}
