@@ -28,7 +28,7 @@
         <h2 class="balance-text">Your browser is not supported.</h2>
         <p class="balance-text">You'll need a modern browser that supports 'grid' layout.</p>
         <div class="modal-button">
-            <a class="button" target="_blank" href="https://caniuse.com/#search=grid">
+            <a class="button feature" target="_blank" href="https://caniuse.com/#search=grid">
                 <i class="fa fa-info-circle"></i> Like What?
             </a>
         </div>
@@ -44,6 +44,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 <script src="{{ config.PUBLIC_DIR }}/common.js"></script>
+
+{% if config.GOOGLE_ANALYTICS_TRACKING_ID != "" %}
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ config.GOOGLE_ANALYTICS_TRACKING_ID }}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag('js', new Date());
+  gtag('config', '{{ config.GOOGLE_ANALYTICS_TRACKING_ID }}');
+</script>
+
+{% endif %}
 
 {% block javascripts %}
 {% endblock %}
