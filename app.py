@@ -18,6 +18,7 @@ from copy import copy
 
 import codecs
 import logging
+import pprint
 import os
 import sys
 import tempfile
@@ -94,16 +95,13 @@ def before_request():
         views.globals['theme'] = "theme-default"
 
 
-def abs_url(config: dict, uri: str) -> str:
+def abs_url(request: bottle.BaseRequest, uri: str) -> str:
     """
     Prepend scheme/port/host to URI.
     """
-    host = config['WEB_HOST']
-    port = config['WEB_HOST_PORT']
-    if host == 'localhost':
-        return 'http://{:s}:{:s}/{:s}'.format(host, port, uri.lstrip('/'))
-    else:
-        return 'https://{:s}/{:s}'.format(host, uri.lstrip('/'))
+    parts = request.urlparts
+    # print(pprint.pformat(parts))
+    return '{:s}//{:s}/{:s}'.format(parts.scheme, parts.netloc, uri.lstrip('/'))
 
 
 # -------------------------------------------------------------
@@ -574,11 +572,11 @@ def read_document(user_slug, doc_slug):
         data.userDocumentMetadata_set(user_slug, doc_slug, metadata)
 
     uri = '/read/{:s}/{:s}'.format(user_slug, doc_slug)
-    metadata['url'] = abs_url(config, uri)
+    metadata['url'] = abs_url(bottle.request, uri)
     author_uri = '/user/{:s}'.format(user_slug)
-    metadata['author_url'] = abs_url(config, author_uri)
-    metadata['home_url'] = abs_url(config, '/')
-    metadata['image_url'] = abs_url(config, '/static/site-image.png')
+    metadata['author_url'] = abs_url(bottle.request, author_uri)
+    metadata['home_url'] = abs_url(bottle.request, '/')
+    metadata['image_url'] = abs_url(bottle.request, '/static/site-image.png')
 
     # @todo: function to split on multi authors as well as emails.
     title = metadata.get('title', 'Untitled')
