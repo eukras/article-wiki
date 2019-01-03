@@ -9,6 +9,7 @@ Jinja2
 lxml
 python-dotenv
 python-slugify
+pytz
 redis
 roman
 sortedcontainers

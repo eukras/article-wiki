@@ -2,13 +2,20 @@
 Some functions that are widely used.
 """
 
+import collections
+import pytz
 import random
 import re
 
+from datetime import datetime
+from dateutil import parser
+from functools import reduce
+from typing import Union
+
 from lib.wiki.placeholders import strip_placeholder_delimiters
 
-from functools import reduce
-import collections
+
+DATE_FORMAT_ISO8601 = "%Y-%m-%dT%H:%M:%S%z"
 
 
 def clean_document(parts_dict):
@@ -146,6 +153,45 @@ def one_line(text: str) -> str:
     space. AKA normalise spacing.
     """
     return re.sub(r'\s+', ' ', text.strip())
+
+
+def parse_date(date: str, tz_name: str) -> Union[datetime, None]:
+    """
+    If this can be converted to a Datetime, then do so;
+    return as UTC in ISO8601 format.
+
+    Args:
+        date: "1 Jan 2019"
+        tz_name: "Australia/Sydney"
+    Return:
+        2018-12-31T13:01:00+0000
+    """
+    try:
+        tz_local = pytz.timezone(tz_name)
+        tz_utc = pytz.timezone('UTC')
+        local = parser.parse(date)
+        utc = tz_local.localize(local).astimezone(tz_utc)
+        return utc.strftime(DATE_FORMAT_ISO8601)
+    except ValueError:
+        return None
+
+
+def format_date(date: str, tz_name: str, date_fmt: str) -> str:
+    """
+    Args:
+        date: 2018-12-31T13:01:00+0000  # <-- UTC ISO_8601
+        tz_name: "Australia/Sydney"
+        date_fmt: "%d %b %Y"
+    Return:
+        01 Jan 2019
+    """
+    try:
+        tz_local = pytz.timezone(tz_name)
+        utc = datetime.strptime(date, DATE_FORMAT_ISO8601)
+        local = utc.astimezone(tz_local)
+        return local.strftime(date_fmt)
+    except ValueError:
+        return "[Invalid Date]"
 
 
 def pipe(objects: list, method_name: str, argument: str) -> str:

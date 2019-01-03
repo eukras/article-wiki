@@ -66,6 +66,7 @@ def load_env_config() -> dict:
         'REDIS_PORT',
         'REDIS_DATABASE',
         'REDIS_TEST_DATABASE',
+        'TIME_ZONE',
         'WEB_HOST',
         'WEB_HOST_PORT',
         'UPLOAD_LIMIT_KB',
@@ -75,7 +76,7 @@ def load_env_config() -> dict:
         config[key] = os.environ.get(key, None)
         if config[key] is None:
             cmd = "set -a && source ENV.dist && set +a"
-            msg = "Env vars missing ({:s}); try '{:s}'."
+            msg = "Env var missing ({:s}); try '{:s}'."
             raise RuntimeError(msg.format(key, cmd))
 
     # Extras
@@ -100,6 +101,7 @@ class Data(object):
             db=config['REDIS_DATABASE'],
             decode_responses=True,
         )
+        self.time_zone = config['TIME_ZONE']
         self.strict = bool(strict)
 
     # ------------------

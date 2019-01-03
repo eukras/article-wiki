@@ -1,15 +1,27 @@
-<html lang="en" class="{% if theme %}{{ theme }}{% else %}theme-default{% endif %}">
+<html lang="en"
+      class="{% if theme %}{{ theme }}{% else %}theme-default{% endif %}"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta name="generator" content="Article Wiki">
+
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <title>{{ page_title | default('Untitled') }}</title>
+
+    {% block metadata %}
+    {% endblock %}
+
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="{{ config.PUBLIC_DIR }}/main.css" media="all" />
-    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans+Condensed:400,400i,600,600i|IBM+Plex+Serif:400,400i,600,600i|Fira+Mono:400,400i,600,600i" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans+Condensed:400,400i,600,600i|IBM+Plex+Serif:400,400i,600,600i|Fira+Mono:400,400i,600,600i">
     {% block header_tags %}
     {% endblock %}
+
 </head>
 <body>
 <div id="background"></div>

@@ -94,6 +94,18 @@ def before_request():
         views.globals['theme'] = "theme-default"
 
 
+def abs_url(config: dict, uri: str) -> str:
+    """
+    Prepend scheme/port/host to URI.
+    """
+    host = config['WEB_HOST']
+    port = config['WEB_HOST_PORT']
+    if port == 443:
+        return 'https://{:s}/{:s}'.format(host, uri.lstrip('/'))
+    else:
+        return 'http://{:s}:{:s}/{:s}'.format(host, port, uri.lstrip('/'))
+
+
 # -------------------------------------------------------------
 # AUTHENTICATION/AUTHORISATION
 # - Adequate for SINGLE_USER mode in v.0.1.0; interim approach.
@@ -315,17 +327,16 @@ def editor_post():
 
 @bottle.get('/favicon.ico')
 def favicon_file():
-    """
-    In production, hand this off to the web server.
-    """
     return bottle.static_file('favicon.ico', root='static')
+
+
+@bottle.get('/robots.txt')
+def robots_file():
+    return bottle.static_file('robots.txt', root='static')
 
 
 @bottle.get('/static/<file_name>')
 def static_files(file_name):
-    """
-    In production, hand this off to the web server.
-    """
     return bottle.static_file(file_name, root='static')
 
 
@@ -551,14 +562,23 @@ def read_document(user_slug, doc_slug):
     })
 
     metadata = data.userDocumentMetadata_get(user_slug, doc_slug)
+
     html = data.userDocumentCache_get(user_slug, doc_slug)
     if not html or not metadata:
         wiki = Wiki(settings)
         doc_parts = require_document(user_slug, doc_slug)
         html = wiki.process(doc_parts)
         data.userDocumentCache_set(user_slug, doc_slug, html)
-        metadata = wiki.compile_metadata(user_slug, doc_slug)
+        metadata = wiki.compile_metadata(config.TIME_ZONE, user_slug, doc_slug)
+        metadata['url'] = '/read/{:s}/{:s}'.format(user_slug, doc_slug),
         data.userDocumentMetadata_set(user_slug, doc_slug, metadata)
+
+    uri = '/read/{:s}/{:s}'.format(user_slug, doc_slug)
+    metadata['url'] = abs_url(config, uri)
+    author_uri = '/user/{:s}'.format(user_slug)
+    metadata['author_url'] = abs_url(config, author_uri)
+    metadata['home_url'] = abs_url(config, '/')
+    metadata['image_url'] = abs_url(config, '/static/site-image.png')
 
     # @todo: function to split on multi authors as well as emails.
     title = metadata.get('title', 'Untitled')
@@ -571,6 +591,7 @@ def read_document(user_slug, doc_slug):
     page_html = template.render(
         config=config,
         page_title=page_title,
+        metadata=metadata,
         user_slug=user_slug,
         doc_slug=doc_slug,
         header_buttons=header_buttons,

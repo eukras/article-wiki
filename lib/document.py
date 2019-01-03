@@ -159,7 +159,8 @@ class Document(object):
             self.data.userDocumentCache_set(self.user_slug, self.doc_slug,
                                             html)
 
-            metadata = wiki.compile_metadata(self.user_slug, self.doc_slug)
+            metadata = wiki.compile_metadata(self.data.time_zone,
+                                             self.user_slug, self.doc_slug)
             self.data.userDocumentMetadata_set(self.user_slug, self.doc_slug,
                                                metadata)
 

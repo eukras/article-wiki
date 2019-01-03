@@ -92,8 +92,9 @@ def write_archive_dir(archive_data: Dict[str, Dict[str, str]], dir_path: str):
         doc_dir = os.path.join(dir_path, doc_slug)
         if not os.path.isdir(doc_dir):
             os.makedirs(doc_dir)
-        parts = archive_data[doc_slug]
-        save_dir(doc_dir, parts)
+        parts = archive_data.get(doc_slug)
+        if isinstance(parts, dict):
+            save_dir(doc_dir, parts)
 
 
 def compress_archive_dir(dir_path: str, tgz_name: str) -> str:
@@ -105,9 +106,12 @@ def compress_archive_dir(dir_path: str, tgz_name: str) -> str:
     is a one-time operation on a unique temporary directory, and we know we
     have permissions for that directory.
 
-    :param str dir_path: absolute path to target directory
-    :param str tgz_name: name of archive file to create
-    :return str: dir_path/tgz_name ... because why not?
+    Args:
+        dir_path: absolute path to target directory
+        tgz_name: name of archive file to create
+
+    Returns:
+        dir_path/tgz_name
     """
     cwd = os.getcwd()
     os.chdir(dir_path)

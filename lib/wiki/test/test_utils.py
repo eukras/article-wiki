@@ -6,8 +6,10 @@ from .context import lib  # noqa: F401
 
 from lib.wiki.utils import \
     compose, \
+    format_date, \
     html_escape, \
     one_line, \
+    parse_date, \
     pluralize, \
     split_options, \
     trim
@@ -54,6 +56,19 @@ def test_one_line():
     """)
     normalised = "Sentence. Sentence! Sentence; sentence. Sentence sentence."
     assert one_line(text) == normalised
+
+
+def test_parse_date():
+    local_time = "1 Jan 2019"
+    tz_name = "Australia/Sydney"
+    utc_time = "2018-12-31T13:00:00+0000"
+    assert utc_time == parse_date(local_time, tz_name)
+
+
+def test_format_date():
+    utc_time = "2018-12-31T13:00:00+0000"
+    tz_name = "Australia/Sydney"
+    assert "01 Jan 2019" == format_date(utc_time, tz_name, "%d %b %Y")
 
 
 def test_trim():

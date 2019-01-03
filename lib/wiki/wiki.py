@@ -8,6 +8,7 @@ in directories.
 """
 
 import logging
+import pytz
 import re
 
 from html import escape
@@ -36,6 +37,9 @@ from lib.wiki.tags import Tags
 from lib.wiki.utils import \
     clean_document, \
     clean_text, \
+    DATE_FORMAT_ISO8601, \
+    format_date, \
+    parse_date, \
     pipe, \
     random_slug, \
     split_options, \
@@ -230,24 +234,33 @@ class Wiki(object):
         """
         print(pformat(self.outline))
 
-    def compile_metadata(self, user_slug, doc_slug=None):
+    def compile_metadata(self, tz_name, user_slug, doc_slug=None):
         """
         Return just the elements we want to store in the document
         metadata cache. Self.metadata is a copy of settings made after
         processing the index part, plus other items like count_words.
         """
-        today = date.today().strftime("%d %b %Y")
         data = {}
-        data['title'] = self.settings.get('TITLE', '')
+
         data['user'] = user_slug
+        data['title'] = self.settings.get('TITLE', '')
         data['slug'] = doc_slug if doc_slug else slugify(data['title'])
         data['summary'] = self.settings.get('SUMMARY', '')
-        data['author'] = self.settings.get('AUTHOR', '')  # <- Add processing
-        data['date'] = self.settings.get('DATE', today)
         data['license'] = self.settings.get('LICENSE', '')
         data['publish'] = self.settings.get('PUBLISH', 'YES')  # <-- Default
+
+        data['author'] = self.settings.get('AUTHOR', '')  # <- Add processing
+        data['facebook'] = self.settings.get('FACEBOOK', '')
+        data['twitter'] = self.settings.get('TWITTER', '')
+
+        default = date.today().strftime("%d %b %Y")
+        data['date'] = self.settings.get('DATE', default)
+        utc = parse_date(data['date'], tz_name)
+        data['published_time'] = format_date(utc, tz_name, DATE_FORMAT_ISO8601)
+
         data['todo'] = self.settings.get('TODO', '')
         data['word_count'] = self.outline.total_word_count()
+
         return data
 
     def make_index(self, text):
@@ -280,6 +293,21 @@ class Wiki(object):
             </div>
             {% endif %}
 
+            {% if facebook != "" or twitter != "" %}
+            <p class="space space-between">
+                {% if facebook != "" %}
+                <a href="https://facebook.com/{{ facebook }}" target="_blank">
+                    <i class="fa fa-facebook-square"></i> {{ facebook }}
+                </a>
+                {% endif %}
+                {% if twitter != "" %}
+                <a href="https://twitter.com/{{ twitter }}" target="_blank">
+                    <i class="fa fa-twitter"></i> {{ twitter }}
+                </a>
+                {% endif %}
+            </p>
+            {% endif %}
+
             {% if date %}
             <p class="space" rel="date">
                 <time pubdate datetime="{{ date }}">{{ date }}</time>
@@ -303,6 +331,8 @@ class Wiki(object):
             summary_html=inline.process(summary),
             author=author,
             cols=self.author_cols(author),
+            facebook=self.settings.get('FACEBOOK', ''),
+            twitter=self.settings.get('TWITTER', ''),
             date=inline.process(self.settings.get('DATE', '')),
             edit_link=self.settings.get_base_uri('edit') + '/index',
             content_html=content_html,

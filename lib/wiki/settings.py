@@ -76,7 +76,7 @@ class Settings(object):
         """
         Return a setting if it exists.
         """
-        return self._[key] if key in self._ else default
+        return self._.get(key, default)
 
     def format_value(self, pattern):
         """
