@@ -53,7 +53,7 @@ summary {
     margin: 0 0 1rem 0;
     padding: 0;
     font-style: italic;
-    font-size: 1.2rem;
+    font-size: $fontSizePlus1;
 }
 
 form {
@@ -204,7 +204,7 @@ header {
 }
 
 header summary {
-    font-size: $fontSizePlus1;
+    font-size: $fontSizePlus2;
     margin-bottom: 2rem;
 }
 
