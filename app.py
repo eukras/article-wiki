@@ -101,7 +101,7 @@ def abs_url(request: bottle.BaseRequest, uri: str) -> str:
     """
     parts = request.urlparts
     # print(pprint.pformat(parts))
-    return '{:s}//{:s}/{:s}'.format(parts.scheme, parts.netloc, uri.lstrip('/'))
+    return '{:s}://{:s}/{:s}'.format(parts.scheme, parts.netloc, uri.lstrip('/'))
 
 
 # -------------------------------------------------------------
