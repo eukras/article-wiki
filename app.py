@@ -100,10 +100,10 @@ def abs_url(config: dict, uri: str) -> str:
     """
     host = config['WEB_HOST']
     port = config['WEB_HOST_PORT']
-    if port == 443:
-        return 'https://{:s}/{:s}'.format(host, uri.lstrip('/'))
-    else:
+    if host == 'localhost':
         return 'http://{:s}:{:s}/{:s}'.format(host, port, uri.lstrip('/'))
+    else:
+        return 'https://{:s}/{:s}'.format(host, uri.lstrip('/'))
 
 
 # -------------------------------------------------------------
