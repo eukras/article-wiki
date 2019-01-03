@@ -249,7 +249,8 @@ class Wiki(object):
         data['license'] = self.settings.get('LICENSE', '')
         data['publish'] = self.settings.get('PUBLISH', 'YES')  # <-- Default
 
-        data['author'] = self.settings.get('AUTHOR', '')  # <- Add processing
+        data['author'] = self.settings.get('AUTHOR', '')
+        data['email'] = self.settings.get('EMAIL', '')
         data['facebook'] = self.settings.get('FACEBOOK', '')
         data['twitter'] = self.settings.get('TWITTER', '')
 
@@ -266,6 +267,7 @@ class Wiki(object):
     def make_index(self, text):
         """
         Front matter preceding index text.
+        Multi-author blocks are disabled for now; v.0.1.0 is SINGLE_USER.
         """
         html = Template(trim("""
         <header>
@@ -279,17 +281,16 @@ class Wiki(object):
             </hgroup>
             {% endif %}
 
-            {% if author|length > 0 %}
+            {% if author != "" or email != "" %}
             <div class="author-list">
-            {% for block in author %}
-                {% if block|length > 0 %}
-                <address class="col-xs-{{ cols }}">
-                    {% for line in block %}
-                    <div>{{ line }}</div>
-                    {% endfor %}
-                </address>
+                <address>
+                {% if author != "" %}
+                    <div>{{ author }}</div>
                 {% endif %}
-            {% endfor %}
+                {% if email != "" %}
+                    <div><a href="mailto:{{ email }}">{{ email }}</a></div>
+                {% endif %}
+                </address>
             </div>
             {% endif %}
 
@@ -325,12 +326,12 @@ class Wiki(object):
         title, summary = blocks.pop_titles()
         content_html = blocks.html(['0'], 'index', self.settings,
                                    fragment=True)
-        author = self.split_author(self.settings.get('AUTHOR', ''))
+        # author = self.split_author()
         return html.render(
             title_html=inline.process(title),
             summary_html=inline.process(summary),
-            author=author,
-            cols=self.author_cols(author),
+            author=self.settings.get('AUTHOR', ''),
+            email=self.settings.get('EMAIL', ''),
             facebook=self.settings.get('FACEBOOK', ''),
             twitter=self.settings.get('TWITTER', ''),
             date=inline.process(self.settings.get('DATE', '')),
@@ -341,6 +342,8 @@ class Wiki(object):
     # Move to geometry?
     def split_author(self, author):
         """
+        UNUSED FOR NOW. v.0.1.0 is SINGLE_USER.
+
         Split into authors and lines.
 
         $ AUTHOR = Author / Affiliation

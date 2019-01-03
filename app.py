@@ -15,6 +15,7 @@ contents.
 # -----
 
 from copy import copy
+from datetime import datetime
 
 import codecs
 import logging
@@ -580,7 +581,7 @@ def read_document(user_slug, doc_slug):
 
     # @todo: function to split on multi authors as well as emails.
     title = metadata.get('title', 'Untitled')
-    author = metadata.get('author', 'Untitled').split(' / ')[0]
+    author = metadata.get('author', 'Anonymous')
     page_title = "{:s} - {:s}".format(title, author)
 
     template = views.get_template('read.html')
@@ -612,10 +613,14 @@ def edit_part(user_slug, doc_slug, part_slug=None):
         if not has_authority_for_user(user_slug):
             msg = "You must be logged in to add a new document."
             bottle.abort(HTTP_UNAUTHORIZED, msg)
+        today = datetime.now().strftime("%d %B %Y")
         part_text = trim("""
             ARTICLE_TITLE
 
-            $ AUTHOR = AUTHOR_NAME / AUTHOR_EMAIL
+            $ AUTHOR = AUTHOR_NAME
+            $ EMAIL = AUTHOR_EMAIL
+            $ FACEBOOK = FACEBOOK_USER
+            $ TWITTER = TWITTER_USER
             $ DATE = PUBLICATION_DATE
             $ PUBLISH = NO
 
@@ -629,7 +634,7 @@ def edit_part(user_slug, doc_slug, part_slug=None):
             ` Part One
             ` ` Section A
             ` Part Two
-        """)
+        """.replace('PUBLICATION_DATE', today))
         return show_editor(part_text, user_slug, doc_slug, part_slug,
                            is_preview=False,
                            can_be_saved=has_authority_for_user(user_slug))
