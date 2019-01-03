@@ -9,6 +9,7 @@
     <meta itemprop="image" content="{{ metadata.image_url }}">
 
     {% if 'facebook' in metadata %}
+    <meta property="fb:app_id" content="{{ config.FACEBOOK_APP_ID }}">
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="{{ config.APP_NAME }}">
     <meta property="og:title" content="{{ metadata.title }}">

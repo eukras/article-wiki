@@ -59,6 +59,7 @@ def load_env_config() -> dict:
         'COOKIE_NAME',
         'COOKIE_SECRET',
         'ENVIRONMENT',
+        'FACEBOOK_APP_ID',
         'GOOGLE_ANALYTICS_TRACKING_ID',
         'PUBLIC_DIR',
         'SINGLE_USER',  # YES/NO
