@@ -1,0 +1,11 @@
+<div>
+    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
+        <img alt="Creative Commons Licence" style="border-width:0; width: 2rem;" src="{{ config.PUBLIC_DIR }}/creative-commons_cc.svg" />
+        <img alt="Creative Commons Licence" style="border-width:0; width: 2rem;" src="{{ config.PUBLIC_DIR }}/creative-commons_{{ code }}.svg" />
+    </a>
+</div>
+<p>
+    <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text" property="dct:title" rel="dct:type"><i>{{ metadata.title }}</i></span>
+    by <a xmlns:cc="http://creativecommons.org/ns#" href="{{ metadata.author_url }}" property="cc:attributionName" rel="cc:attributionURL">{{ metadata.author }}</a>
+    is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-{{ code }}/4.0/" target="_blank">Creative Commons Attribution-{{ name }} 4.0 International License</a>.
+</p>

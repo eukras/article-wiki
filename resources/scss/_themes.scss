@@ -137,6 +137,11 @@
             border: 0.1rem dotted $fg;
         }
 
+        .license {
+            img {
+                opacity: .5;
+            }
+        }
     }
 
     html.theme-readable {
