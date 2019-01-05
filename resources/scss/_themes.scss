@@ -6,6 +6,10 @@
         $bg: #050509;
         $hl: #67679e;
 
+        ::selection {
+            background-color: #bac;
+        }
+
         color: $fg;
         background-color: $bg;
 
@@ -20,7 +24,7 @@
         }
 
         a {
-            color: #ccc;
+            color: #999;
             text-decoration: none;
         }
 
