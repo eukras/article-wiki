@@ -217,9 +217,9 @@ def space_sentences(text: str) -> str:
     module; using a clunky interim solution.
     """
     def repl(match) -> str:
-        abbrevs = ['mr', 'st', 'mrs', 'ms', 'dr', 'jr', 'sr', 'sq'
+        abbrevs = ['mr', 'st', 'mrs', 'ms', 'dr', 'jr', 'sr', 'sq', 'vol'
                    'esp', 'inc', 'co', 'ltd', 'p.a', 'a.m', 'p.m',
-                   'a.s.a.p', 'r.s.v.p', 'i.e', 'e.g', 'etc'
+                   'a.s.a.p', 'r.s.v.p', 'i.e', 'e.g', 'etc',
                    ]
         tail, punctuation, head = match.groups()
         if punctuation == '.' and tail.lower() in abbrevs:
