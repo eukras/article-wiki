@@ -46,6 +46,14 @@ $(document).ready(function() {
         }
     });
 
+    //  Handy shortcut for editing.
+    $('#editor textarea').on('keydown', function(e) {
+        const SPACE = 32;
+        if (e.keyCode == SPACE && e.ctrlKey) {
+            selectParagraph();
+        }
+    });
+
     //  On small screens, 'Edit' button switches back from #editor.mode-preview
     //  to #editor.mode-edit. CSS will show and hide page elements accordingly.
 
@@ -239,4 +247,26 @@ function cycleTheme() {
     }
     html.addClass(classes[0]);  // <-- If no matches, use first theme
     setSvgBackground()
+}
+
+//  ----------------------------------------
+//  Keystroke and editing functions
+//  ----------------------------------------
+
+function selectParagraph()
+{
+    let textareas = document.getElementsByTagName('textarea');
+    if (textareas.length == 1) {
+        let textarea = textareas[0];
+        if (textarea.selectionStart == textarea.selectionEnd) {
+            //  No selection; create one
+            let caret = textarea.selectionStart;
+            let text = textarea.value;
+            let prevEol = text.lastIndexOf('\n\n', caret);
+            let nextEol = text.indexOf('\n\n', caret - 2);
+            let startParagraph = prevEol == -1 ? 0 : prevEol + 1;
+            let endParagraph = nextEol == -1 ? text.length : nextEol + 1;
+            textarea.setSelectionRange(startParagraph, endParagraph);
+        }
+    }
 }

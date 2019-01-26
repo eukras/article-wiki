@@ -656,19 +656,13 @@ def edit_part(user_slug, doc_slug, part_slug=None):
             default = trim("""
                 {:s}
 
-                (Some example text!) Paragraph with *bold* and /italic/ text,
-                and a ^[footnote].
+                - Shortcuts!
 
-                > Quote
-                = Citation
+                When editing, the following operations may save time.
 
-                * Bullets List
-
-                # Numbered List
-
-                @
-
-                ^ Footnote goes here
+                CENTER (80%) ---
+                | Ctrl-SPACE | Select the current paragraph
+                ---
                 """.format(title))
             can_be_saved = has_authority_for_user(user_slug)
             return show_editor(default, user_slug, doc_slug, part_slug,
