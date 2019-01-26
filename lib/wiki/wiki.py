@@ -8,6 +8,7 @@ in directories.
 """
 
 import logging
+import pprint
 import pytz
 import re
 
@@ -20,7 +21,10 @@ from slugify import slugify
 
 from lib.wiki.backslashes import Backslashes
 from lib.wiki.bibliography import Bibliography, split_bibliography
-from lib.wiki.blocks import BlockList, get_title_data
+from lib.wiki.blocks import \
+    BlockList, \
+    CharacterBlock, \
+    get_title_data
 from lib.wiki.citations import Citations
 from lib.wiki.config import Config
 from lib.wiki.cross_references import CrossReferences

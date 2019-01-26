@@ -16,7 +16,7 @@ Each Block must:
 
 import re
 
-from textwrap import shorten, wrap
+from textwrap import shorten
 
 from copy import copy
 from jinja2 import Template
@@ -28,14 +28,13 @@ from lib.wiki.functions.base import \
     Compact, \
     Indent, \
     Feature, \
+    Function, \
     Float, \
     Left, \
     Right, \
     Text, \
     Verbatim, \
     Wrapper
-from lib.wiki.functions.grid import \
-    Grid
 from lib.wiki.functions.table import \
     Table
 
@@ -61,8 +60,9 @@ from lib.wiki.inline import \
     Inline
 from lib.wiki.utils import \
     clean_text, \
-    split_options, \
     one_line, \
+    random_slug, \
+    split_options, \
     trim
 
 
@@ -119,8 +119,6 @@ class BlockList(object):
         ]}
 
         functions = {_.__name__.upper(): _ for _ in [
-            # Code,
-            # Dot,
             Grid,
             Table,
             Text,
@@ -185,15 +183,16 @@ class BlockList(object):
             for block in self.blocks
         ])
 
-    def find(self, class_name, control_character: str = None) -> list:
+    def find(self, class_name, control_characters: str = None) -> list:
         """
-        A quick way to filter for block types.
+        A quick way to filter for block types (more than one, e.g. "+-").
         """
         found = []
         for _ in self.blocks:
             if _.__class__.__name__ == class_name:
                 if class_name == 'CharacterBlock':
-                    if _.control_character in (None, control_character):
+                    if (_.control_character is None or
+                            _.control_character in control_characters):
                         found += [_]
                 else:
                     found += [_]
@@ -247,9 +246,10 @@ class BlockList(object):
                 self.blocks.pop(0)
         if len(self.blocks) > 0:
             _ = self.blocks[0]
-            if isinstance(_, CharacterBlock) and _.control_character == Config.caption:
-                summary = _.content[2:]
-                self.blocks.pop(0)
+            if isinstance(_, CharacterBlock):
+                if _.control_character == Config.caption:
+                    summary = _.content[2:]
+                    self.blocks.pop(0)
         return (str(shorten(title, 128, placeholder='...')),
                 str(shorten(summary, 128, placeholder='...')))
 
@@ -266,6 +266,7 @@ class BlockList(object):
         renderer = Html({})
         renderer.settings = copy(settings)
         out = []
+        # Headings (if required)
         if not fragment and slug != 'index':
             out += ['<hgroup>']
             title, summary = self.pop_titles()
@@ -283,11 +284,30 @@ class BlockList(object):
                 out += ["<summary>%s</summary>" %
                         renderer.inline.process(summary)]
             out += ['</hgroup>']
+            # Create an outline.
+            headings = self.find('CharacterBlock', "+-")
+            if len(headings) > 0:
+                def heading_html(block):
+                    "May need this later..."
+                    if block.control_character == '+':
+                        return "<b>" + block.content[2:] + "</b>"
+                    elif block.control_character == '-':
+                        return block.content[2:]
+                elements = [heading_html(block) for block in headings]
+                menu_html = '<menu class="balance-text">{:s}</menu>'
+                out += [menu_html.format(" · ".join(elements))]
+        # Assemble
         local_settings = copy(settings)
         for _ in self.blocks:
             block_html, local_settings = _.html(renderer, local_settings)
             out += [block_html]
         return "\n\n".join(out)
+
+    def get_outline(self, blocks):
+        """
+        Produce a compact list of the headings in this section.
+        @idea Maybe later add links or slides.
+        """
 
 
 def get_title_data(text: str, part_slug: str) -> (str, str, str, str):
@@ -518,10 +538,55 @@ class FunctionBlock(Block):
             function = self.function_class(self.options, '')  # <-- ignore text
             html = function.wrap(inner_html)
         else:
-            function = self.function_class(self.options,
-                                           settings.replace(self.content))
+            function = self.function_class(self.options, self.content)
+            # settings.replace(self.content))
             html = function.html(renderer)
         return (html, settings)
+
+# --------------------------------------
+# FunctionBlocks that utilise BlockLists
+# --------------------------------------
+
+
+class Grid(Function):
+    """
+    GRID +++
+    - Column 1, Row 1
+    ---
+    > Column 2, Row 1
+    ===
+    * Column 1, Row 2
+    ---
+    # Column 2, Row 2
+    +++
+    """
+
+    def html(self, renderer):
+        html_rows = []
+        for row in [row.strip() for row in self.text.split("===")]:
+            html_cells = []
+            for cell in [cell.strip() for cell in row.split("---")]:
+                blocks = BlockList(clean_text(cell))
+                slug = random_slug('grid-')
+                html = blocks.html([0], slug, renderer.settings, fragment=True)
+                html_cells.append(html)
+            html_rows.append(html_cells)
+
+        twig = Template(trim("""
+            <table class="table table-condensed">
+            <tbody>
+            {% for html_row in html_rows %}
+                <tr>
+                    {% for html_cell in html_row %}
+                    <td>{{ html_cell|safe }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+            </table>
+        """))
+
+        return twig.render(html_rows=html_rows)
 
 
 # ------------------------------

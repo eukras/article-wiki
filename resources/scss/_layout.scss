@@ -56,6 +56,14 @@ summary {
     font-size: $fontSizePlus1;
 }
 
+section > menu {
+    font-size: $fontSizeMinus1;
+    font-style: italic;
+    margin-left: 7.2rem;
+    border-left: 1px dotted black;
+    padding-left: 1rem;
+}
+
 form {
     margin-bottom: 0;
 }

@@ -22,6 +22,11 @@ from lib.wiki.settings import Settings
 from lib.wiki.utils import trim
 
 
+def class_list(blocks):
+    "Return a list of class names as strings"
+    return [_.__class__.__name__ for _ in blocks]
+
+
 def test_start_of_block():
     "Advance the cursor to next non-whitespace start-of-line."
     text = trim("""
@@ -103,8 +108,7 @@ def test_blocklist():
         ---
         """)
     blocks = BlockList(text)
-    class_list = [_.__class__.__name__ for _ in blocks]
-    assert class_list == [
+    assert class_list(blocks) == [
         'CharacterBlock',
         'Paragraph',
         'Divider',
@@ -136,8 +140,7 @@ def test_blocklist():
         Paragraph
         """)
     blocks = BlockList(text)
-    class_list = [_.__class__.__name__ for _ in blocks]
-    assert class_list == [
+    assert class_list(blocks) == [
         'FunctionBlock',
         'CharacterBlock',
         'Paragraph',
@@ -147,6 +150,31 @@ def test_blocklist():
         'Paragraph',
     ]
     assert blocks.text() == text
+
+
+def test_find():
+    """
+    s
+    """
+    text = trim("""
+        Title
+
+        = Summary
+
+        + Heading
+
+        OK
+
+        - Subheading
+
+        OK
+        """)
+    blocks = BlockList(text)
+    headings = blocks.find('CharacterBlock', "+-")
+    assert class_list(headings) == [
+        'CharacterBlock',
+        'CharacterBlock',
+    ]
 
 
 def test_pop_titles():
@@ -246,8 +274,7 @@ def test_empty_blocklist():
         ---
         """)
     blocks = BlockList(text)
-    class_list = [_.__class__.__name__ for _ in blocks]
-    assert class_list == ['FunctionBlock']
+    assert class_list(blocks) == ['FunctionBlock']
     assert blocks.text() == text
 
 
@@ -261,10 +288,11 @@ def test_nested_blocklist():
         ---
         """)
     blocks = BlockList(text)
-    class_list = [_.__class__.__name__ for _ in blocks]
-    assert class_list == ['FunctionBlock']
-    class_list = [_.__class__.__name__ for _ in list(iter(blocks))[0].blocks]
-    assert class_list == ['FunctionBlock']
+    assert class_list(blocks) == ['FunctionBlock']
+    subclass_list = [
+        _.__class__.__name__ for _ in list(iter(blocks))[0].blocks
+    ]
+    assert subclass_list == ['FunctionBlock']
     assert blocks.text() == text
 
 
