@@ -218,8 +218,9 @@ def space_sentences(text: str) -> str:
     """
     def repl(match) -> str:
         abbrevs = ['mr', 'st', 'mrs', 'ms', 'dr', 'jr', 'sr', 'sq', 'vol'
-                   'esp', 'inc', 'co', 'ltd', 'p.a', 'a.m', 'p.m',
-                   'a.s.a.p', 'r.s.v.p', 'i.e', 'e.g', 'etc',
+                   'esp', 'inc', 'co', 'ltd', 'p.a', 'a.m', 'p.m', 'var',
+                   'a.s.a.p', 'r.s.v.p', 'cf', 'i.e', 'e.g', 'etc',
+                   'trad', 'par', 'lit'
                    ]
         tail, punctuation, head = match.groups()
         if punctuation == '.' and tail.lower() in abbrevs:
@@ -227,7 +228,7 @@ def space_sentences(text: str) -> str:
         else:
             return tail + punctuation + "&nbsp; " + head
 
-    return re.sub(r'(\S+)([!?.][”’"\']?)\s+(\w)', repl, text)
+    return re.sub(r'(\S+)([!?.][”’"\']?)\s+(\S)', repl, text)
 
 
 def strip_markup(content):
