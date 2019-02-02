@@ -722,7 +722,11 @@ def quote_block(content, settings):
     out = []
     for char, content in lines:
         if char == '>':
-            out += [tag('blockquote', content)]
+            if " > " in content[:60]:
+                out += [tag('blockquote', content,
+                            'indent-hanging', ' > ', 'b')]
+            else:
+                out += [tag('blockquote', content)]
         elif char == Config.caption:
             out += [tag('p', content, 'caption', ' = ', 'b')]
     if len(out) > 0:
