@@ -87,6 +87,13 @@ your config so you end up with something closer to
 `install/etc/nginx/sites-enabled/default-ssl`, which you should then use
 instead.
 
+Up-to-date renewal methods mean using the PPA, not the Ubuntu certbot. Follow
+the installation instructions here:
+
+```bash
+https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx
+```
+
 ```bash
 apt-get install certbot python-certbot-nginx
 certbot --nginx -d example.com
