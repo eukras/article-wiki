@@ -700,8 +700,11 @@ div.gloss {
     align-contents: top;
     margin: 0; 
 
+    /* phrase-group goes in between */
+
     div.phrase {
         padding: .2rem 1rem .2rem 0;    
+        float: left;
 
         div.source {
             padding-top: .4rem;

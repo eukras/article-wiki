@@ -850,19 +850,31 @@ def gloss_block(text, settings):
     inline = Inline()
     char = text[0]  # '/', as used here
     gloss = []
+    num = None;
     for _, line in split_to_array(text, char):
         parts = line.split(" %s " % char)
-        source_html = inline.process(parts.pop(0))
-        translations_html = [inline.process(part) for part in parts]
-        gloss += [(source_html, translations_html)]
+        if len(parts) == 1:
+            num = parts.pop(0)
+        else:
+            source_html = inline.process(parts.pop(0))
+            translations_html = [inline.process(part) for part in parts]
+            if num != None:
+                gloss += [[(str(num), ''), (source_html, translations_html)]]
+                num = None
+            else:
+                gloss += [[(source_html, translations_html)]]
 
     twig = Template(trim("""
         <div class="gloss">
-        {% for source_html, translations in gloss %}
-            <div class="phrase">
-                <div class="source">{{ source_html|safe }}</div>
-                {% for translation_html in translations %}
-                <div class="translation">{{ translation_html|safe }}</div>
+        {% for translation_group in gloss %}
+            <div class="phrase-group">
+                {% for source_html, translations in translation_group %}
+                <div class="phrase">
+                    <div class="source">{{ source_html|safe }}</div>
+                    {% for translation_html in translations %}
+                    <div class="translation">{{ translation_html|safe }}</div>
+                    {% endfor %}
+                </div>
                 {% endfor %}
             </div>
         {% endfor %}
