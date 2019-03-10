@@ -31,6 +31,7 @@ from lib.wiki.functions.base import \
     Function, \
     Float, \
     Left, \
+    Quote, \
     Right, \
     Text, \
     Verbatim, \
@@ -115,6 +116,7 @@ class BlockList(object):
             Float,
             Indent,
             Left,
+            Quote,
             Right,
         ]}
 

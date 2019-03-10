@@ -30,7 +30,8 @@ class Function(object):
             'description': trim(self.__doc__),
             'options': self.options,
             'examples': self.examples,
-            }
+        }
+
 
 class Text(Function):
     """
@@ -67,7 +68,7 @@ class Verbatim(Function):
           x x  x   x
         ---
         """)
-        ]
+    ]
 
     def html(self, renderer):
         "Simplest possible case..."
@@ -97,11 +98,11 @@ class Left(Wrapper):
             . NSW 2000
             ---
         """),
-        ]
+    ]
 
     option_list = {
         '1': "width (e.g. 5% or 5em)",
-        }
+    }
 
     def wrap(self, html):
         "Wrap in left alignment."
@@ -121,7 +122,7 @@ class Center(Wrapper):
             . Jenny and Dave
             ---
         """),
-        ]
+    ]
 
     option_list = {
         '1': "width (integer; % or em)",
@@ -146,7 +147,7 @@ class Right(Wrapper):
             . State Postcode
             ---
         """),
-        ]
+    ]
 
     option_list = {
         '1': "width (integer; % or em)",
@@ -155,6 +156,7 @@ class Right(Wrapper):
     def wrap(self, html):
         "Wrap in right alignment."
         return wrap('right', html, self.options)
+
 
 class Float(Wrapper):
     """
@@ -170,7 +172,7 @@ class Float(Wrapper):
             . State Postcode
             ---
         """),
-        ]
+    ]
 
     option_list = {
         '1': "width (integer; % or em)",
@@ -179,6 +181,7 @@ class Float(Wrapper):
     def wrap(self, html):
         "Wrap in right alignment."
         return wrap('float', html, self.options)
+
 
 class Indent(Wrapper):
     """
@@ -195,7 +198,7 @@ class Indent(Wrapper):
             . State Postcode
             ---
         """),
-        ]
+    ]
 
     option_list = {
         '1': "width (integer; % or em)",
@@ -204,6 +207,32 @@ class Indent(Wrapper):
     def wrap(self, html):
         "Wrap in indentation."
         return wrap('indent', html, self.options)
+
+
+class Quote(Wrapper):
+    """
+    Quotes are like indents, but with a smaller font size, and using blockquote
+    tags.
+    """
+
+    examples = [
+        trim("""
+            QUOTE ---
+            . Line
+            : Indented line
+            , Reference
+            ---
+        """),
+    ]
+
+    option_list = {
+        '1': "width (integer; % or em)",
+    }
+
+    def wrap(self, html):
+        "Wrap in indentation."
+        return '<blockquote>{:s}</blockquote>'.format(html)
+
 
 class Compact(Wrapper):
     """
@@ -222,7 +251,7 @@ class Compact(Wrapper):
             of text lots of text lots of text lots of text lots of text
             ---
         """),
-        ]
+    ]
 
     option_list = {
         '1': "2cols, 3cols (optional)"
@@ -243,12 +272,13 @@ class Compact(Wrapper):
 
 class Feature(Wrapper):
     "Label content as featured for CSS."
- 
+
     def wrap(self, html):
         """
         Wrap inner HTML.
         """
         return "<div class=\"wiki-feature\">%s</div>" % html
+
 
 class Box(Wrapper):
     """
@@ -266,7 +296,7 @@ class Box(Wrapper):
             of text lots of text lots of text lots of text lots of text
             ---
         """),
-        ]
+    ]
 
     option_list = {
     }
