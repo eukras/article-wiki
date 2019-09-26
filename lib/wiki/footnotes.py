@@ -131,7 +131,7 @@ class Footnotes(object):
             {% if backlinks|length < 2 %}
                 {% for number, entries in backlinks %}
                     {% for count, (ref_link, ref_text) in entries %}
-                <div class="indent-hanging">
+                <div class="indent-first-line">
                     <sup>{{ ref_link|safe }}</sup> {{ ref_text|safe }}
                 </div>
                     {% endfor %}
@@ -141,11 +141,9 @@ class Footnotes(object):
                 <div class="columns-x2">
                 {% for number, entries in backlinks %}
                     <div class="no-widows">
-                        <div class="footnotes-section-number">
-                            {{ number }}
-                        </div>
+                        <div><b>{{ number }}</b></div>
                     {% for count, (ref_link, ref_text) in entries %}
-                        <div class="indent-hanging">
+                        <div class="indent-first-line">
                             <sup>{{ ref_link|safe }}</sup> {{ ref_text|safe }}
                         </div>
                     {% endfor %}

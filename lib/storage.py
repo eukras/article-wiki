@@ -14,6 +14,7 @@ version control operations.
 import codecs
 import datetime
 import glob
+import logging
 import os
 import subprocess
 
@@ -72,19 +73,19 @@ def load_dir(dir_path: str) -> dict:
 
 
 # -----------------
-# Generate tarfiles
+# Generate zip file
 # -----------------
 
-def make_tgz_name(user_slug: str) -> str:
+def make_zip_name(user_slug: str) -> str:
     "Formats a timestamped archive name for this user_slug."
-    name = "article-wiki_{:s}_{:d}-{:d}-{:d}.tgz"
+    name = "article-wiki_{:s}_{:d}-{:d}-{:d}.zip"
     now = datetime.datetime.now()
     return name.format(user_slug, now.year, now.month, now.day)
 
 
-def write_archive_dir(archive_data: Dict[str, Dict[str, str]], dir_path: str):
+def write_archive_dir(dir_path: str, archive_data: Dict[str, Dict[str, str]]):
     """
-    Writes user documents into a hiererchy of text files.
+    Writes user documents into a hierarchy of text files.
 
     For each {doc_slug: {part_slug: part_text}}, create
     """
@@ -95,11 +96,13 @@ def write_archive_dir(archive_data: Dict[str, Dict[str, str]], dir_path: str):
         parts = archive_data.get(doc_slug)
         if isinstance(parts, dict):
             save_dir(doc_dir, parts)
+        else:
+            print("Not a dict? " + doc_slug)
 
 
-def compress_archive_dir(dir_path: str, tgz_name: str) -> str:
+def compress_archive_dir(dir_path: str, zip_name: str) -> str:
     """
-    For a directory dir_path create dir_path/tgz_name.
+    For a directory dir_path create dir_path/zip_name.
 
     Typically used `with tempfile.TemporaryDirectory()`, so permissions and
     cleanup are automatic. Archive file goes inside target dir, since this
@@ -108,16 +111,17 @@ def compress_archive_dir(dir_path: str, tgz_name: str) -> str:
 
     Args:
         dir_path: absolute path to target directory
-        tgz_name: name of archive file to create
+        zip_name: name of archive file to create
 
     Returns:
-        dir_path/tgz_name
+        dir_path/zip_name
     """
     cwd = os.getcwd()
     os.chdir(dir_path)
-    command = "tar -czf {} */*.txt".format(tgz_name)
+    command = "zip -R {:s} {:s}".format(zip_name, "*/*")
+    print(command)
     process = subprocess.Popen(command, shell=True)
     process.communicate()  # <-- Wait for completion!
     os.chdir(cwd)
-    tgz_path = os.path.join(dir_path, tgz_name)
-    return tgz_path
+    zip_path = os.path.join(dir_path, zip_name)
+    return zip_path

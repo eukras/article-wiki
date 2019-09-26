@@ -19,7 +19,7 @@ from datetime import datetime
 
 import codecs
 import logging
-import pprint
+# import pprint
 import os
 import sys
 import tempfile
@@ -36,7 +36,7 @@ from lib.data import Data, load_env_config
 from lib.document import Document
 from lib.storage import \
     compress_archive_dir, \
-    make_tgz_name, \
+    make_zip_name, \
     write_archive_dir
 from lib.wiki.blocks import BlockList, get_title_data
 from lib.wiki.inline import Inline
@@ -96,7 +96,7 @@ def before_request():
         views.globals['theme'] = "theme-default"
 
 
-def abs_url(request: bottle.BaseRequest, uri: str) -> str:
+def abs_url(request, uri):
     """
     Prepend scheme/port/host to URI.
     """
@@ -775,13 +775,21 @@ def export_archive(user_slug):
 
     @todo: Import archive!
     """
+    config['DEBUG'] = 'YES'
     require_user(user_slug)  # else 404
-    tgz_name = make_tgz_name(user_slug)
     with tempfile.TemporaryDirectory() as dir_path:
         archive_data = data.userDocument_hash(user_slug)
-        write_archive_dir(archive_data, dir_path)
-        compress_archive_dir(dir_path, tgz_name)
-        return bottle.static_file(tgz_name, root=dir_path, download=tgz_name)
+        write_archive_dir(dir_path, archive_data)
+        if 'DEBUG' in config:
+            print(['FILE NAMES: ' + user_slug, os.listdir(dir_path)])
+        zip_name = make_zip_name(user_slug)
+        zip_path = os.path.join(dir_path, zip_name)
+        compress_archive_dir(dir_path, zip_name)
+        if os.path.exists(zip_path):
+            return bottle.static_file(zip_name, root=dir_path, download=zip_name)
+        else:
+            logging.error("Download failed: " + zip_name)
+            bottle.abort(HTTP_BAD_REQUEST, "Download failed.")
 
 
 @bottle.get('/download/<user_slug>/<doc_slug>')

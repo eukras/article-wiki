@@ -21,7 +21,6 @@ LEFT (70%) ---
 * ^[HTTPS]. ?[+++]
 * Identifier string: base64(author,path,file)
 * Link: Edit --> edit/$identifier
-* Or just upload-download a composite .txt? Or a .zip/.tgz? ?[++-]
 * User identification is by email; authentication is by edit key (or password). ?[+++]
 
 ^ https://jaredquinn.info/2016/05/no-excuses-left-for-plaintext-http/

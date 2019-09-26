@@ -6,8 +6,9 @@ from .context import lib  # noqa: F401
 from lib.storage import \
     compress_archive_dir, \
     load_dir, \
-    make_tgz_name, \
-    save_dir
+    make_zip_name, \
+    save_dir, \
+    write_archive_dir
 
 from lib.wiki.sample_data import minimal_document
 from lib.wiki.utils import random_slug
@@ -41,8 +42,12 @@ def test_user_archive():
     """
     with tempfile.TemporaryDirectory() as dir_path:
         # import pdb; pdb.set_trace()
-        save_dir(dir_path, minimal_document)
+        archive_data = {
+            'test': minimal_document,
+            'test-2': minimal_document,
+            }
+        write_archive_dir(dir_path, minimal_document)
         user_slug = random_slug('test-user-')
-        tgz_name = make_tgz_name(user_slug)
-        tgz_path = compress_archive_dir(dir_path, tgz_name)
-        assert os.path.exists(tgz_path)
+        zip_name = make_zip_name(user_slug)
+        zip_path = compress_archive_dir(dir_path, zip_name)
+        assert os.path.exists(zip_path)

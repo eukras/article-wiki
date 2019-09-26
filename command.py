@@ -76,7 +76,12 @@ def create_admin_user():
     """
     config = load_env_config()
     data = get_redis_client()
-    data.user_set(config['ADMIN_USER'], config['ADMIN_USER_PASSWORD'])
+    admin_user = {
+        'slug': config['ADMIN_USER'],
+        'password': config['ADMIN_USER_PASSWORD'],
+        'is_admin': 'YES',
+    }
+    data.user_set(config['ADMIN_USER'], admin_user)
     print("Created user: {:s}".format(config['ADMIN_USER']))
 
 

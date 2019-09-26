@@ -14,6 +14,7 @@ config = {
     'REDIS_PORT': 6379,
     'REDIS_DATABASE': 1,  # <-- TESTING
     'ADMIN_USER': 'admin',
+    'TIME_ZONE': 'Australia/Sydney',
 }
 
 data = Data(config, strict=True)

@@ -49,8 +49,20 @@ $(document).ready(function() {
     //  Handy shortcut for editing.
     $('#editor textarea').on('keydown', function(e) {
         const SPACE = 32;
-        if (e.keyCode == SPACE && e.ctrlKey) {
-            selectParagraph();
+        const KEY_B = 66;
+        const KEY_I = 73;
+        const KEY_U = 85;
+        if (e.ctrlKey) {
+            if (e.keyCode == SPACE) {
+                selectParagraph(this);
+            } else if (e.keyCode == KEY_I) {
+                insertAtCursor(this, '/', '/');
+            } else if (e.keyCode == KEY_B) {
+                insertAtCursor(this, '*', '*');
+            } else if (e.keyCode == KEY_U) {
+                insertAtCursor(this, '_', '_');
+                return false;
+            }
         }
     });
 
@@ -253,20 +265,30 @@ function cycleTheme() {
 //  Keystroke and editing functions
 //  ----------------------------------------
 
-function selectParagraph()
+function selectParagraph(textarea)
 {
-    let textareas = document.getElementsByTagName('textarea');
-    if (textareas.length == 1) {
-        let textarea = textareas[0];
-        if (textarea.selectionStart == textarea.selectionEnd) {
-            //  No selection; create one
-            let caret = textarea.selectionStart;
-            let text = textarea.value;
-            let prevEol = text.lastIndexOf('\n\n', caret);
-            let nextEol = text.indexOf('\n\n', caret - 2);
-            let startParagraph = prevEol == -1 ? 0 : prevEol + 1;
-            let endParagraph = nextEol == -1 ? text.length : nextEol + 1;
-            textarea.setSelectionRange(startParagraph, endParagraph);
-        }
+    if (textarea.selectionStart == textarea.selectionEnd) {
+        //  No selection; create one
+        let caret = textarea.selectionStart;
+        let text = textarea.value;
+        let prevEol = text.lastIndexOf('\n\n', caret);
+        let nextEol = text.indexOf('\n\n', caret - 2);
+        let startParagraph = prevEol == -1 ? 0 : prevEol + 1;
+        let endParagraph = nextEol == -1 ? text.length : nextEol + 1;
+        textarea.setSelectionRange(startParagraph, endParagraph);
     }
+}
+
+function insertAtCursor(textarea, prepend, append='') {
+    if (document.selection) {
+        textarea.focus();
+        document.selection.createRange().text = prepend + document.selection.createRange().text + append;
+    } else if (textarea.selectionStart || textarea.selectionStart == '0') {
+        var startPos = textarea.selectionStart;
+        var endPos = textarea.selectionEnd;
+        textarea.value = textarea.value.substring(0, startPos) + prepend + textarea.value.substring(startPos, endPos) + append + textarea.value.substring(endPos, textarea.value.length);
+        //  textarea.focus();
+        textarea.selectionStart = startPos + prepend.length;
+        textarea.selectionEnd = endPos + prepend.length;
+    } 
 }
