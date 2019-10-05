@@ -146,6 +146,14 @@
                 opacity: .5;
             }
         }
+    
+        .popover-nav-modal {
+            background-color: $bg;
+        }
+    
+        .popover-nav-content {
+            background-color: $bg;
+        }
     }
 
     html.theme-readable {
