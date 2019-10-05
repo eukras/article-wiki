@@ -1,0 +1,30 @@
+div.popover-nav-modal.visible {
+
+    /* Center content */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* Modal background */
+    position: fixed;
+    z-index: 10;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+
+    background-color: #f8f8f8;
+}
+
+div.popover-nav-modal.visible nav.popover-nav-content {
+    
+    width: 40rem;
+    height: 90vh;
+    padding: 1rem 2rem;
+    overflow-y: scroll;
+
+}
+
+div.visible-over-popover-nav-modal {
+    z-index: 20;
+}
