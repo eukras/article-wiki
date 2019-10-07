@@ -197,3 +197,52 @@ form {
 #menu-button {
     z-index: 20;
 }
+
+
+/* CSS Modal notice: only deactivated if grid is supported. */
+
+.modal {
+
+    display: block;
+
+    .modal-cover {
+        z-index: 10;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: #000;
+        width: 100vw;
+        height: 100vh;
+        opacity: 0.5;
+    }
+
+    .modal-message {
+        position: fixed;
+        z-index: 11;
+        top: 2em;
+        left: 2em;
+        border-radius: $borderRadius;
+        box-shadow: 1rem 1rem 2rem #444;
+        text-align: center;
+        background-color: #fff;
+        width: 18em;
+        max-width: 90%;
+        padding: 2rem;
+
+        h2 {
+            font-weight: bold;
+            margin: 0 0 1rem 0;
+        }
+
+        .modal-button {
+            margin: 2rem 0 1rem 0;
+        }
+    }
+
+}
+
+@supports (display: flex) {
+    .modal {
+        display: none;
+    }
+}

@@ -38,7 +38,7 @@ def write_epub(user_slug, doc_slug, file_path):
     title = metadata.get('title', 'Untitled')
     author = metadata.get('author', 'Anonymous')
 
-    chapter_file_name = doc_slug + '.html'
+    chapter_file_name = doc_slug + '.xhtml'
 
     book = epub.EpubBook()
 

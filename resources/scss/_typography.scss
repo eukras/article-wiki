@@ -229,12 +229,18 @@ ul > ul, ol > ol {
 
 
 h1, h2, h3, h4, h5, h6 {
-    text-wrap: balanced;
+    text-wrap: balanced;  /** Future, 2019**/
     margin-top: 0;
     padding-top: 0.7rem;
     margin-bottom: 0;
     padding-bottom: 0.3rem;
     margin-top: 1rem;
+}
+
+@media print {
+    h1, h2, h3, h4, h5, h6 {
+        page-break-after: avoid; /** IE only (2019) **/
+    }
 }
 
 h1, h2, h4, h5, h6 {
@@ -639,16 +645,6 @@ ol ol ol ol ol ol {
 
 ol ol ol ol ol ol ol { 
     list-style: upper-greek; 
-}
-
-ul.dashes {
-    list-style-type: none;
-}
-
-ul.dashes > li:before {
-    content: "–"; /* en dash here */
-    position: absolute;
-    margin-left: -1.1em; 
 }
 
 ul.checkboxes {
