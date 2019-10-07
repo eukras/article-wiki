@@ -243,6 +243,17 @@ td.word-count {
     font-size: $fontSizeMinus2;
 }
 
+/**
+ * Control print layout
+ */
+
+p,
+li,
+blockquote,
+td {
+    widows: 3;
+    orphans: 3;
+}
 
 /* CSS Modal notice: only deactivated if grid is supported. */
 
@@ -286,7 +297,7 @@ td.word-count {
 
 }
 
-@supports (display: grid) {
+@supports (display: flex) {
     .modal {
         display: none;
     }
