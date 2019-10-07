@@ -852,9 +852,9 @@ def post_upload_txt(user_slug, doc_slug):
         msg = "The uploaded file is too large (limit: {:d}K)."
         bottle.abort(msg.format(limit))
     name = upload.filename
-    prefix = '{:s}_{:s}_'.format(user_slug, doc_slug)
+    prefix = 'article-wiki_{:s}_{:s}_'.format(user_slug, doc_slug)
     if not name.startswith(prefix) or not name.endswith('.txt'):
-        msg = "A '{:s}*.txt' file is required."
+        msg = "A '{:s}*.txt' filename is expected."
         bottle.abort(msg.format(prefix))
 
     # Load contents

@@ -362,3 +362,5 @@ class Document(object):
             else:
                 raise ValueError("Malformed import file.")
             pos += 3
+        # If all OK...
+        self.set_slugs(user_slug, doc_slug)
