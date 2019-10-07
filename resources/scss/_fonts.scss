@@ -1,16 +1,4 @@
 /**
- * Supply local override font for greek-extended characters.
- */
-
-@font-face {
-    font-family: 'Greek';
-    src: url("/static/GFSDidot.otf") format("opentype");
-    font-style: normal;
-    font-weight: normal;
-    unicode-range: U+0370-03FF;  /* Greek */
-}
-
-/**
  * Fix valign of FontAwesome list icons.
  */
 

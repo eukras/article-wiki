@@ -3,12 +3,15 @@
 @import "_reset.scss";
 @import "_fonts.scss";
 
-/* The web application design. */
-
+/**
+ * Theoretically, this is unnecessary for ebooks.
+ *
 @import "_layout.scss";
 @import "_buttons.scss";
 @import "_popover.scss";
 @import "_themes.scss";
+ *
+ */
 
 /* Typography: Same for book/print/ebook. */
 @import "_wiki.scss";
@@ -16,4 +19,4 @@
 @import "_responsive.scss";
 
 /* main.css and epub.css are two separate builds.*/
-@import "_web.scss";
+@import "_ebook.scss";

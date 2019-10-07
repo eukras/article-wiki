@@ -4,6 +4,7 @@ bottle
 bottle_utils
 click
 cssselect
+ebooklib
 html-parser
 Jinja2
 lxml

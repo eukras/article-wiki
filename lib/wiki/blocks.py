@@ -286,18 +286,6 @@ class BlockList(object):
                 out += ["<summary>%s</summary>" %
                         renderer.inline.process(summary)]
             out += ['</hgroup>']
-            # Create an outline.
-            headings = self.find('CharacterBlock', "+-")
-            if len(headings) > 0:
-                def heading_html(block):
-                    "May need this later..."
-                    if block.control_character == '+':
-                        return "<b>" + block.content[2:] + "</b>"
-                    elif block.control_character == '-':
-                        return block.content[2:]
-                elements = [heading_html(block) for block in headings]
-                menu_html = '<menu class="balance-text">{:s}</menu>'
-                out += [menu_html.format(" · ".join(elements))]
         # Assemble
         local_settings = copy(settings)
         for _ in self.blocks:

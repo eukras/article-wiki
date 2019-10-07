@@ -12,6 +12,7 @@ cloc:
 
 css: resources/scss/*.scss
 	pyscss -o static/main.css resources/scss/main.scss
+	pyscss -o static/epub.css resources/scss/epub.scss
 
 lint:
 	flake8

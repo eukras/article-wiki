@@ -5,8 +5,202 @@
  *
  */
 
+* {
+    line-height: 150%;
+}
+
+html {
+    font-family: $fontFamilySerif;
+    font-size: $fontSize;
+    line-height: 150%;
+    color: #222;
+}
+
+header {
+    text-align: center;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+
+header h1 {
+    text-align: center;
+}
+
+header summary {
+    font-size: $fontSizePlus2;
+    margin-bottom: 2rem;
+}
+
+header address {
+    display: inline-block;
+    margin: .3rem;
+    font-style: normal;
+}
+
+article {
+    margin-top: 4rem;
+}
+
+summary {
+    margin: 0 0 1rem 0;
+    padding: 0;
+    font-style: italic;
+    font-size: $fontSizePlus1;
+}
+
 section#footnotes {
     overflow-wrap: break-word;
+}
+
+a, button {
+    border: none;
+    background: none;
+}
+
+section {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+section.depth-1 {
+    margin-top: 2rem;
+}
+
+section.depth-2 {
+    margin-top: 1rem;
+}
+
+section.depth-3 {
+    margin-top: 1rem;
+}
+
+h1 + summary {
+    margin-top: none;
+}
+
+section.depth-1 h1, header h1 {
+    font-size: $fontSizePlus3;
+}
+
+section.depth-2 h1 {
+    font-size: $fontSizePlus2;
+}
+
+section.depth-3 h1 {
+    font-size: $fontSizePlus1;
+}
+
+section.depth-4 h1,
+footer h1 {
+    font-size: $fontSize
+}
+
+section.depth-5 h1 {
+    font-size: $fontSizeMinus1;
+}
+
+section.depth-6 h1 {
+    font-size: $fontSizeMinus1;
+}
+
+footer {
+    font-size: $fontSizeMinus1;
+}
+
+
+/**
+ * Put wiki demo sections side by side when there is space available.
+ */
+
+.wiki-demo {
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: row;
+
+    .wiki-demo-source {
+        border-right: .1rem dotted black;
+        padding-right: 2rem;
+        min-width: 40%;
+        pre {
+            padding: 0;
+        }
+    }
+    .wiki-demo-output {
+        padding-left: 1rem;
+        min-width: 40%;
+        article {
+            margin: 0;
+        }
+    }
+}
+
+.wiki-demo-wide {
+    overflow-y: hidden;
+
+    .wiki-demo-source {
+        padding-left: 2rem;
+        padding-right: 0;
+    }
+    .wiki-demo-output {
+        border-left: 0.1rem dotted black;
+        padding-left: 2.4rem;
+        padding-right: 0;
+        article {
+            margin: 0;
+        }
+    }
+}
+
+.wiki-demo-output section.depth-1,
+.wiki-demo-output section.depth-2,
+.wiki-demo-output section.depth-3 {
+    margin-top: 1rem;
+}
+
+.wiki-demo table {
+    min-width: 20em;
+}
+
+/**
+ * Articles list for home and user pages.
+ * Consider CSS Masonry/Flexboxy instead. 
+ */
+
+.article-list {
+    margin: 1.5em 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 45% 45%;
+    grid-gap: 10%;
+    grid-row-gap: 0;
+}
+.article {
+    display: inline-block;
+    padding: 1rem 0;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+}
+.article-title {
+    font-size: $fontSize;
+    font-style: bold;
+}
+.article-summary {
+    margin-bottom: 1rem;
+    font-size: $fontSizeMinus1;
+}
+.article-details {
+    margin-top: .5em;
+    font-size: $fontSizeMinus1;
+}
+
+/**
+ * Incidental styling.
+ */
+
+.clickable {
+    cursor: pointer;
+    user-select: none;
 }
 
 .footnotes-section-number {
@@ -14,17 +208,98 @@ section#footnotes {
     font-weight: bold;
 }
 
-/**
- * -------------------------------------------------------------------------
- * CODE:  Pygments markup for black-and-white.
- * -------------------------------------------------------------------------
- *
-
-.linenos pre {
-    min-width: 3rem;
+.no-overflow {
+    overflow: hidden;
 }
 
- *
+.wiki-error {
+    color: red;
+}
+ 
+.wiki-no-select {
+  -webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  user-select: none;          /* Likely future */      
+}
+
+.no-column-break {
+    -webkit-column-break-inside: avoid; /* Chrome, Safari */
+    page-break-inside: avoid;           /* Theoretically FF 20+ */
+    break-inside: avoid-column;         /* IE 11 */
+    display:table;                      /* Actually FF 20+ */
+}
+
+/**
+ * [NC 2019-10-07] Table of contents
+ */
+
+h2 + table.table-of-contents {
+    margin-top: 0;
+}
+
+td.word-count { 
+    text-align: right;
+    font-size: $fontSizeMinus2;
+}
+
+
+/* CSS Modal notice: only deactivated if grid is supported. */
+
+.modal {
+
+    display: block;
+
+    .modal-cover {
+        z-index: 10;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: #000;
+        width: 100vw;
+        height: 100vh;
+        opacity: 0.5;
+    }
+
+    .modal-message {
+        position: fixed;
+        z-index: 11;
+        top: 2em;
+        left: 2em;
+        border-radius: $borderRadius;
+        box-shadow: 1rem 1rem 2rem #444;
+        text-align: center;
+        background-color: #fff;
+        width: 18em;
+        max-width: 90%;
+        padding: 2rem;
+
+        h2 {
+            font-weight: bold;
+            margin: 0 0 1rem 0;
+        }
+
+        .modal-button {
+            margin: 2rem 0 1rem 0;
+        }
+    }
+
+}
+
+@supports (display: grid) {
+    .modal {
+        display: none;
+    }
+}
+
+/**
+ * -------------------------------------------------------------------------
+ * FOR PLUGINS
+ * -------------------------------------------------------------------------
+ */
+
+/** 
+ * CODE
  */
 
 .code .hll { background-color: #ffffcc }

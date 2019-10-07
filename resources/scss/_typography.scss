@@ -10,6 +10,10 @@
     clear: both;
 }
 
+.clear-after + * {
+    clear: both;
+}
+
 .text-center {
     text-align: center;
 }
@@ -50,7 +54,7 @@ a.unmarked {
 }
 
 .wiki { 
-    padding: 3rem 7rem 3rem 7rem;
+    padding: 3rem 7rem 7rem 7rem;
 }
 
 p {
@@ -256,8 +260,8 @@ h2 {
     text-align: center;
     margin: 1rem 0;
     padding: 0.5rem 0;
-    border-top: dotted 1px black;
-    border-bottom: dotted 1px black;
+    background-color: white;
+    border-radius: $borderRadius;
 }
 
 h3 {
@@ -542,8 +546,8 @@ table {
     display: block;
 }
 
-thead tr {
-    border-bottom: solid .4rem white;
+thead tr td {
+    padding: 0.4rem;
 }
 
 tbody td {
@@ -603,6 +607,14 @@ small {
 }
 .header .date { 
     margin-top: 1rem;
+}
+
+ul, ol {
+    padding-left: 2.25rem;
+}
+
+li {
+    padding-left: 0.15rem;
 }
 
 ol ol { 

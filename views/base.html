@@ -19,43 +19,45 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="{{ config.PUBLIC_DIR }}/main.css" media="all" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans+Condensed:400,400i,600,600i|IBM+Plex+Serif:400,400i,600,600i|Fira+Mono:400,400i,600,600i">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=GFS+Didot&display=swap&subset=greek">
+
+
     {% block header_tags %}
     {% endblock %}
 
 </head>
 <body>
-<div id="background"></div>
 
-{% block content %}
-{% endblock %}
+    <div id="background"></div>
 
-{% if config.ENVIRONMENT != "prod" %}
-<div class="wiki-ribbon no-print">{{ config.ENVIRONMENT }}</div>
-{% endif %}
+    {% block content %}
+    {% endblock %}
 
-<div id="browser-not-supported" class="modal">
-    <div class="modal-cover">
-    </div>
-    <div class="modal-message">
-        <h2 class="balance-text">Your browser is not supported.</h2>
-        <p class="balance-text">You'll need a modern browser that supports 'grid' layout.</p>
-        <div class="modal-button">
-            <a class="button feature" target="_blank" href="https://caniuse.com/#search=grid">
-                <i class="fa fa-info-circle"></i> Like What?
-            </a>
+    <!-- Modal note for browsres without grad layout. -->
+    <div id="browser-not-supported" class="modal">
+        <div class="modal-cover">
+        </div>
+        <div class="modal-message">
+            <h2 class="balance-text">Your browser is not supported.</h2>
+            <p class="balance-text">You'll need a modern browser that supports 'grid' layout.</p>
+            <div class="modal-button">
+                <a class="button feature" target="_blank" href="https://caniuse.com/#search=grid">
+                    <i class="fa fa-info-circle"></i> Like What?
+                </a>
+            </div>
         </div>
     </div>
-</div>
 
-<div id="progress" class="side-nav bottom-menu progress-nav no-print clickable">
-    <span id="progress-percent">...</span> <i class="fa fa-arrow-up"></i>
-</div> 
+    <!-- Nav elements -->
+    <div id="menu" class="side-nav menu-nav visible-over-popover-nav-modal no-print">
+        <div title="Show/hide menu [Esc]" id="menu-button" class="clickable">
+            <i class="fa fa-bars"></i>
+        </div>
+    </div> 
 
-<div id="menu" class="side-nav menu-nav visible-over-popover-nav-modal no-print">
-    <div title="Show/hide menu [Esc]" id="menu-button" class="clickable">
-        <i class="fa fa-bars"></i>
-    </div>
-</div> 
+    <div id="progress" class="side-nav bottom-menu progress-nav no-print clickable">
+        <span id="progress-percent">...</span> <i class="fa fa-arrow-up"></i>
+    </div> 
 
 </body>
 

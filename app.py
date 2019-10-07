@@ -34,6 +34,7 @@ from slugify import slugify
 
 from lib.data import Data, load_env_config
 from lib.document import Document
+from lib.ebook import write_epub
 from lib.storage import \
     compress_archive_dir, \
     make_zip_name, \
@@ -102,7 +103,9 @@ def abs_url(request, uri):
     """
     parts = request.urlparts
     # print(pprint.pformat(parts))
-    return '{:s}://{:s}/{:s}'.format(parts.scheme, parts.netloc, uri.lstrip('/'))
+    return '{:s}://{:s}/{:s}'.format(
+        parts.scheme, parts.netloc, uri.lstrip('/')
+        )
 
 
 # -------------------------------------------------------------
@@ -768,6 +771,11 @@ def delete_part(user_slug, doc_slug, part_slug):
         bottle.redirect('/user/{:s}'.format(user_slug))
 
 
+# -------------------------------------------------------------
+# IMPORT AND EXPORT FUNCTIONS
+# -------------------------------------------------------------
+
+
 @bottle.get('/export-archive/<user_slug>')
 def export_archive(user_slug):
     """
@@ -786,7 +794,11 @@ def export_archive(user_slug):
         zip_path = os.path.join(dir_path, zip_name)
         compress_archive_dir(dir_path, zip_name)
         if os.path.exists(zip_path):
-            return bottle.static_file(zip_name, root=dir_path, download=zip_name)
+            return bottle.static_file(
+                zip_name,
+                root=dir_path,
+                download=zip_name
+                )
         else:
             logging.error("Download failed: " + zip_name)
             bottle.abort(HTTP_BAD_REQUEST, "Download failed.")
@@ -863,6 +875,32 @@ def post_upload_txt(user_slug, doc_slug):
 
     uri = '/read/{:s}/{:s}'.format(user_slug, doc_slug)
     bottle.redirect(uri)
+
+
+@bottle.get('/download-epub/<user_slug>/<doc_slug>')
+def generate_epub(user_slug, doc_slug):
+    """
+    Writes an .epub to a new /tmp directory; restrict to admin for now. Better
+    in a job queue.
+    """
+    require_authority_for_user(user_slug)  # else 401s
+
+    work_dir = '/tmp'
+    file_name = '%s_%s.epub' % (user_slug, doc_slug)
+    file_path = '%s/%s' % (work_dir, file_name)
+
+    write_epub(user_slug, doc_slug, file_path)
+
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            attach_as_file = 'attachment; filename="{:s}"'.format(file_name)
+            bottle.response.set_header('Content-Type', 'application/epub+zip')
+            bottle.response.set_header('Content-Disposition', attach_as_file)
+            return f.read()
+
+    # if still here...
+    logging.error("Download failed: " + file_path)
+    bottle.abort(HTTP_BAD_REQUEST, "Download failed.")
 
 
 # --------

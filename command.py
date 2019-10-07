@@ -16,6 +16,7 @@ import click
 from typing import List
 
 from lib.data import Data, load_env_config
+from lib.ebook import write_epub
 from lib.document import Document
 from lib.storage import load_dir, save_dir
 
@@ -70,6 +71,15 @@ def save_user_document(data: Data, user_slug: str, doc_slug: str):
 # ------------------------
 
 
+def generate_epub():
+    """
+    Writes an .epub to a new /tmp directory
+    """
+    file_path = '/tmp/eukras-help.epub'
+    write_epub('eukras', 'help', file_path)
+    print("Generated ebook: {:s}".format(file_path))
+
+
 def create_admin_user():
     """
     Creates an $ADMIN_USER with $ADMIN_USER_PASSWORD.
@@ -119,7 +129,9 @@ def refresh_metadata():
 @click.argument('command')
 def console(command):
     """Processes console commands."""
-    if command == 'initialize':
+    if command == 'generate-epub':
+        generate_epub()
+    elif command == 'initialize':
         create_admin_user()
         load_fixtures()
     elif command == 'load-fixtures':
@@ -130,6 +142,7 @@ def console(command):
         save_fixtures()
     else:
         print("Commands:")
+        print("  - generate-epub")
         print("  - initialize")
         print("  - load-fixtures")
         print("  - refresh_metadata")
