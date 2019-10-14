@@ -89,6 +89,7 @@ bottle.install(flash.message_plugin)
 def before_request():
     """
     If a theme is set, make sure the views know about it.
+    Also set the FQDN as a global for
     """
     theme = bottle.request.get_cookie('article-wiki-theme')
     if isinstance(theme, str):
@@ -102,9 +103,18 @@ def abs_url(request, uri):
     Prepend scheme/port/host to URI.
     """
     parts = request.urlparts
-    # print(pprint.pformat(parts))
     return '{:s}://{:s}/{:s}'.format(
         parts.scheme, parts.netloc, uri.lstrip('/')
+        )
+
+
+def domain_name(request):
+    """
+    Prepend scheme/port/host to URI.
+    """
+    parts = request.urlparts
+    return '{:s}://{:s}'.format(
+        parts.scheme, parts.netloc
         )
 
 
@@ -252,6 +262,7 @@ def show_editor(source: str,
     Common renderer for /playground and /edit/user_slug/doc_slug/part_slug.
     """
     settings = Settings({
+        'config:host': domain_name(bottle.request),
         'config:user': user_slug,
         'config:document': doc_slug,
     })
@@ -445,6 +456,7 @@ def home_page():
             (Text goes here...)
         """)}
     settings = Settings({
+        'config:host': domain_name(bottle.request),
         'config:user': data.admin_user,
         'config:document': 'fixtures',
     })
@@ -504,6 +516,7 @@ def user_page(user_slug):
         unpublished_articles = []
 
     settings = Settings({
+        'config:host': domain_name(bottle.request),
         'config:user': user_slug,
         'config:document': 'fixtures',
     })
@@ -559,9 +572,12 @@ def read_document(user_slug, doc_slug):
     footer_buttons += [download_button(user_slug, doc_slug)]
 
     settings = Settings({
+        'config:host': domain_name(bottle.request),
         'config:user': user_slug,
         'config:document': doc_slug,
     })
+
+    # pprint.pprint(domain_name(bottle.request))
 
     metadata = data.userDocumentMetadata_get(user_slug, doc_slug)
 
@@ -697,6 +713,8 @@ def post_edit_part(user_slug, doc_slug, part_slug):
     new_doc_slug, old_doc_slug = doc_slug, doc_slug
 
     document = Document(data)
+    host = domain_name(bottle.request)
+    document.set_host(host)
     if doc_slug == "_":
         # New article...
         new_doc_slug = document.set_index(new_text)
@@ -759,6 +777,7 @@ def delete_part(user_slug, doc_slug, part_slug):
     """
     require_authority_for_user(user_slug)  # or 401
     document = Document(data)
+    document.set_host(domain_name(bottle.request))
     if not document.load(user_slug, doc_slug):
         msg = "Document '{:s}/{:s}' not found."
         bottle.abort(HTTP_NOT_FOUND, msg.format(user_slug, doc_slug))
@@ -810,6 +829,7 @@ def download_txt(user_slug, doc_slug):
     Creates a single text file to download.
     """
     document = Document(data)
+    document.set_host(domain_name(bottle.request))
     if not document.load(user_slug, doc_slug):
         msg = "Document '{:s}' not found."
         bottle.abort(HTTP_NOT_FOUND, msg.format(doc_slug))
@@ -870,6 +890,8 @@ def post_upload_txt(user_slug, doc_slug):
     os.unlink(filepath)
 
     document = Document(data)
+    host = domain_name(bottle.request)
+    document.set_host(host)
     document.import_txt_file(user_slug, doc_slug, contents)
     document.save()
 

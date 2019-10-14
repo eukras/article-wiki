@@ -26,11 +26,11 @@ def test_tag():
     index = Index(outline)
     link = index.tag('alias', 'tag', 'subtag', '?', ['1', 'a'], 'i')
 
-    assert '<a name="tag_subtag_1.a_i" href="#ref_tag_subtag_1.a_i">' in link
+    assert '<a id="tag_subtag_1.a_i" href="#ref_tag_subtag_1.a_i">' in link
     assert 'alias?<sup>i</sup>' in link  # <-- (?)
     assert '</a>' in link
 
-    back_link = '<a name="ref_tag_subtag_1.a_i" href="#tag_subtag_1.a_i">'
+    back_link = '<a id="ref_tag_subtag_1.a_i" href="#tag_subtag_1.a_i">'
     assert back_link in index.tags['tag']['subtag']['1.a'][0]
 
 

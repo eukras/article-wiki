@@ -84,8 +84,8 @@ class Config(object):
 
     # See wiki.shorthand
     inline_shorthand_tuples = [
-        ('/', 'i'),
-        ('*', 'b'),
+        ('/', 'em'),
+        ('*', 'strong'),
         ('_', 'u'),
-        ('`', 'tt'),
+        ('`', 'kbd'),
     ]

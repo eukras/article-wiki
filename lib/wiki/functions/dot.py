@@ -12,6 +12,7 @@ import subprocess
 from lib.wiki.functions.base import Function
 from lib.wiki.renderer import alert, verbatim
 
+# No SVG in initial conversion of ebooks.
 
 class Dot(Function):
     """

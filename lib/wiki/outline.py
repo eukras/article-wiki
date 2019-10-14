@@ -8,7 +8,7 @@ processing errors.
 from typing import Generator
 
 from html import escape
-from jinja2 import Template
+from jinja2 import Environment
 from slugify import slugify
 
 from lib.wiki.blocks import BlockList, CharacterBlock, get_title_data
@@ -117,7 +117,7 @@ class Outline(object):
         if part_slug not in self.errors:
             self.errors[part_slug] = []
         self.errors[part_slug] += [(pattern, message)]
-        return "<tt class=\"wr-error\" title=\"%s\">%s</tt>" % (
+        return "<kbd class=\"wr-error\" title=\"%s\">%s</kbd>" % (
             escape(pattern), escape(message)
         )
 
@@ -125,70 +125,73 @@ class Outline(object):
         """
         Generate a table of contents.
         """
-        html = Template(trim("""
+        env = Environment(autoescape=True)
+        tpl = env.from_string(trim("""
             {% if outline|length > 0 %}
             <div class="popover-nav-modal">
                 <nav class="popover-nav-content">
                     <h2>Table of Contents</h2>
                     <table class="table table-of-contents table-condensed">
-                        {% for numbering, name, slug, title, word_count, subtotal in outline %}
-                        <tr>
-                            {% if slug == 'index' %}
-                            <td></td>
-                            <td class="word-count" colspan="{{ (max_depth * 2) - 1 }}">
-                                Index.
-                            </td>
-                            <td class="word-count">{{ word_count }}</td>
-                            {% else %}
+                        <tbody>
+                            {% for numbering, name, slug, title, word_count, subtotal in outline %}
+                            <tr>
+                                {% if slug == 'index' %}
+                                <td></td>
+                                <td class="word-count" colspan="{{ (max_depth * 2) - 1 }}">
+                                    Index.
+                                </td>
+                                <td class="word-count">{{ word_count }}</td>
+                                {% else %}
 
-                                {% for i in range(numbering|length - 1) %}
-                            <td></td>
-                                {% endfor %}
+                                    {% for i in range(numbering|length - 1) %}
+                                <td></td>
+                                    {% endfor %}
 
-                            <td align="right">
-                                <b>{{ numbering | join('.') }}</b>.
-                            </td>
+                                <td class="text-right">
+                                    <b>{{ numbering | join('.') }}</b>.
+                                </td>
 
                                 {% if subtotal == "0" %}
-                            <td colspan="{{ (max_depth - numbering|length) * 2 + 1 }}">
+                                <td colspan="{{ (max_depth - numbering|length) * 2 + 1 }}">
                                 {% else %}
-                            <td colspan="{{ (max_depth - numbering|length) * 2 }}">
+                                <td colspan="{{ (max_depth - numbering|length) * 2 }}">
                                 {% endif %}
 
-                                {% if word_count == "0" %}
-                                <i class="fa fa-plus"</i>&nbsp;
-                                <a href="{{ edit_base_uri }}/{{ slug }}?title={{ title }}" class="unmarked">
-                                    <i>{{ title }}</i>
-                                </a>
-                                {% else %}
-                                <a href="#{{ name }}" class="unmarked">
-                                    {{ title }}
-                                </a>
-                                {% endif %}
-                            </td>
+                                    {% if word_count == "0" %}
+                                    <i class="fa fa-plus"</i>&nbsp;
+                                    <a href="{{ edit_base_uri }}/{{ slug }}?title={{ title|urlencode }}" class="unmarked">
+                                        <i>{{ title }}</i>
+                                    </a>
+                                    {% else %}
+                                    <a href="#{{ name }}" class="unmarked">
+                                        {{ title|safe }}
+                                    </a>
+                                    {% endif %}
+                                </td>
 
-                            <td class="word-count">
-                                {% if word_count == "0" %}&mdash;{% else %}{{ word_count }}{% endif %}
-                            </td>
+                                <td class="word-count">
+                                    {% if word_count == "0" %}&mdash;{% else %}{{ word_count }}{% endif %}
+                                </td>
 
-                                {% if numbering|length > 1 or subtotal != "0" %}
-                            <td class="word-count">
-                                    {% if subtotal != "0" %}<b>{{ subtotal }}</b>{% endif %}
-                            </td>
-                                    {% for i in range(numbering|length - 2) %}
-                            <td></td>
-                                    {% endfor %}
+                                    {% if numbering|length > 1 or subtotal != "0" %}
+                                <td class="word-count">
+                                        {% if subtotal != "0" %}<b>{{ subtotal }}</b>{% endif %}
+                                </td>
+                                        {% for i in range(numbering|length - 2) %}
+                                <td></td>
+                                        {% endfor %}
+                                    {% endif %}
                                 {% endif %}
-                            {% endif %}
-                        </tr>
-                        {% endfor %}
-                        <tr>
-                            <td></td>
-                            <td class="word-count" colspan="{{ (max_depth * 2) - 1 }}">
-                                Total words.
-                            </td>
-                            <td class="word-count"><b>{{ total_word_count }}</b></td>
-                        </tr>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                                <td></td>
+                                <td class="word-count" colspan="{{ (max_depth * 2) - 1 }}">
+                                    Total words.
+                                </td>
+                                <td class="word-count"><b>{{ total_word_count }}</b></td>
+                            </tr>
+                        </tbody>
                     </table>
                 </nav>
             </div>
@@ -205,7 +208,7 @@ class Outline(object):
                       ) for (numbering, slug, title, total_slug, word_count, subtotal)
                      in totalize(self.elements)
                      ]
-        return html.render(
+        return tpl.render(
             outline=formatted,
             max_depth=max_depth,
             edit_base_uri=edit_base_uri,
@@ -216,7 +219,8 @@ class Outline(object):
         """
         Render an errors summary: @todo
         """
-        html = Template(trim("""
+        env = Environment(autoescape=True)
+        tpl = env.from_string(trim("""
             <nav id="table-of-contents">
                 {% for number, name, title, word_count in outline %}
                 <div class="row">
@@ -233,7 +237,7 @@ class Outline(object):
                 {% endfor %}
             </nav>
             """))
-        return html.render(errors=self.errors)
+        return tpl.render(errors=self.errors)
 
     def html_spare_parts(self, doc_parts, edit_base_uri):
         """
@@ -248,7 +252,8 @@ class Outline(object):
             if _ not in found and _ not in ['index', 'biblio']
         ]
 
-        html = Template(trim("""
+        env = Environment(autoescape=True)
+        tpl = env.from_string(trim("""
             {% if spare_parts|length > 0 %}
             <div class="wiki-note">
                 These parts  do not appear in the index's outline:
@@ -259,7 +264,7 @@ class Outline(object):
             </div>
             {% endif %}
             """))
-        return html.render(
+        return tpl.render(
             spare_parts=spare_parts,
             edit_base_uri=edit_base_uri
         )
@@ -361,17 +366,18 @@ def html_heading(numbering: list,
 
     The numbering depth determines H1..H6.
     """
-    html = Template(trim("""
+    env = Environment(autoescape=True)
+    tpl = env.from_string(trim("""
         <div class="pull-right">
             <a href="{{ base_edit_uri }}{{ slug }}">Edit</a>
         </div>
         <{{ tag }} class="balance-text">
-            <a name="{{ name }}" href="#{{ name }}">
+            <a id="{{ name }}" href="#{{ name }}">
                 {{ title }}
             </a>
         </{{ tag }}>
         """))
-    return html.render(
+    return tpl.render(
         base_edit_uri=base_edit_uri,
         name=anchor_name(numbering, slug),
         slug=slug,

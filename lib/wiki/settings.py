@@ -9,6 +9,7 @@ e.g. AUTHOR, OUTLINE, NUMBERING.
 """
 
 import re
+# import pprint
 
 from html import escape
 from copy import deepcopy
@@ -30,6 +31,8 @@ class Settings(object):
 
         self._ = defaults if isinstance(defaults, dict) else {}
 
+        # pprint.pprint(('CREATED', self._))
+
     def copy(self):
         """
         Return a copy (usually for use a local settings).
@@ -39,7 +42,8 @@ class Settings(object):
     def extract(self, parts: dict):
         """
         Scan the index_part for global document settings; these parts should
-        have already had DEMO blocks removed, as they can also contain settings.
+        have already had DEMO blocks removed, as they can also contain
+        settings.
         """
         if 'index' in parts:
             blocks = BlockList(parts['index']).find('CharacterBlock', '$')
@@ -104,7 +108,7 @@ class Settings(object):
             if value in self._:
                 return self._[value]
             else:
-                return '<tt class="error">%s</tt>' % escape(value)
+                return '<kbd class="error">%s</kbd>' % escape(value)
 
     def decorate(self, match):
         """
@@ -122,12 +126,13 @@ class Settings(object):
         """
         Normal base URL for any given action.
         """
+        website = self.get('config:host', 'https://example.org')
         user_slug = self.get('config:user', 'guest')
         doc_slug = self.get('config:document', 'notebook')
         if part:
-            return "/%s/%s/%s/%s" % (action, user_slug, doc_slug, part)
+            return '/'.join([website, action, user_slug, doc_slug, part])
         else:
-            return "/%s/%s/%s" % (action, user_slug, doc_slug)
+            return '/'.join([website, action, user_slug, doc_slug])
 
     def set_config(self, key, list_):
         """

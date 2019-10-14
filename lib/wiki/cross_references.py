@@ -60,7 +60,7 @@ class CrossReferences(object):
                 if pattern[-1] in ",.?!:;·":
                     link += pattern[-1]
                 return link
-        error = "<tt class=\"wiki-error\">%s</tt>"
+        error = "<kbd class=\"wiki-error\">%s</kbd>"
         return error % escape(pattern)
 
     def replace(self, html_parts):

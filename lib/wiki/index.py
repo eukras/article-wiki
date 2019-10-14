@@ -2,7 +2,7 @@
 Construct an index from #Tags in document parts.
 """
 
-from jinja2 import Template
+from jinja2 import Environment
 from slugify import slugify
 
 from lib.wiki.counters import RomanNumerals
@@ -64,12 +64,12 @@ class Index(object):
             self.tags[tag][subtag][number] = []
 
         link = trim("""
-                <a name=\"%s\" href=\"#ref_%s\">%s%s<sup>%s</sup></a>
+                <a id=\"%s\" href=\"#ref_%s\">%s%s<sup>%s</sup></a>
             """) % (
-                nav_id, nav_id, alias, punctuation, count
-            )
+            nav_id, nav_id, alias, punctuation, count
+        )
 
-        ref_link = "<a name=\"ref_%s\" href=\"#%s\">%s</a>" % \
+        ref_link = "<a id=\"ref_%s\" href=\"#%s\">%s</a>" % \
                    (nav_id, nav_id, count)
 
         self.tags[tag][subtag][number] += [ref_link]
@@ -99,7 +99,8 @@ class Index(object):
         """
         assert isinstance(self.tags, dict)
 
-        html = Template("""
+        env = Environment(autoescape=True)
+        tpl = env.from_string(trim("""
             <section id="index">
             {% if not single_page %}
                 <h1><a href="#index">Index</a></h1>
@@ -114,7 +115,7 @@ class Index(object):
                     <div class="indent-first-line">{{ subtag }}
                         {% for number, links in numbers %}
                         <b>{{ number }}</b>
-                        {{ links|join(', ') }}.
+                        {{ links | join(', ') | safe }}.
                         {% endfor %}
                     </div>
                     {% endfor %}
@@ -122,15 +123,15 @@ class Index(object):
             {% endfor %}
             </div>
             </section>
-            """)
+            """))
 
         if len(self.tags) == 0:
             return ""
         else:
-            return html.render(
+            return tpl.render(
                 single_page=self.outline.single_page(),
                 tags=self.get_sorted_tags(),
-                )
+            )
 
 
 # -----------------
@@ -146,6 +147,7 @@ def get_number(numbering):
         return '.'.join([str(_) for _ in numbering])
     else:
         return '0'  # <-- for the index
+
 
 def get_nav_id(tag, subtag, numbering, count):
     """

@@ -46,19 +46,56 @@ class Inline(object):
 
     def process(self, text: str) -> str:
         """
-        Simple non-recursive parser to match *[...] patterns,
-        but now with recursively combining characters.
         @todo: Recursion! (and/or combinations).
+
+        Basic splitters are handled here:
+
+        - Double-stops for leading: ** //
+        - Float-right for >>
+        """
+        new_text = text
+        html_parts = []
+        double_stops = [
+            (' ** ', '<strong>', '</strong>'),
+            (' // ', '<em>', '</em>')
+        ]
+        for pattern, open_tag, close_tag in double_stops:
+            # print((pattern, open_tag, close_tag));
+            if pattern in new_text:
+                parts = new_text.split(pattern, 1)
+                html_parts += [
+                    open_tag +
+                    self.process_after_splitting(parts[0]) +
+                    close_tag
+                ]
+                new_text = parts[1]
+                continue
+        # print(html_parts)
+        if " >> " in new_text:
+            parts = new_text.split(" >> ", 1)
+            html_parts += [
+                self.process_after_splitting(parts[0]),
+                '<span class="fill-space">' +
+                self.process_after_splitting(parts[1]) +
+                '</span>'
+            ]
+        else:
+            html_parts += [self.process_after_splitting(new_text)]
+        return "&nbsp; ".join(html_parts);
+
+    def process_after_splitting(self, text: str) -> str:
+        """
+        Simple non-recursive parser to match *[...] patterns.
         """
         out = ''
         length = len(text)
-        _ = 0
-        while _ < length:
-            match = self.pattern.search(text, _)
+        pos = 0
+        while pos < length:
+            match = self.pattern.search(text, pos)
             if match is not None:
                 start = match.start()
-                if start > _:
-                    out += self.typography(text[_:start])
+                if start > pos:
+                    out += self.typography(text[pos:start])
                 end = text.find(']', match.end()) + 1
                 if end > 1:
                     part = text[start:end]  # '?[...]'
@@ -66,13 +103,13 @@ class Inline(object):
                     control = part[0:bracket]
                     body = part[(bracket + 1):-1]
                     out += self.brackets(control, body)
-                    _ = end
+                    pos = end
                 else:
-                    out += self.typography(text[_:])
-                    _ = length
+                    out += self.typography(text[pos:])
+                    pos = length
             else:
-                out += self.typography(text[_:])
-                _ = length
+                out += self.typography(text[pos:])
+                pos = length
         return out
 
     def typography(self, text: str) -> str:
@@ -181,7 +218,7 @@ class Inline(object):
         elif char == '=':
             return '<span class="small-caps">%s</span>' % small_caps(content)
         elif char == '`':
-            return '<tt>%s</tt>' % content
+            return '<kbd>%s</kbd>' % content
         elif char == ';':  # sans-serif
             return '<span class="opposite">%s</span>' % content
         elif char == '!':
@@ -201,8 +238,8 @@ class Inline(object):
         elif char == '}':
             return '<span class="pull-right space-left">%s</span>' % content
         else:
-            return '<tt class="error">%s[%s]</tt>' % (html_escape(char),
-                                                      html_escape(content))
+            return '<kbd class="error">%s[%s]</kbd>' % (html_escape(char),
+                                                        html_escape(content))
 
 
 # ----------------

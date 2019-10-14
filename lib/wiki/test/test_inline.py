@@ -21,7 +21,7 @@ def test_inline():
         "*[To boldly] go where _[none] have gone /[before.]")
 
     out = '<ins>To boldly</ins> go where <del>none</del> ' + \
-          'have gone <tt>before</tt>.'
+          'have gone <kbd>before</kbd>.'
     assert out == test.process(
         '+[To boldly] go where -[none] have gone `[before].')
 

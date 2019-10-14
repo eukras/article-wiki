@@ -7,37 +7,34 @@ in directories.
 @see install/help/, or /help in a browser when the app is running.
 """
 
-import logging
-import pprint
-import pytz
 import re
 
 from html import escape
 from datetime import date, datetime
+from dateutil.parser import parse
 from pprint import pformat
 
-from jinja2 import Template
+from jinja2 import Environment
 from slugify import slugify
 
 from lib.wiki.backslashes import Backslashes
 from lib.wiki.bibliography import Bibliography, split_bibliography
 from lib.wiki.blocks import \
     BlockList, \
-    CharacterBlock, \
     get_title_data
 from lib.wiki.citations import Citations
 from lib.wiki.config import Config
 from lib.wiki.cross_references import CrossReferences
 from lib.wiki.entities import Entities
 from lib.wiki.footnotes import Footnotes
-from lib.wiki.index import Index
+# from lib.wiki.index import Index
 from lib.wiki.inline import Inline
 from lib.wiki.links import Links
 from lib.wiki.outline import Outline, default_counters
 from lib.wiki.placeholders import Placeholders
 from lib.wiki.renderer import Html
 from lib.wiki.settings import Settings
-from lib.wiki.tags import Tags
+# from lib.wiki.tags import Tags
 from lib.wiki.utils import \
     clean_document, \
     clean_text, \
@@ -67,6 +64,11 @@ class Wiki(object):
 
         self.settings = settings
         self.html = Html(self.settings)
+
+        self.id_prefix = self.settings.get(
+            'config:document',
+            random_slug('wiki_')  # <-- else
+        )
 
         self.outline = None
         self.cross_references = None
@@ -99,7 +101,7 @@ class Wiki(object):
         # Add placeholders for elements not processed by the wiki
         # -------------------------------------------------------
 
-        demo = Demo(self.settings.copy())
+        demo = Demo()
         backslashes = Backslashes()
         entities = Entities()
         verbatim = Verbatim()
@@ -121,20 +123,20 @@ class Wiki(object):
 
         # ^[marker]
         # ^ Reference
-        self.footnotes = Footnotes(parts, self.outline)
-        self.links = Links(self.footnotes)
+        self.footnotes = Footnotes(parts, self.outline, self.id_prefix)
+        self.links = Links(self.footnotes, self.id_prefix)
 
         # #[Topic, sub-topic]
-        self.index = Index(self.outline)
-        self.tags = Tags(self.index)
+        # self.index = Index(self.outline)
+        # self.tags = Tags(self.index)
 
         # ~[Author 2000, p.34]
-        self.bibliography = Bibliography(parts, self.outline)
+        self.bibliography = Bibliography(parts, self.outline, self.id_prefix)
         self.citations = Citations(self.bibliography)
 
-        parts = pipe([self.cross_references,  # <-- same function on each.
+        parts = pipe([self.cross_references,  # <-- call 'insert(parts)'
                       self.links,
-                      self.tags,
+                      # self.tags,
                       self.citations], 'insert', parts)
 
         # -------------
@@ -179,7 +181,7 @@ class Wiki(object):
         # -------------------------------------
 
         html_parts = pipe([self.cross_references,
-                           self.tags,
+                           # self.tags,
                            self.links,
                            self.citations], 'replace', html_parts)
 
@@ -208,16 +210,17 @@ class Wiki(object):
     def make_footer(self):
         """
         <footer>
-            <section id="footnotes">
-            <section id="bibliography">
-            <section id="index">
+            <section id="prefix-footnotes">
+            <section id="prefix-bibliography">
+            <section id="prefix-index">
         """
         endmatter = [_ for _ in [
             self.footnotes.html(),
             self.bibliography.html(),
-            self.index.html(),
+            # self.index.html(),
         ] if _.strip() != ""]
-        html = Template(trim("""
+        env = Environment(autoescape=True)
+        tpl = env.from_string(trim("""
                 <footer>
                 {% if endmatter|length > 0 %}
                     <hr class="div-left div-solid"/>
@@ -227,7 +230,7 @@ class Wiki(object):
                 {% endif %}
                 </footer>
             """))
-        return html.render(
+        return tpl.render(
             endmatter=endmatter,
             biblio_link=self.settings.get_base_uri('edit') + '/biblio'
         )
@@ -273,14 +276,15 @@ class Wiki(object):
         Front matter preceding index text.
         Multi-author blocks are disabled for now; v.0.1.0 is SINGLE_USER.
         """
-        html = Template(trim("""
+        env = Environment(autoescape=True)
+        tpl = env.from_string(trim("""
         <header>
 
             {% if title_html != "" %}
             <hgroup>
                 <h1 class="balance-text">{{ title_html|safe }}</h1>
             {% if summary != "" %}
-                <summary class="balance-text">{{ summary_html|safe }}</summary>
+                <h2 class="balance-text">{{ summary_html|safe }}</h2>
             {% endif %}
             </hgroup>
             {% endif %}
@@ -315,7 +319,11 @@ class Wiki(object):
 
             {% if date %}
             <p class="space" rel="date">
-                <time pubdate datetime="{{ date }}">{{ date }}</time>
+                {% if parsed_date != None %}
+                <time pubdate datetime="{{ parsed_date }}">{{ date }}</time>
+                {% else %}
+                {{ date }}
+                {% endif %}
             </p>
             {% endif %}
 
@@ -330,15 +338,24 @@ class Wiki(object):
         title, summary = blocks.pop_titles()
         content_html = blocks.html(['0'], 'index', self.settings,
                                    fragment=True)
+
+        date_string = inline.process(self.settings.get('DATE', ''))
+        try:
+            dt = parse(date_string)
+            date_yyyymmdd = dt.date().isoformat()
+        except ValueError:
+            date_yyyymmdd = None
+
         # author = self.split_author()
-        return html.render(
+        return tpl.render(
             title_html=inline.process(title),
             summary_html=inline.process(summary),
             author=self.settings.get('AUTHOR', ''),
             email=self.settings.get('EMAIL', ''),
             facebook=self.settings.get('FACEBOOK', ''),
             twitter=self.settings.get('TWITTER', ''),
-            date=inline.process(self.settings.get('DATE', '')),
+            date=date_string,
+            parsed_date=date_yyyymmdd,
             edit_link=self.settings.get_base_uri('edit') + '/index',
             content_html=content_html,
         )
@@ -385,15 +402,15 @@ class Wiki(object):
         A fragment has no heading. A preview has a heading but no context,so no
         numbering.
         """
-        html = Template(trim("""
+        env = Environment(autoescape=True)
+        tpl = env.from_string(trim("""
         <section class="body depth-{{ depth }}">
         {% if not fragment %}
-        <div class="pull-right no-print no-preview">
-            <button class="button-edge"
-                    onclick="location.href='{{ edit_link }}';">
+        <nav class="button-list button-list-edge no-preview no-print">
+            <a class="button" href="{{ edit_link }}">
                 <i class="fa fa-pencil"></i> Edit
-            </button>
-        </div>
+            </a>
+        </nav>
         {% endif %}
         {{ content_html|safe }}
         </section>
@@ -405,7 +422,7 @@ class Wiki(object):
             numbering, slug, self.settings, fragment, preview
         )
 
-        return html.render(
+        return tpl.render(
             depth=len(numbering),
             edit_link=self.settings.get_base_uri('edit') + '/' + slug,
             content_html=content_html,
@@ -477,10 +494,15 @@ class Demo(object):
     regex = r"DEMO\s+(\([^)]+\)\s)?\s*([%s])\2\2\s*\n.+?\n\2\2\2" % \
         re.escape(Config.delimiters)
 
-    def __init__(self, settings):
+    def __init__(self, settings=None):
         "Just a thin wrapper for Placeholders; parse options in replace()."
         self.placeholders = Placeholders(self.regex, 'demo')
-        self.settings = settings.copy()
+        if settings:
+            self.settings = settings.copy()
+        else:
+            self.settings = Settings()
+            self.settings.set('config:user', '_')
+            self.settings.set('config:document', random_slug('demo'))
 
     def insert(self, parts):
         "Add placeholders."
@@ -488,8 +510,12 @@ class Demo(object):
 
     def decorate(self, pattern, part_slug):
         """
-        Get options from first line.
+        When we process a new demo block it needs to be assigned a unique
+        id_prefix as its config:document name. Micro chance of a collision;
+        maybe replace with a singleton to track random IDs in use.
         """
+        self.settings.set('config:document', random_slug('demo'))
+
         wiki = Wiki(self.settings)
         options = match_demo_options(pattern)
         wide = "-wide" if 'wide' in options else ""
@@ -499,17 +525,11 @@ class Demo(object):
         source = "\n".join(lines[1:-1])
         output = wiki.process({part_slug: source}, fragment)
 
-        # print "================"
-        # print "-----SOURCE-----"
-        # print source
-        # print "-----OUTPUT-----"
-        # print output
-        # print "================"
-
-        twig = Template(trim("""
+        env = Environment(autoescape=True)
+        tpl = env.from_string(trim("""
             <div class="wiki-demo{{ wide }} space">
                 <div class="wiki-demo-source">
-                    <pre>{{ source }}</pre>
+                    <pre>{{ source|safe }}</pre>
                 </div>
                 <div class="wiki-demo-output">
                     {{ output|safe }}
@@ -517,12 +537,11 @@ class Demo(object):
             </div>
         """))
 
-        html = twig.render(
+        return tpl.render(
             wide=wide,
             source=escape(source),
             output=output
         )
-        return html
 
     def replace(self, html_parts, decorator=None):
         "Generate demo blocks."

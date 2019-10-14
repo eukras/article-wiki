@@ -80,11 +80,23 @@ input[type="file"] {
     }
 }
 
+.button-list-edge {
+    -webkit-transform: rotate(90deg);  
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);  
+    float: right;
+    position: relative;
+    top: 1rem;
+    left: 8.8rem;
+}
+
 /*
  * Button goes on edge of paper.
  *
  */
-a.button.button-edge,
+a.button-edge,
 button.button-edge {
     transform: rotate(90deg);
     background-image: linear-gradient(rgba(128, 128, 128, 0.1), rgba(128, 128, 128, 0));
@@ -94,12 +106,12 @@ button.button-edge {
     top: 2.6rem;
 }
 
-a.button.button-edge:hover,
+a.button-edge:hover,
 button.button-edge:hover {
     background-image: none;
 }
 
-a.button.button-edge:active,
+a.button-edge:active,
 button.button-edge:active {
     background-image: linear-gradient(rgba(128, 128, 128, 0.25), rgba(128, 128, 128, 0));
 }

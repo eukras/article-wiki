@@ -7,7 +7,7 @@ Manage a simple bibliography list, of full-line records.
 
 import re
 
-from jinja2 import Template
+from jinja2 import Environment
 from slugify import slugify
 from sortedcontainers import SortedDict
 
@@ -28,7 +28,7 @@ class Bibliography(object):
     they wrap?  Or '~'?
     """
 
-    def __init__(self, parts, outline):
+    def __init__(self, parts, outline, id_prefix):
         """
         Create bibliography entries, and the structure for recording citations
         as they occur (These will be back-linked in the bibliography's
@@ -46,6 +46,8 @@ class Bibliography(object):
 
         self.outline = outline
         self.entries = collate_bibliography(parts)
+
+        self.id_prefix = id_prefix
 
         self.citations = {}
         self.counters = {}
@@ -113,18 +115,20 @@ class Bibliography(object):
 
         if note.strip() != "":
             note_markup = self.inline.process(note)
-            link = "<a id=\"%s\" href=\"#ref_%s\">%s%s, %s%s%s" \
+            link = "<a id=\"%s_%s\" href=\"#ref_%s_%s\">%s%s, %s%s%s" \
                    "<sup>%s</sup></a>" % \
-                   (nav_id, nav_id, bracket_open, citation_markup, note_markup,
-                    bracket_close, punctuation, count)
+                   (self.id_prefix, nav_id, self.id_prefix, nav_id,
+                    bracket_open, citation_markup, note_markup, bracket_close,
+                    punctuation, count)
         else:
-            link = "<a id=\"%s\" href=\"#ref_%s\">%s%s%s%s" \
+            link = "<a id=\"%s_%s\" href=\"#ref_%s_%s\">%s%s%s%s" \
                    "<sup>%s</sup></a>" % \
-                   (nav_id, nav_id, bracket_open, citation_markup,
-                    bracket_close, punctuation, count)
+                   (self.id_prefix, nav_id, self.id_prefix, nav_id,
+                    bracket_open, citation_markup, bracket_close,
+                    punctuation, count)
 
-        ref_link = "<a id=\"ref_%s\" href=\"#%s\">%s</a>" % \
-                   (nav_id, nav_id, count)
+        ref_link = "<a id=\"ref_%s_%s\" href=\"#%s_%s\">%s</a>" % \
+                   (self.id_prefix, nav_id, self.id_prefix, nav_id, count)
         self.citations[label][number] += [ref_link]
 
         return link
@@ -132,43 +136,48 @@ class Bibliography(object):
     def html(self):
         """
         From a list of bibliography lines.
-
-        TODO: First letters?
         """
         assert isinstance(self.entries, dict)
 
-        html = Template("""
+        env = Environment(autoescape=True)
+        tpl = env.from_string("""
             {% if entries|length > 0 %}
-            <section class="bibliography">
+            <section id="{{ id_prefix }}-bibliography" class="bibliography">
             {% if not single_page %}
-                <h1><a href="#bibliography">Bibliography</a></h1>
+                <h1>
+                    <a href="#{{ id_prefix }}-bibliography">Bibliography</a>
+                </h1>
             {% endif %}
             {% for label in entries %}
                 <div class="indent-hanging">
-                    {{ label }} {{ entries[label] }}
-                    {% if sublabel in citations %}
-                        {% for number in citations[sublabel] %}
-                            <b>{{ number }}</b>
-                            <span class="wiki-no-select">
-                                [{{ citations[sublabel][number]|join(', ') }}]
-                            </span>
+                    {{ label }}&nbsp; {{ entries[label] }}
+                    {% if label in citations %}
+                        <span class="wiki-no-select">
+                        {% for number in citations[label] %}
+                            {% if not single_page %}
+                            <b>{{ number }}.</b>
+                            {% endif %}
+                            ({{
+                                citations[label][number] | join(', ') | safe
+                            }}).
                         {% endfor %}
+                        </span>
                     {% endif %}
                 </div>
             {% endfor %}
+            {#
+            <pre>{{ entries | tojson }}</pre>
+            <pre>{{ citations | tojson }}</pre>
+            #}
             </section>
             {% endif %}
             """)
 
-        # return pformat(self.citations)
-
-        # if len(self.citations) == 0:
-        # return ""
-        # else:
-        return html.render(
+        return tpl.render(
             single_page=self.outline.single_page(),
             entries=self.entries,
-            citations=self.citations
+            citations=self.citations,
+            id_prefix=self.id_prefix
         )
 
 

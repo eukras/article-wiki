@@ -4,6 +4,7 @@ from lib.wiki.functions.dot import Dot
 from lib.wiki.renderer import Html
 from lib.wiki.utils import trim
 
+# No SVG in initial conversion of ebooks.
 
 def DISABLED_test_simplest_graph():  # <-- Restore when Dot() is added again.
     """

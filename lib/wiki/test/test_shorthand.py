@@ -24,7 +24,7 @@ def test_underlines():
 def test_mixed_tags():
     _ = Shorthand([
         ['/', 'i'],
-        ['`', 'tt']
+        ['`', 'kbd']
     ])
     pairs = [
         ["simple /italics/ example", "simple <i>italics</i> example"],
@@ -32,10 +32,10 @@ def test_mixed_tags():
         ["http://example.org/some/path/", "http://example.org/some/path/"],
         ["http://example.org/some/path/", "http://example.org/some/path/"],
         ["http://localhost:8084/", "http://localhost:8084/"],
-        ["simple `teletype` example", "simple <tt>teletype</tt> example"],
-        ["simple `_teletype_` example", "simple <tt>_teletype_</tt> example"],
-        ["(`brackets`)", "(<tt>brackets</tt>)"],
-        ["`#brackets`", "<tt>#brackets</tt>"],
+        ["simple `teletype` example", "simple <kbd>teletype</kbd> example"],
+        ["simple `_teletype_` example", "simple <kbd>_teletype_</kbd> example"],
+        ["(`brackets`)", "(<kbd>brackets</kbd>)"],
+        ["`#brackets`", "<kbd>#brackets</kbd>"],
     ]
     for test, result in pairs:
         assert _.replace(test) == result

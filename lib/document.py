@@ -22,7 +22,7 @@ class Document(object):
     >>> data = Data(config)  # <-- redis connection
 
     >>> doc = Document(data)
-    >>> doc.set_parts(user_slug, doc_slug, parts_dict)
+    >>> doc.set_parts(host, user_slug, doc_slug, parts_dict)
     >>> doc.save()
 
     >>> doc.load(user_slug, doc_slug)  # <-- from database
@@ -35,6 +35,7 @@ class Document(object):
 
     def __init__(self, data: Data):
         """Specifies Redis connection to use."""
+        self.host = None
         self.user_slug = None
         self.doc_slug = None
         self.parts = {}
@@ -69,6 +70,12 @@ class Document(object):
         Part slugs that are never to be renamed by editing.
         """
         return ['index', 'biblio']
+
+    def set_host(self, host: str):
+        """
+        Set domain name for FQDN link generation.
+        """
+        self.host = host
 
     def set_slugs(self, user_slug: str, doc_slug: str):
         """
@@ -152,6 +159,7 @@ class Document(object):
         if pregenerate:
 
             wiki = Wiki(Settings({
+                'config:host': self.host,  # <-- ebooks req. FQDN
                 'config:user': self.user_slug,
                 'config:document': self.doc_slug
             }))

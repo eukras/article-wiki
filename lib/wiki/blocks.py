@@ -19,7 +19,7 @@ import re
 from textwrap import shorten
 
 from copy import copy
-from jinja2 import Template
+from jinja2 import Environment
 from slugify import slugify
 
 from lib.wiki.functions.base import \
@@ -283,7 +283,7 @@ class BlockList(object):
                     nav_id, nav_id, number, renderer.inline.process(title))
             out += [head]
             if summary != '':
-                out += ["<summary>%s</summary>" %
+                out += ['<h2>%s</h2>' %
                         renderer.inline.process(summary)]
             out += ['</hgroup>']
         # Assemble
@@ -388,10 +388,10 @@ class Divider(Block):
             # Markers
             '*': '<p class="text-center text-large space">✻</p>',
             '-': rule('div-solid div-center'),
-            '@': image('fleuron.svg', 'fleuron'),
+            # '@': image('fleuron.svg', 'fleuron'),
             '* * *': '<p class="text-center text-large big-space">✻ ✻ ✻</p>',
             '- - -': rule('div-solid'),
-            '@ @ @': image('swash.svg', 'swash'),
+            # '@ @ @': image('swash.svg', 'swash'),
             '. . .': rule('div-dotted div-wide'),
             '= = =': rule('div-thick div-wide'),
             # Spacers
@@ -562,7 +562,8 @@ class Grid(Function):
                 html_cells.append(html)
             html_rows.append(html_cells)
 
-        twig = Template(trim("""
+        env = Environment(autoescape=True)
+        tpl = env.from_string(trim("""
             <table class="table table-condensed">
             <tbody>
             {% for html_row in html_rows %}
@@ -576,7 +577,7 @@ class Grid(Function):
             </table>
         """))
 
-        return twig.render(html_rows=html_rows)
+        return tpl.render(html_rows=html_rows)
 
 
 # ------------------------------
@@ -618,7 +619,7 @@ def get_section_nav_id(numbering, title):
 
 def align_block(content, settings):
     """
-    There is space around each set of alingment statements, but not
+    There is space around each set of alignment statements, but not
     between the individual lines. Ths means divs are wrapped in an outer
     paragraph tag.
     """
@@ -668,7 +669,7 @@ def heading_block(text, settings):
         elif char == '-':
             out += [tag('h3', content, "balance-text")]
         elif char == Config.caption:
-            out += [tag('summary', content)]
+            out += [tag('div', content, "summary")]
     if len(out) > 0:
         return "\n".join(out)
     else:
@@ -774,10 +775,23 @@ def list_block(text, settings):
                 settings.set('CONTINUE', 1)
         if char == '_':
             properties += ['class="fa-ul"']
-        out = ["<%s%s>" % (list_tag, ' '.join(properties))]
+
+        # XHTML (for ebooks) requires that a child list appears inside the
+        # preceeding <li> rather than inside it's own <li>. So we'll accumulate
+        # display_items distinct from structural items, and join these into an
+        # HTML list at the end.
+        open_tag = "<%s%s>" % (list_tag, ' '.join(properties))
+        display_items = []
         for item in items:
             if isinstance(item, list):
-                out += [list_block_recursor(char, item, settings, depth + 1)]
+                # There should always be a preceding element when we reach a
+                # sublist. Append to that:
+                if len(display_items) > 0:
+                    last = len(display_items) - 1
+                    sub_list = list_block_recursor(
+                        char, item, settings, depth + 1
+                        )
+                    display_items[last] += sub_list
             else:
                 if char == '_':
                     parts = item.split(" ", 1)
@@ -789,19 +803,26 @@ def list_block(text, settings):
                     else:
                         icon = 'square-o'
                         line = item
-                    out += [
-                        "<li><span class=\"fa-li\">%s</span> %s</li>" % (
+                    display_items += [
+                        "<span class=\"fa-li\">%s</span> %s" % (
                             "<i class=\"fa fa-%s\"></i>" % slugify(
                                 expand_shorthand(icon)),
                             inline.process(line)
                         )
                     ]
                 else:
-                    out += ["<li>%s</li>" % inline.process(item)]
+                    display_items += [inline.process(item)]
                 if list_tag == 'ol' and depth == 1:
                     settings.set('CONTINUE', settings.get('CONTINUE') + 1)
-        out += ["</%s>" % list_tag]
-        return "\n".join(out)
+        close_tag = "</%s>" % list_tag
+        elements = [
+            open_tag,
+            "<li>",
+            "</li><li>".join(display_items),
+            "</li>",
+            close_tag
+        ]
+        return "".join(elements)
 
     # May need a character-aware recursor to support mixed levels.
     char = text[0]
@@ -840,7 +861,7 @@ def gloss_block(text, settings):
     inline = Inline()
     char = text[0]  # '/', as used here
     gloss = []
-    num = None;
+    num = None
     for _, line in split_to_array(text, char):
         parts = line.split(" %s " % char)
         if len(parts) == 1:
@@ -848,13 +869,14 @@ def gloss_block(text, settings):
         else:
             source_html = inline.process(parts.pop(0))
             translations_html = [inline.process(part) for part in parts]
-            if num != None:
+            if num is not None:
                 gloss += [[(str(num), ''), (source_html, translations_html)]]
                 num = None
             else:
                 gloss += [[(source_html, translations_html)]]
 
-    twig = Template(trim("""
+    env = Environment(autoescape=True)
+    tpl = env.from_string(trim("""
         <div class="gloss">
         {% for translation_group in gloss %}
             <div class="phrase-group">
@@ -871,8 +893,7 @@ def gloss_block(text, settings):
         </div>
     """))
 
-    html = twig.render(gloss=gloss)
-    return html
+    return tpl.render(gloss=gloss)
 
 
 def icon_block(name: str, text: str):

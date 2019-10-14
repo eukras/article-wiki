@@ -22,11 +22,15 @@ header {
     margin-bottom: 3rem;
 }
 
-header h1 {
+header hgroup h1 {
     text-align: center;
 }
 
-header summary {
+header hgroup h2 {
+    padding: 0;
+    margin: 0 0 1rem 0;
+    font-style: italic;
+    font-weight: normal;
     font-size: $fontSizePlus2;
     margin-bottom: 2rem;
 }
@@ -39,13 +43,6 @@ header address {
 
 article {
     margin-top: 4rem;
-}
-
-summary {
-    margin: 0 0 1rem 0;
-    padding: 0;
-    font-style: italic;
-    font-size: $fontSizePlus1;
 }
 
 section#footnotes {
@@ -72,10 +69,6 @@ section.depth-2 {
 
 section.depth-3 {
     margin-top: 1rem;
-}
-
-h1 + summary {
-    margin-top: none;
 }
 
 section.depth-1 h1, header h1 {
@@ -120,14 +113,14 @@ footer {
     .wiki-demo-source {
         border-right: .1rem dotted black;
         padding-right: 2rem;
-        min-width: 40%;
+        min-width: calc(50% - 2.2rem);
         pre {
             padding: 0;
         }
     }
     .wiki-demo-output {
         padding-left: 1rem;
-        min-width: 40%;
+        min-width: calc(50% - 1.1rem);
         article {
             margin: 0;
         }
@@ -183,15 +176,31 @@ footer {
 }
 .article-title {
     font-size: $fontSize;
+    text-align: center;
     font-style: bold;
 }
 .article-summary {
     margin-bottom: 1rem;
+    text-align: center;
     font-size: $fontSizeMinus1;
 }
 .article-details {
     margin-top: .5em;
+    text-align: center;
     font-size: $fontSizeMinus1;
+}
+
+/**
+ * Footnote layout
+ */
+
+.footnote-title {
+    font-weight: bold;
+    padding: 0.7rem 0 0.3rem 0;
+}
+
+.footnote-item {
+    
 }
 
 /**

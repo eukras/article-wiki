@@ -97,9 +97,9 @@ def test_constructor():
     footnotes = Footnotes(parts, outline)
     assert footnotes.outline.errors == {
         'topic-four': [
-            ('', 'More <tt>^[link]s</tt> than footnotes! (+1)')
+            ('', 'More <kbd>^[link]s</kbd> than footnotes! (+1)')
         ],
         'topic-three': [
-            ('', 'More footnotes than <tt>^[link]s</tt>! (+1)')
+            ('', 'More footnotes than <kbd>^[link]s</kbd>! (+1)')
         ]
     }

@@ -31,7 +31,7 @@ def write_epub(user_slug, doc_slug, file_path):
         'config:document': doc_slug,
     })
     wiki = Wiki(settings)
-    html = wiki.process(document)
+    xhtml = wiki.process(document)
     metadata = wiki.compile_metadata(config['TIME_ZONE'], user_slug, doc_slug)
     metadata['url'] = '/read/{:s}/{:s}'.format(user_slug, doc_slug),
 
@@ -45,7 +45,7 @@ def write_epub(user_slug, doc_slug, file_path):
     # TODO: Recognise multiple chapters in when printing books.
 
     # set metadata
-    book.set_identifier('ID')
+    book.set_identifier(user_slug + '+' + doc_slug)
     book.set_title(config['APP_NAME'])
     book.set_language('en')
 
@@ -53,7 +53,7 @@ def write_epub(user_slug, doc_slug, file_path):
 
     # define CSS style
     with open('static/epub.css') as f:
-        style = f.read();
+        style = f.read()
     global_css = epub.EpubItem(
         uid="style_nav",
         file_name="style/nav.css",
@@ -68,14 +68,14 @@ def write_epub(user_slug, doc_slug, file_path):
         file_name=chapter_file_name,
         lang='en'
     )
-    c1.content = html
+    c1.content = xhtml
     c1.add_item(global_css)
     book.add_item(c1)
 
     # define Table Of Contents
     book.toc = (
         epub.Link(chapter_file_name, title, doc_slug),
-        # (epub.Section('Simple book'), (c1, ))
+        # (epub.Section(user_slug), (c1, ))
     )
 
     # add default NCX and Nav file

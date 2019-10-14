@@ -4,7 +4,7 @@ Construct footnotes from ^[Links] in document parts.
 
 import re
 
-from jinja2 import Template
+from jinja2 import Environment
 from sortedcontainers import SortedDict
 
 from lib.wiki.blocks import BlockList
@@ -21,7 +21,7 @@ class Footnotes(object):
     Manage erm... the footnotes.
     """
 
-    def __init__(self, parts, outline):
+    def __init__(self, parts, outline, id_prefix):
         """
         Matches ^[link] and
 
@@ -29,12 +29,14 @@ class Footnotes(object):
 
         Constructs: {part_numbering, {count: (link_text, footnote_text)}}
         """
-        assert isinstance(outline, Outline)
-        self.outline = outline
-
         assert isinstance(parts, dict)
         self.links, self.footnotes = self.collate_footnotes(parts)
         self.backlinks = SortedDict()
+
+        assert isinstance(outline, Outline)
+        self.outline = outline
+
+        self.id_prefix = id_prefix
 
         self.inline = Inline()
         self.counters = {}
@@ -52,11 +54,11 @@ class Footnotes(object):
             num_links = len(links[slug])
             num_notes = len(notes[slug])
             if num_notes > num_links:
-                message = "More <tt>^[link]s</tt> than footnotes! (+%d)"
+                message = "More <kbd>^[link]s</kbd> than footnotes! (+%d)"
                 diff = num_notes - num_links
                 self.outline.error(slug, "", message % diff)
             if num_links > num_notes:
-                message = "More footnotes than <tt>^[link]s</tt>! (+%d)"
+                message = "More footnotes than <kbd>^[link]s</kbd>! (+%d)"
                 diff = num_links - num_notes
                 self.outline.error(slug, "", message % diff)
         return (links, notes)
@@ -69,7 +71,7 @@ class Footnotes(object):
             self.counters[part_slug] = Numbers()
         return next(self.counters[part_slug])
 
-    def footnote(self, pattern, part_slug, count):
+    def footnote(self, prefix, pattern, part_slug, count):
         """
         Take ^[some link] and return a link to its Index line.
         Also store the back-link for when the index is generated.
@@ -87,17 +89,18 @@ class Footnotes(object):
                 footnote_text = self.footnotes[part_slug][count]
         ref_text = self.inline.process(footnote_text)
 
-        ref_link = '<a name="footnote_%s" href="#link_%s">%s</a>' % \
-                   (nav_id, nav_id, count)
+        ref_link = '<a id="%s_footnote_%s" href="#%s_link_%s">%s</a>' % \
+                   (self.id_prefix, nav_id, self.id_prefix, nav_id, count)
 
         if number not in self.backlinks:
             self.backlinks[number] = {}
         self.backlinks[number][count] = (ref_link, ref_text)
 
         link = trim("""
-                <a name="link_%s" href="#footnote_%s">%s%s<sup>%s</sup></a>
+            <a id="%s_link_%s" href="#%s_footnote_%s">%s%s<sup>%s</sup></a>
             """) % (
-            nav_id, nav_id, self.inline.process(link_markup),
+            self.id_prefix, nav_id,
+            self.id_prefix, nav_id, self.inline.process(link_markup),
             punctuation, count
         )
 
@@ -126,24 +129,25 @@ class Footnotes(object):
         for _ in list(self.backlinks.items()):
             assert isinstance(_, tuple)
 
-        html = Template("""
-            <section id="footnotes">
+        env = Environment(autoescape=True)
+        tpl = env.from_string("""
+            <section id="{{ id_prefix }}-footnotes">
             {% if backlinks|length < 2 %}
                 {% for number, entries in backlinks %}
                     {% for count, (ref_link, ref_text) in entries %}
-                <div class="indent-first-line">
+                <div class="footnote-item">
                     <sup>{{ ref_link|safe }}</sup> {{ ref_text|safe }}
                 </div>
                     {% endfor %}
                 {% endfor %}
             {% else %}
-                <h1><a href="#footnotes">Footnotes</a></h1>
+                <h1><a href="#{{ id_prefix }}-footnotes">Footnotes</a></h1>
                 <div class="columns-x2">
                 {% for number, entries in backlinks %}
                     <div class="no-widows">
-                        <div><b>{{ number }}</b></div>
+                        <div class="footnote-title"><b>{{ number }}</b></div>
                     {% for count, (ref_link, ref_text) in entries %}
-                        <div class="indent-first-line">
+                        <div class="footnote-item">
                             <sup>{{ ref_link|safe }}</sup> {{ ref_text|safe }}
                         </div>
                     {% endfor %}
@@ -157,8 +161,9 @@ class Footnotes(object):
         if len(self.backlinks) == 0:
             return ""
         else:
-            return html.render(
+            return tpl.render(
                 backlinks=list(self.sort()),
+                id_prefix=self.id_prefix
             )
 
 

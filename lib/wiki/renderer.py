@@ -187,11 +187,11 @@ def generate_table(data, options=None):
     if 'headers' in options:
         options.remove('headers')
         headers = data.pop(0)
-        out += ["<thead>"]
+        out += ["<thead>", "<tr>"]
         for _, header in enumerate(headers):
             align = alignments[_] if _ < len(alignments) else 'l'
             out += ["<th %s>%s</th>" % get_cell_formatting(align, header)]
-        out += ["</thead>"]
+        out += ["</tr>", "</thead>"]
     out += [
         "<tbody>"
     ]
@@ -276,9 +276,9 @@ def wrap(alignment_name, html, options):
     subclasses. Handles css_dimensions in options.
     """
     dimension = get_option(options, 1, 'dimension', None)
+    if dimension == "":
+        dimension = 'auto'
     if alignment_name == 'center':
-        if not dimension:
-            dimension = 'auto'
         properties = ["style=\"width: %s; margin: auto;\"" % dimension]
         return trim("""
             <div %s>%s</div>

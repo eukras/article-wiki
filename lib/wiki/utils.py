@@ -35,7 +35,7 @@ def clean_document(parts_dict):
             identifier, suffix = keyparts
             if suffix in ['txt']:
                 parts[str(identifier)] = clean_text(text)
-            elif suffix in ['png', 'jpg', 'svg']:
+            elif suffix in ['png', 'jpg']:
                 files += [str(key)]
             else:
                 pass
@@ -211,7 +211,7 @@ def pluralize(number: int, singular: str, plural: str = "") -> str:
     if number == 1:
         return "%d %s" % (number, singular)
     else:
-        if plural is not "":
+        if plural != "":
             return "%d %s" % (number, plural)
         else:
             return "%d %ss" % (number, singular)
@@ -221,7 +221,7 @@ def random_slug(prefix: str) -> str:
     """
     Used for DEMO blocks.
     """
-    return str(prefix) + str(random.randrange(1000000, 9999999))
+    return str(prefix) + str(random.randrange(100000000, 999999999))
 
 
 def split_options(options: str) -> str:
