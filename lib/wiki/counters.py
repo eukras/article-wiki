@@ -15,7 +15,7 @@ next(counter) == u'XII'  # <-- and so on.
 import roman
 
 
-ROMAN_LETTERS = 'abcdefjhijklmnopqrstuvwxyz'
+ROMAN_LETTERS = 'abcdefghijklmnopqrstuvwxyz'
 GREEK_LETTERS = 'αβγδεζηθικλμνξοπρστυφχψω'
 SYMBOL_MARKERS = '*†‡§‖¶'
 
