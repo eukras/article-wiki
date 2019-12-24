@@ -1,5 +1,5 @@
 """
-Data manages all operations relating to the key-value store, whicy
+Data manages all operations relating to the key-value store, which
 is a Redis database.
 
 General naming is {object}_{verb}(). These functions are obvious
@@ -111,8 +111,8 @@ class Data(object):
 
     def __enter__(self):
         """
-        Replace self.redis with a pipeline; so all Data funnctions will now
-        accumulate
+        Replace self.redis with a pipeline; so all Data functions will now
+        accumulate and run atomically.
         """
         self.backup_redis_connection = self.redis
         self.redis = self.redis.pipeline()
@@ -179,8 +179,8 @@ class Data(object):
 
     def login_set(self, user: dict):
         token = uuid.uuid4().hex
-        _ = self.login_key(token)
-        self.redis.hmset(_, user)
+        key = self.login_key(token)
+        self.redis.hmset(key, user)
         return token
 
     def login_get(self, token: str):
@@ -207,25 +207,25 @@ class Data(object):
         return "us"
 
     def userSet_set(self, user_slug: str):
-        _ = self.userSet_key()
-        self.redis.zadd(_, {user_slug: time.time()})
+        key = self.userSet_key()
+        self.redis.zadd(key, {user_slug: time.time()})
 
     def userSet_exists(self, user_slug: str) -> bool:
-        _ = self.userSet_key()
-        rank = self.redis.zrank(_, user_slug)
+        key = self.userSet_key()
+        rank = self.redis.zrank(key, user_slug)
         return isinstance(rank, int)
 
     def userSet_get(self, user_slug: str):
         raise NotImplementedError("Use user_get.")
 
     def userSet_delete(self, user_slug: str):
-        _ = self.userSet_key()
-        self.redis.zrem(_, user_slug)
+        key = self.userSet_key()
+        self.redis.zrem(key, user_slug)
 
     def userSet_list(self):
         self.require_not_in_context_manager()
-        _ = self.userSet_key()
-        return self.redis.zrange(_, 0, -1)
+        key = self.userSet_key()
+        return self.redis.zrange(key, 0, -1)
 
     def userSet_count(self):
         self.require_not_in_context_manager()
@@ -248,8 +248,8 @@ class Data(object):
         )
 
     def user_set(self, user_slug: str, user: dict):
-        _ = self.user_key(user_slug)
-        self.redis.hmset(_, user)
+        key = self.user_key(user_slug)
+        self.redis.hmset(key, user)
         self.userSet_set(user_slug)
 
     def user_get(self, user_slug: str) -> Union[dict, None]:
@@ -285,24 +285,24 @@ class Data(object):
         return "uds:" + user_slug
 
     def userDocumentSet_set(self, user_slug: str, doc_slug: str):
-        _ = self.userDocumentSet_key(user_slug)
-        self.redis.zadd(_, {doc_slug: time.time()})
+        key = self.userDocumentSet_key(user_slug)
+        self.redis.zadd(key, {doc_slug: time.time()})
 
     def userDocumentSet_exists(self, user_slug: str, doc_slug: str) -> bool:
-        _ = self.userDocumentSet_key(user_slug)
-        rank = self.redis.zrank(_, doc_slug)
+        key = self.userDocumentSet_key(user_slug)
+        rank = self.redis.zrank(key, doc_slug)
         return isinstance(rank, int)
 
     def userDocumentSet_get(self, user_slug: str):
         raise NotImplementedError("Use userDocument_get.")
 
     def userDocumentSet_list(self, user_slug: str) -> List[str]:
-        _ = self.userDocumentSet_key(user_slug)
-        return self.redis.zrange(_, 0, -1)
+        key = self.userDocumentSet_key(user_slug)
+        return self.redis.zrange(key, 0, -1)
 
     def userDocumentSet_delete(self, user_slug: str, doc_slug: str):
-        _ = self.userDocumentSet_key(user_slug)
-        self.redis.zrem(_, doc_slug)
+        key = self.userDocumentSet_key(user_slug)
+        self.redis.zrem(key, doc_slug)
 
     def userDocumentSet_count(self, user_slug: str) -> str:
         return self.redis.zcard(
@@ -342,8 +342,8 @@ class Data(object):
                          user_slug: str,
                          doc_slug: str) -> Union[dict, None]:
         self.require_not_in_context_manager()
-        _ = self.userDocument_key(user_slug, doc_slug)
-        record = self.redis.hgetall(_)
+        key = self.userDocument_key(user_slug, doc_slug)
+        record = self.redis.hgetall(key)
         return record if len(record) > 0 else None
 
     def userDocument_set(self,
@@ -351,9 +351,9 @@ class Data(object):
                          doc_slug: str,
                          doc_parts: dict,
                          metadata: Union[dict, None] = None):
-        _ = self.userDocument_key(user_slug, doc_slug)
-        self.redis.delete(_)
-        self.redis.hmset(_, doc_parts)
+        key = self.userDocument_key(user_slug, doc_slug)
+        self.redis.delete(key)
+        self.redis.hmset(key, doc_parts)
 
         # Dependencies
         self.userSet_set(user_slug)
@@ -459,17 +459,17 @@ class Data(object):
         new_metadata_key = self.userDocumentMetadata_key(
             user_slug, use_doc_slug)
 
-        _ = self.userDocumentLastChanged_key(user_slug)
+        key = self.userDocumentLastChanged_key(user_slug)
 
-        self.redis.lrem(_, LAST_CHANGED_MAX, old_metadata_key)
-        self.redis.lpush(_, new_metadata_key)  # <-- L for left push
-        self.redis.ltrim(_, 0, LAST_CHANGED_MAX)
+        self.redis.lrem(key, LAST_CHANGED_MAX, old_metadata_key)
+        self.redis.lpush(key, new_metadata_key)  # <-- L for left push
+        self.redis.ltrim(key, 0, LAST_CHANGED_MAX)
 
     def userDocumentLastChanged_list(self, user_slug: str) -> list:
         self.require_not_in_context_manager()
-        _ = self.userDocumentLastChanged_key(user_slug)
+        key = self.userDocumentLastChanged_key(user_slug)
         return self.get_hashes(
-            self.redis.lrange(_, 0, 10)
+            self.redis.lrange(key, 0, 10)
         )
 
     def userDocumentLastChanged_delete(self, user_slug: str, doc_slug: str):
@@ -505,10 +505,68 @@ class Data(object):
                               user_slug: str,
                               doc_slug: str,
                               text: str):
-        _ = self.userDocumentCache_key(user_slug, doc_slug)
-        self.redis.set(_, text)
+        key = self.userDocumentCache_key(user_slug, doc_slug)
+        self.redis.set(key, text)
 
     def userDocumentCache_delete(self, user_slug: str, doc_slug: str):
         self.redis.delete(
             self.userDocumentCache_key(user_slug, doc_slug)
+        )
+
+    # ----------
+    # GENERATION,
+    # ----------
+
+    # set a placeholder to say that we're caching epubs...
+
+    def epubCachePlaceholder_key(self, user_slug: str, doc_slug: str):
+        self.check_slugs(user_slug, doc_slug)
+        return "udep:{:s}:{:s}".format(user_slug, doc_slug)
+
+    def epubCachePlaceholder_exists(self, user_slug: str, doc_slug: str) -> bool:
+        self.require_not_in_context_manager()
+        return self.redis.exists(
+            self.epubCachePlaceholder_key(user_slug, doc_slug)
+        )
+
+    def epubCache_get(self, user_slug: str, doc_slug: str) -> Union[dict, None]:
+        self.require_not_in_context_manager()
+        return self.redis.get(
+            self.epubCachePlaceholder_key(user_slug, doc_slug)
+        )
+
+    def epubCachePlaceholder_set(self, user_slug: str, doc_slug: str):
+        key = self.epubCachePlaceholder_key(user_slug, doc_slug)
+        self.redis.set(key, 'placeholder')
+ 
+    def epubCachePlaceholder_delete(self, user_slug: str, doc_slug: str):
+        self.redis.delete(
+            self.epubCachePlaceholder_key(user_slug, doc_slug)
+        )
+
+    # Cache epubs...
+
+    def epubCache_key(self, user_slug: str, doc_slug: str):
+        self.check_slugs(user_slug, doc_slug)
+        return "udec:{:s}:{:s}".format(user_slug, doc_slug)
+
+    def epubCache_exists(self, user_slug: str, doc_slug: str) -> bool:
+        self.require_not_in_context_manager()
+        return self.redis.exists(
+            self.epubCache_key(user_slug, doc_slug)
+        )
+
+    def epubCache_get(self, user_slug: str, doc_slug: str) -> Union[dict, None]:
+        self.require_not_in_context_manager()
+        return self.redis.get(
+            self.epubCache_key(user_slug, doc_slug)
+        )
+
+    def epubCache_set(self, user_slug: str, doc_slug: str, text: str):
+        key = self.epubCache_key(user_slug, doc_slug)
+        self.redis.set(key, text)
+
+    def epubCache_delete(self, user_slug: str, doc_slug: str):
+        self.redis.delete(
+            self.epubCache_key(user_slug, doc_slug)
         )

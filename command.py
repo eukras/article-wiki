@@ -13,8 +13,10 @@ import sys
 
 import click
 
+from faker import Faker
 from typing import List
 
+from lib.cover import make_epub_cover
 from lib.data import Data, load_env_config
 from lib.ebook import write_epub
 from lib.document import Document
@@ -71,12 +73,29 @@ def save_user_document(data: Data, user_slug: str, doc_slug: str):
 # ------------------------
 
 
+def generate_cover(title=None):
+    """
+    Writes an new random cover to the /tmp dir.
+    """
+    fake = Faker()
+    app_root = os.path.dirname(__file__)
+    tmp_cover_file = "/tmp/cover.jpg"
+    make_epub_cover(
+        title if title is not None else fake.sentence(),
+        fake.name(),
+        os.path.join(app_root, 'resources/ttf'),
+        os.path.join(app_root, 'resources/cover.png'),
+        tmp_cover_file
+    )
+    print("Generated ebook: {:s}".format(tmp_cover_file))
+
+
 def generate_epub():
     """
-    Writes an .epub to a new /tmp directory
+    Writes an .epub to the /tmp dir.
     """
-    file_path = '/tmp/eukras-help.epub'
-    write_epub('eukras', 'help', file_path)
+    file_path = '/tmp/eukras-how-should-christians-think-and-speak.epub'
+    write_epub('eukras', 'how-should-christians-think-and-speak', file_path)
     print("Generated ebook: {:s}".format(file_path))
 
 
@@ -131,10 +150,13 @@ def refresh_metadata():
 
 @click.command()
 @click.argument('command')
-def console(command):
+@click.option('--title')
+def console(command, title):
     """Processes console commands."""
     if command == 'generate-epub':
         generate_epub()
+    elif command == 'generate-cover':
+        generate_cover(title)
     elif command == 'initialize':
         create_admin_user()
         load_fixtures()

@@ -242,32 +242,21 @@ def rule(class_name):
     return "<hr class=\"%s\" />" % class_name
 
 
-def tag(tag_name, text, class_name='', lead_sep=None, lead_tag=None):
+def tag(tag_name, text, class_name=''):
     """
-    Regular tag+class convenience function, but with the option of a leading
-    title if a key-value pair is found (e.g. "~ title ~ hanging indent").
+    Regular tag+class convenience function
     """
     inline = Inline()
     if text == "":
         html = "&nbsp;"
-    elif lead_sep and lead_tag:
-        parts = text.split(lead_sep, 1)
-        if len(parts) == 2:
-            html = "<%s>%s</%s> &nbsp; %s" % (
-                lead_tag,
-                inline.process(parts[0]),
-                lead_tag,
-                inline.process(parts[1])
-            )
-        else:
-            html = inline.process(text)
     else:
         html = inline.process(text)
     if class_name != '':
-        return "<%s class=\"%s\">%s</%s>" % (tag_name, class_name,
-                                             html, tag_name)
+        tpl = "<%s class=\"%s\">%s</%s>"
+        return tpl % (tag_name, class_name, html, tag_name)
     else:
-        return "<%s>%s</%s>" % (tag_name, html, tag_name)
+        tpl = "<%s>%s</%s>"
+        return tpl % (tag_name, html, tag_name)
 
 
 def wrap(alignment_name, html, options):
@@ -293,7 +282,7 @@ def wrap(alignment_name, html, options):
     if class_property:
         properties += ["class=\"%s\"" % class_property]
     clear = '<div class="clear"></div>' if alignment_name == 'right' else ''
-    return "<div %s>%s</div>" % (" ".join(properties), html) + clear
+    return "<div %s><span>%s</span></div>" % (" ".join(properties), html) + clear
 
 
 def verbatim(text):

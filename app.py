@@ -105,7 +105,7 @@ def abs_url(request, uri):
     parts = request.urlparts
     return '{:s}://{:s}/{:s}'.format(
         parts.scheme, parts.netloc, uri.lstrip('/')
-        )
+    )
 
 
 def domain_name(request):
@@ -115,7 +115,7 @@ def domain_name(request):
     parts = request.urlparts
     return '{:s}://{:s}'.format(
         parts.scheme, parts.netloc
-        )
+    )
 
 
 # -------------------------------------------------------------
@@ -563,8 +563,11 @@ def read_document(user_slug, doc_slug):
     Compile the complete html document.
     """
 
-    header_buttons = [home_button()]
-    header_buttons += [edit_button(user_slug, doc_slug, 'index')]
+    header_buttons = [
+        home_button(),
+        epub_button(user_slug, doc_slug),
+        edit_button(user_slug, doc_slug, 'index')
+    ]
 
     footer_buttons = [biblio_button(user_slug, doc_slug)]
     if has_authority_for_user(user_slug):
@@ -576,8 +579,6 @@ def read_document(user_slug, doc_slug):
         'config:user': user_slug,
         'config:document': doc_slug,
     })
-
-    # pprint.pprint(domain_name(bottle.request))
 
     metadata = data.userDocumentMetadata_get(user_slug, doc_slug)
 
@@ -817,7 +818,7 @@ def export_archive(user_slug):
                 zip_name,
                 root=dir_path,
                 download=zip_name
-                )
+            )
         else:
             logging.error("Download failed: " + zip_name)
             bottle.abort(HTTP_BAD_REQUEST, "Download failed.")
@@ -898,31 +899,80 @@ def post_upload_txt(user_slug, doc_slug):
     uri = '/read/{:s}/{:s}'.format(user_slug, doc_slug)
     bottle.redirect(uri)
 
+# TODO: - Add .epub download to popover and end-of-page?
+# ----- - TODO: Add mobi as well; same process?
+#       - Add 'Generating...' note; use child process.
 
-@bottle.get('/download-epub/<user_slug>/<doc_slug>')
+
+@bottle.get('/epub/<user_slug>/<doc_slug>')
 def generate_epub(user_slug, doc_slug):
     """
-    Writes an .epub to a new /tmp directory; restrict to admin for now. Better
-    in a job queue.
+    Generates, caches and downloads an .epub; use a 'generating' notice to say
+    reload the page in 5s; uses a simple redis lock or queue to show a 'reload
+    in 5s' note.
     """
-    require_authority_for_user(user_slug)  # else 401s
 
-    work_dir = '/tmp'
     file_name = '%s_%s.epub' % (user_slug, doc_slug)
-    file_path = '%s/%s' % (work_dir, file_name)
 
-    write_epub(user_slug, doc_slug, file_path)
+    if data.epubCache_exists(user_slug, doc_slug):
 
-    if os.path.exists(file_path):
-        with open(file_path, 'rb') as f:
-            attach_as_file = 'attachment; filename="{:s}"'.format(file_name)
-            bottle.response.set_header('Content-Type', 'application/epub+zip')
-            bottle.response.set_header('Content-Disposition', attach_as_file)
-            return f.read()
+        # Serve
 
-    # if still here...
-    logging.error("Download failed: " + file_path)
-    bottle.abort(HTTP_BAD_REQUEST, "Download failed.")
+        attach_as_file = 'attachment; filename="{:s}"'.format(file_name)
+        bottle.response.set_header('Content-Type', 'application/epub+zip')
+        bottle.response.set_header('Content-Disposition', attach_as_file)
+        try:
+            return data.epubCache_get(user_slug, doc_slug)
+        except:
+            data.epubCache_delete(user_slug, doc_slug)  # <--not right, kill it
+            bottle.abort(HTTP_NOT_FOUND, "Temporary error generating ebook")
+
+    elif data.epubCachePlaceholder_exists(user_slug, doc_slug):
+
+        # Show the reload-in-5-mins page
+
+        back_button = {
+            'name': 'Back',
+            'href': '/read/{:s}/{:s}'.format(user_slug, doc_slug),
+            'icon': 'arrow-left'
+        }
+        return views.get_template('reload.html').render(
+            config=config,
+            user_slug=user_slug,
+            doc_slug=doc_slug,
+            header_buttons=[back_button, home_button()],
+            title="Generating..."
+        )
+
+    else:
+
+        # Generate and cache; requests for a a lot of simultaneous
+        # books that must all be fgenerated could slow this down; add
+        # a job queue later if that becomes necessary.
+
+        data.epubCachePlaceholder_set(user_slug, doc_slug)  # with expiry
+
+        file_path = os.path.join('/tmp', file_name)
+        write_epub(user_slug, doc_slug, file_path)
+
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as f:
+                content = f.read()
+        else:
+            logging.error("Download failed: " + file_path)
+            bottle.abort(HTTP_BAD_REQUEST, "Download failed.")
+
+        data.epubCache_set(user_slug, doc_slug, content)
+        data.epubCachePlaceholder_delete(user_slug, doc_slug)
+
+        attach_as_file = 'attachment; filename="{:s}"'.format(file_name)
+        bottle.response.set_header('Content-Type', 'application/epub+zip')
+        bottle.response.set_header('Content-Disposition', attach_as_file)
+        try:
+            return data.epubCache_get(user_slug, doc_slug)
+        except:
+            data.epubCache_delete(user_slug, doc_slug)  # <--not right, kill it
+            bottle.abort(HTTP_NOT_FOUND, "Temporary error generating ebook")
 
 
 # --------
@@ -1001,6 +1051,13 @@ def new_article_button(user_slug: str) -> dict:
         'icon': 'plus',
     }
 
+
+def epub_button(user_slug: str, doc_slug: str) -> dict:
+    return {
+        'name': 'eBook',
+        'href': '/epub/{:s}/{:s}'.format(user_slug, doc_slug),
+        'icon': 'download',
+    }
 
 def edit_button(user_slug: str, doc_slug: str, part_slug: str) -> dict:
     return {

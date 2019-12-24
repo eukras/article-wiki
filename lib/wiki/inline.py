@@ -21,17 +21,22 @@ class Inline(object):
         '/': 'Italic',
         '*': 'Bold',
         '_': 'Underline',
-        '`': 'Teletype',
-        '!': 'Marker',
-        ';': 'Sans-Serif Font',
         '=': 'Small Caps',
         '+': 'Insertion',
         '-': 'Deletion',
+        '`': 'Teletype',
+        '!': 'Marker',
+        ';': 'Sans-Serif Font',
         "'": 'Superscript',
         ',': 'Subscript',
-        '}': 'Float Right',  # >
-        '{': 'Float Left',  # <
     }
+
+    double_stops = [
+        ('//', "<em>", "</em>"),
+        ('**', "<b>", "</b>"),
+        ('__', "<u>", "</u>"),
+        ('==', "<span class=\"small-caps\">", "</span>"),
+    ]
 
     def __init__(self):
         """
@@ -46,42 +51,42 @@ class Inline(object):
 
     def process(self, text: str) -> str:
         """
-        @todo: Recursion! (and/or combinations).
+        Before any other inline formatting happens:
 
-        Basic splitters are handled here:
+        - Double stops at the start of a block format it all.
+        - Double stops in the middle will format the head and leave the tail
+        unchanged.
 
-        - Double-stops for leading: ** //
-        - Float-right for >>
+        A bit of a hack with the special treatmennt for small_caps.
+
+        ; ** Centered bold text
+        . // Left-aligned italics
+        . Bold lead text. ** Remainder of the block.
+        > Small-caps lead text. == Remainder of the quote
         """
-        new_text = text
-        html_parts = []
-        double_stops = [
-            (' ** ', '<strong>', '</strong>'),
-            (' // ', '<em>', '</em>')
-        ]
-        for pattern, open_tag, close_tag in double_stops:
-            # print((pattern, open_tag, close_tag));
-            if pattern in new_text:
-                parts = new_text.split(pattern, 1)
-                html_parts += [
-                    open_tag +
-                    self.process_after_splitting(parts[0]) +
-                    close_tag
-                ]
-                new_text = parts[1]
-                continue
-        # print(html_parts)
-        if " >> " in new_text:
-            parts = new_text.split(" >> ", 1)
-            html_parts += [
-                self.process_after_splitting(parts[0]),
-                '<span class="fill-space">' +
-                self.process_after_splitting(parts[1]) +
-                '</span>'
-            ]
-        else:
-            html_parts += [self.process_after_splitting(new_text)]
-        return "&nbsp; ".join(html_parts);
+        for pattern, open_tag, close_tag in self.double_stops:
+            if text.startswith(pattern + ' '):
+                if pattern == '==':
+                    return self.small_caps(text[3:])
+                else:
+                    return "".join([
+                        open_tag,
+                        self.process_after_splitting(text[3:]),
+                        close_tag
+                    ])
+            elif ' ' + pattern + ' ' in text:
+                parts = text.split(' ' + pattern + '', 1)
+                if pattern == '==':
+                    return self.small_caps(parts[0]) + "&nbsp; " + \
+                        self.process_after_splitting(parts[1])
+                else:
+                    return "".join([
+                        open_tag,
+                        self.process_after_splitting(parts[0]),
+                        close_tag + "&nbsp; ",
+                        self.process_after_splitting(parts[1])
+                    ])
+        return self.process_after_splitting(text)
 
     def process_after_splitting(self, text: str) -> str:
         """
@@ -139,8 +144,8 @@ class Inline(object):
             # en dash between numbers
             (re.compile(r"(?<=\d)-(?=\d)"), "&ndash;"),
 
-            (re.compile(r"\s---\s"), "&mdash;"),
-            (re.compile(r"\s--\s"), " &ndash; "),
+            (re.compile(r"(^|\s*)---($|\s*)"), "&mdash;"),
+            (re.compile(r"(^|\s*)--($|\s*)"), "\\1&ndash;\\2"),
 
             (re.compile(r"\(1\/2\)"), "&frac12;"),
             (re.compile(r"\(1\/4\)"), "&frac14;"),
@@ -182,12 +187,17 @@ class Inline(object):
             (re.compile(r"\(4EM\)"), "&#8195;" * 4),
 
             # an apostrophe at the start may trail a ^[link], for example.
-            (re.compile(r"^'s(\W)"), "&rsquo;s\\1"),
+            (re.compile(r"^'s(\W)"), "’\\1"),
 
-            (re.compile(r"(\S)'"), "\\1&rsquo;"),
-            (re.compile(r"'(\S)"), "&lsquo;\\1"),
-            (re.compile(r'(\S)"'), "\\1&rdquo;"),
-            (re.compile(r'"(\S)'), "&ldquo;\\1"),
+            # Special case: a quote within a bracket ... handle square?
+            (re.compile(r"\('(\S)"), "(‘\\1"),
+            (re.compile(r'\("(\S)'), "(“\\1"),
+
+            # ‘ ’ “ ”
+            (re.compile(r"(\S)'"), "\\1’"),
+            (re.compile(r"'(\S)"), "‘\\1"),
+            (re.compile(r'(\S)"'), "\\1”"),
+            (re.compile(r'"(\S)'), "“\\1"),
 
             (re.compile(r'\\' + '\n'), "<br/>\n"),
 
@@ -199,47 +209,64 @@ class Inline(object):
             (re.compile(r"\(END\)"), "⬛")
         ]
 
-    def brackets(self, char, content):
+    def brackets(self, char, content, depth=0):
         """
         Process the *_[content] where char = '*_'.
+        Must use typography onc
         Prevent excessive recursion.
         """
-        if len(char) == 0 or len(char) > 3:
-            return content
-        while len(char) > 1:
-            # Recursion!
-            char, content = char[:-1], self.brackets(char[-1], content)
-        if char == '/':
-            return '<i>%s</i>' % content
-        elif char == '*':
-            return '<b>%s</b>' % content
-        elif char == '_':
-            return '<u>%s</u>' % content
-        elif char == '=':
-            return '<span class="small-caps">%s</span>' % small_caps(content)
-        elif char == '`':
-            return '<kbd>%s</kbd>' % content
-        elif char == ';':  # sans-serif
-            return '<span class="opposite">%s</span>' % content
-        elif char == '!':
-            return '<var>%s</var>' % content
-        # elif char == ';': # script
-            # return '<span class="alternate">%s</span>' % content
-        elif char == "'":
-            return '<sup>%s</sup>' % content
-        elif char == ',':
-            return '<sub>%s</sub>' % content
-        elif char == '+':
-            return '<ins>%s</ins>' % content
-        elif char == '-':
-            return '<del>%s</del>' % content
-        elif char == '{':
-            return '<span class="pull-left space-right">%s</span>' % content
-        elif char == '}':
-            return '<span class="pull-right space-left">%s</span>' % content
+
+        open_tags = []
+        close_tags = []
+
+        if '=' in char:
+            content_html = self.small_caps(content)
         else:
-            return '<kbd class="error">%s[%s]</kbd>' % (html_escape(char),
-                                                        html_escape(content))
+            content_html = self.typography(content)
+
+        if '/' in char:
+            open_tags.append('<em>')
+            close_tags.insert(0, '</em>')
+        if '*' in char:
+            open_tags.append('<strong>')
+            close_tags.insert(0, '</strong>')
+        if char == '=':
+            pass  # <-- Already handled by small_caps()
+        if '_' in char:
+            open_tags.append('<u>')
+            close_tags.insert(0, '</u>')
+        if char == '+':
+            open_tags.append('<ins>')
+            close_tags.insert(0, '</ins>')
+        if char == '-':
+            open_tags.append('<del>')
+            close_tags.insert(0, '</del>')
+
+        if '`' in char:
+            open_tags.append('<kbd>')
+            close_tags.insert(0, '</kbd>')
+        if ';' in char:
+            open_tags.append('<span class="opposite">')
+            close_tags.insert(0, '</span>')
+        if '!' in char:
+            open_tags.append('<var>')
+            close_tags.insert(0, '</var>')
+        if "'" in char:
+            open_tags.append('<sup>')
+            close_tags.insert(0, '</sup>')
+        if ',' in char:
+            open_tags.append('<sub>')
+            close_tags.insert(0, '</sub>')
+
+        return "".join(open_tags) + content_html + "".join(close_tags)
+
+    def small_caps(self, content):
+        """
+        Wrap the capitals in <span> for better control of letter heights.
+        """
+        return '<span class="small-caps">' + \
+            re.sub('([A-Z]+)', '<span>\\1</span>', self.typography(content)) + \
+            '</span>'
 
 
 # ----------------
@@ -249,23 +276,16 @@ class Inline(object):
 
 def space_sentences(text: str) -> str:
     """
-    Add an extra thin space after sentences; may not catch all cases.
-    This is better done with NLTK, but would require rewriting the Inline
-    module; using a clunky interim solution.
+    Common abbreviations and acronyms can be handled with backslashing.
+    Mainly we need to deal with end-of-sentence punctuation that is followed by
+    other characters, like right-parentheses, quotes, or other punctuation.
     """
-    def repl(match) -> str:
-        abbrevs = ['mr', 'st', 'mrs', 'ms', 'dr', 'jr', 'sr', 'sq', 'vol'
-                   'esp', 'inc', 'co', 'ltd', 'p.a', 'a.m', 'p.m', 'var',
-                   'a.s.a.p', 'r.s.v.p', 'cf', 'i.e', 'e.g', 'etc',
-                   'trad', 'par', 'lit'
-                   ]
-        tail, punctuation, head = match.groups()
-        if punctuation == '.' and tail.lower() in abbrevs:
-            return tail + punctuation + " " + head
-        else:
-            return tail + punctuation + "&nbsp; " + head
 
-    return re.sub(r'(\S+)([!?.][”’"\']?)\s+(\S)', repl, text)
+    def repl(match) -> str:
+        tail, punctuation, head = match.groups()
+        return tail + punctuation + "&nbsp; " + head
+
+    return re.sub(r'(\S+)([!?.][”’"\'\)\]]{0,3})\s+(\S)', repl, text)
 
 
 def strip_markup(content):
@@ -279,10 +299,3 @@ def strip_markup(content):
                  tags=[],
                  strip=True,
                  strip_comments=True)
-
-
-def small_caps(content):
-    """
-    Wrap the capitals in <span> for better control of letter heights.
-    """
-    return re.sub('([A-Z]+)', '<span>\\1</span>', content)

@@ -5,3 +5,11 @@ html {
 .no-print {
     display: none;
 }
+
+section {
+    page-break-before: always;
+}
+
+h1, h2, h3, h4, h5, h6, hgroup {
+    page-break-after: avoid;
+}

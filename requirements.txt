@@ -5,9 +5,11 @@ bottle_utils
 click
 cssselect
 ebooklib
+faker
 html-parser
 Jinja2
 lxml
+Pillow
 python-dotenv
 python-slugify
 pytz

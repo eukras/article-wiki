@@ -5,7 +5,7 @@ Test the redis interface for user and docs handling.
 import os
 
 from lib.data import Data
-from lib.ebook import Ebook
+from lib.ebook import write_epub
 
 config = {
     'REDIS_HOST': 'localhost',
@@ -27,6 +27,5 @@ def test_write_epub():
     if os.path.exists(file_path):
         os.remove(file_path)
 
-    ebook = Ebook()
-    ebook.write_epub('eukras', 'help', file_path)
+    write_epub('eukras', 'help', file_path)
     assert os.path.exists(file_path)

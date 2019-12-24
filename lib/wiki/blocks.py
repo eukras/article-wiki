@@ -48,13 +48,12 @@ from lib.wiki.renderer import \
     alert, \
     generate_table, \
     Html,\
-    image, \
     parse_table_data, \
     rule,\
     space,\
     tag
-from lib.wiki.icons import \
-    expand_shorthand
+# from lib.wiki.icons import \
+# expand_shorthand
 from lib.wiki.placeholders import \
     is_placeholder
 from lib.wiki.inline import \
@@ -283,7 +282,7 @@ class BlockList(object):
                     nav_id, nav_id, number, renderer.inline.process(title))
             out += [head]
             if summary != '':
-                out += ['<h2>%s</h2>' %
+                out += ['<p class="summary">%s</p>' %
                         renderer.inline.process(summary)]
             out += ['</hgroup>']
         # Assemble
@@ -386,12 +385,14 @@ class Divider(Block):
         """
         html = {
             # Markers
-            '*': '<p class="text-center text-large space">✻</p>',
+            '*': '<p class="text-center text-large space"><span>✻</span></p>',
             '-': rule('div-solid div-center'),
-            # '@': image('fleuron.svg', 'fleuron'),
-            '* * *': '<p class="text-center text-large big-space">✻ ✻ ✻</p>',
+            '* * *': trim("""
+                <p class="text-center text-large big-space">
+                    <span>✻ ✻ ✻</span>
+                </p>
+                """),
             '- - -': rule('div-solid'),
-            # '@ @ @': image('swash.svg', 'swash'),
             '. . .': rule('div-dotted div-wide'),
             '= = =': rule('div-thick div-wide'),
             # Spacers
@@ -424,14 +425,10 @@ class CharacterBlock(Block):
     def text(self):
         """
         Leave lines beginning with a control character unwrapped.
-        Add an extra blank line before headers.
         """
         tuples = split_to_array(self.content, Config.all_control_chars)
         lines = [char + ' ' + one_line(line) for char, line in tuples]
-        leading_space = "\n" \
-            if self.control_character in Config.headers \
-            else ""
-        return leading_space + "\n".join(lines)
+        return "\n".join(lines)
 
     def html(self, renderer, settings):
         """
@@ -445,8 +442,8 @@ class CharacterBlock(Block):
             html = ''
         elif _ in Config.setters:
             settings.read_settings_block(content)
-        elif _ in Config.headers:
-            html = heading_block(content, settings)
+        elif _ in Config.subheads:
+            html = subhead_block(content, settings)
         elif _ in Config.quotes:
             html = quote_block(content, settings)
         elif _ in Config.notes:
@@ -632,94 +629,67 @@ def align_block(content, settings):
             ',': 'text-right',
             ':': 'indent',
             '~': 'indent-hanging',
-            '{': 'float-left',
-            '}': 'float-right',
         }.get(char, '')
-        separator = ' %s ' % char
-        if char == ':':
-            parts = line.split(separator, 1)
-            if len(parts) == 2:
-                out += [icon_block(parts[0], parts[1])]
-            else:
-                out += [tag('div', line, class_name, separator, 'em')]
-        elif char in Config.leaders:
-            out += [tag('div', line, class_name, separator, 'i')]
-        else:
-            out += [tag('div', line, class_name)]
+        out += [tag('div', line, class_name)]
     if len(out) > 0:
-        return '<div class="wr-align-block space">' + \
-            ''.join(out) + '</div>'
+        return "".join([
+            '<div class="wr-align-block space">',
+            '<span>',
+            ''.join(out),
+            '</span>',
+            '</div>',
+        ])
     else:
         return ''
 
 
-def heading_block(text, settings):
-    """
-    Config.headers:
-    + Heading -- Large, centered?
-    - Subheading (Italics) [or? ". / Title"]
-    Plus:
-    " Summary
-    """
-    lines = split_to_array(text, prefixes=Config.headers + Config.caption)
-    out = []
-    for char, content in lines:
-        if char == '+':
-            out += [tag('h2', content, "balance-text")]
-        elif char == '-':
-            out += [tag('h3', content, "balance-text")]
-        elif char == Config.caption:
-            out += [tag('div', content, "summary")]
-    if len(out) > 0:
-        return "\n".join(out)
-    else:
-        return ""
-
-
 def note_block(content, settings):
     """
-    ' aside (marginal note)
     " block note
     """
     lines = split_to_array(content, prefixes=Config.notes)
-    char = content[0]
-    separator = ' %s ' % char
-    out = []
-    for char, content in lines:
-        if char == "'":
-            out += [tag('aside', content, '', separator, 'b')]
-        elif char == '"':
-            out += [tag('p', content, 'note', separator, 'b')]
-    if len(out) > 0:
-        return "\n".join(out)
-    else:
-        return ""
+
+    def note_line(part):
+        char, text = part
+        if char == '"':
+            return tag('p', text, 'note')
+        else:
+            return alert(content)
+    out = map(note_line, lines)
+    return "\n".join(out)
+
+
+def subhead_block(content, settings):
+    """
+    Just one level of subheadings for now, no captions.
+    @ Subheading
+    """
+    lines = split_to_array(content, prefixes=Config.subheads)
+
+    def subhead_line(part):
+        char, text = part
+        if char == '@':
+            return tag('p', text, 'subhead')
+        else:
+            return alert(content)
+    out = map(subhead_line, lines)
+    return "\n".join(out)
 
 
 def quote_block(content, settings):
     """
-    (Rare-and/or-strange to combine these, incidentally. consider an error
-    if mixing them.)
-
     Config.quotes:
     > blockquote
-    " feature quote
     plus:
     = caption
-
-    @todo: extract tailing caption and wrap with preceding block.
     """
     lines = split_to_array(content, prefixes=Config.quotes + Config.caption)
     out = []
     for char, content in lines:
         if char == '>':
-            if " > " in content[:60]:
-                out += [tag('blockquote', content,
-                            'indent-hanging', ' > ', 'b')]
-            else:
-                out += [tag('blockquote', content)]
+            out += [tag('blockquote', content)]
         elif char == Config.caption:
-            out += [tag('p', content, 'caption', ' = ', 'b')]
+            out += [tag('p', content, 'caption')]
     if len(out) > 0:
         return "\n".join(out)
     else:
@@ -734,7 +704,7 @@ def caption_block(content, settings):
     out = []
     for char, content in lines:
         if char == Config.caption:
-            out += [tag('p', content, 'caption', ' = ', 'b')]
+            out += [tag('p', content, 'caption')]
     if len(out) > 0:
         return "\n".join(out)
     else:
@@ -774,7 +744,7 @@ def list_block(text, settings):
             else:
                 settings.set('CONTINUE', 1)
         if char == '_':
-            properties += ['class="fa-ul"']
+            properties += ['class="checkboxes"']
 
         # XHTML (for ebooks) requires that a child list appears inside the
         # preceeding <li> rather than inside it's own <li>. So we'll accumulate
@@ -790,28 +760,10 @@ def list_block(text, settings):
                     last = len(display_items) - 1
                     sub_list = list_block_recursor(
                         char, item, settings, depth + 1
-                        )
+                    )
                     display_items[last] += sub_list
             else:
-                if char == '_':
-                    parts = item.split(" ", 1)
-                    if len(parts) == 2:
-                        head, tail = parts
-                        icon = head[1:] if head.startswith(
-                            ':') else "square-o"
-                        line = tail if head.startswith(':') else item
-                    else:
-                        icon = 'square-o'
-                        line = item
-                    display_items += [
-                        "<span class=\"fa-li\">%s</span> %s" % (
-                            "<i class=\"fa fa-%s\"></i>" % slugify(
-                                expand_shorthand(icon)),
-                            inline.process(line)
-                        )
-                    ]
-                else:
-                    display_items += [inline.process(item)]
+                display_items += [inline.process(item)]
                 if list_tag == 'ol' and depth == 1:
                     settings.set('CONTINUE', settings.get('CONTINUE') + 1)
         close_tag = "</%s>" % list_tag
@@ -894,21 +846,6 @@ def gloss_block(text, settings):
     """))
 
     return tpl.render(gloss=gloss)
-
-
-def icon_block(name: str, text: str):
-    """
-    Generate simple icon blocks. This should be redone as an ICON
-    function block to allow better formatting.
-    """
-    inline = Inline()
-    icon = slugify(expand_shorthand(name))
-    out = ['<div class="icon-block">']
-    out += ['<div class="icon"><i class="fa fa-fw fa-2x fa-%s"></i></div>' %
-            icon]
-    out += ['<div class="text">%s</div>' % inline.process(text)]
-    out += ['</div>']
-    return "\n".join(out)
 
 
 def table_block(text, settings):

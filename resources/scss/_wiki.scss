@@ -163,16 +163,19 @@ footer {
     margin: 1.5em 0;
     padding: 0;
     display: grid;
-    grid-template-columns: 45% 45%;
-    grid-gap: 10%;
+    grid-template-columns: 50% 50%;
+    grid-gap: 0;
     grid-row-gap: 0;
 }
 .article {
     display: inline-block;
-    padding: 1rem 0;
+    padding: 1rem 3rem;
     width: 100%;
     box-sizing: border-box;
     text-align: center;
+}
+.article:nth-child(odd) {
+    border-right: 1pt dotted black;
 }
 .article-title {
     font-size: $fontSize;

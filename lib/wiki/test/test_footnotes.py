@@ -94,7 +94,7 @@ def test_match_footnotes():
 def test_constructor():
     parts = sample_doc()
     outline = Outline(parts, default_counters())
-    footnotes = Footnotes(parts, outline)
+    footnotes = Footnotes(parts, outline, 'prefix_')
     assert footnotes.outline.errors == {
         'topic-four': [
             ('', 'More <kbd>^[link]s</kbd> than footnotes! (+1)')

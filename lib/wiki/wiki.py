@@ -306,12 +306,12 @@ class Wiki(object):
             <p class="space space-between">
                 {% if facebook != "" %}
                 <a href="https://facebook.com/{{ facebook }}" target="_blank">
-                    <i class="fa fa-facebook-square"></i> {{ facebook }}
+                    FB: {{ facebook }}
                 </a>
                 {% endif %}
                 {% if twitter != "" %}
                 <a href="https://twitter.com/{{ twitter }}" target="_blank">
-                    <i class="fa fa-twitter"></i> {{ twitter }}
+                    TW: {{ twitter }}
                 </a>
                 {% endif %}
             </p>
@@ -558,10 +558,10 @@ class Demo(object):
 def is_index_part(source):
     """
     Confirm if source text is an index page -- maybe too general? Might
-    repurpose ` for outlines within non-index pages.
+    repurpose `-` for outlines within non-index pages.
     """
     settings = re.search(r'^\$ (AUTHOR|DATE) = ', source, re.M)
-    contents = re.search(r'^` ', source, re.M)
+    contents = re.search(r'^- ', source, re.M)
     return bool(settings) or bool(contents)
 
 

@@ -47,6 +47,10 @@
         grid-template-columns: 100%
     }
 
+    .article:nth-child(odd) {
+        border-right: none;
+    }
+
     #editor {
         grid-template-columns: 1fr 1fr 1fr 1fr;
         grid-gap: 0;

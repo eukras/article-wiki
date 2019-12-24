@@ -18,23 +18,13 @@
     text-align: center;
 }
 
+.text-center span {
+    display: block;
+    text-align: center;
+}
+
 .text-right {
     text-align: right;
-}
-
-
-/*
- * Float left, but clear below as well.
- * Used for end quotes that align right with '>>'.
- */
-.fill-space {
-    float: right;
-    padding-left: 2rem;
-}
-.fill-space:after {
-  content: "";
-  display: table;
-  clear: both;
 }
 
 a {
@@ -74,14 +64,6 @@ a.unmarked {
 
 p {
     margin: 0;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.text-right {
-    text-align: right;
 }
 
 .indent {
@@ -319,14 +301,6 @@ cite {
     font-style: normal;
 }
 
-span.dropcap {
-    float: left;
-    font-weight: bold;
-    padding-top: 3px;
-    padding-right: 8px;
-    padding-left: 0px;
-}
-
 sub, sup {
     font-size: $fontSizeMinus2;
     vertical-align: baseline;
@@ -357,6 +331,17 @@ blockquote {
 
 blockquote + blockquote { 
     margin-top: -0.5rem;
+}
+
+p.subhead {
+    font-weight: bold;
+    margin: 0;
+    padding: 0.8rem 0 0 0;
+}
+
+p.summary {
+    font-size: $fontSizePlus1;
+    margin: 0 0 0.5rem 0;
 }
 
 p.caption {
@@ -590,15 +575,18 @@ small {
 }
 
 .small-caps {
+    display: inline;
     font-size: 0.85em;
     text-transform: uppercase;
     letter-spacing: .08rem;
 }
 
 .small-caps span {
+    display: inline;
     font-size: 1.2em;
     font-style: normal;
-    padding-right: 0.1em;
+    padding-left: 0.07em;
+    padding-right: 0.07em;
 }
 
 .header { 

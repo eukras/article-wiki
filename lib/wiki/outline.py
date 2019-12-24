@@ -158,9 +158,8 @@ class Outline(object):
                                 {% endif %}
 
                                     {% if word_count == "0" %}
-                                    <i class="fa fa-plus"</i>&nbsp;
                                     <a href="{{ edit_base_uri }}/{{ slug }}?title={{ title|urlencode }}" class="unmarked">
-                                        <i>{{ title }}</i>
+                                        <i>[+] {{ title }}</i>
                                     </a>
                                     {% else %}
                                     <a href="#{{ name }}" class="unmarked">
@@ -174,11 +173,14 @@ class Outline(object):
                                 </td>
 
                                     {% if numbering|length > 1 or subtotal != "0" %}
+                                        {% if subtotal != "0" %}
                                 <td class="word-count">
-                                        {% if subtotal != "0" %}<b>{{ subtotal }}</b>{% endif %}
+                                    \\ <b>{{ subtotal }}</b>
                                 </td>
+                                        {% endif %}
                                         {% for i in range(numbering|length - 2) %}
-                                <td></td>
+                                <td>
+                                </td>
                                         {% endfor %}
                                     {% endif %}
                                 {% endif %}
@@ -343,12 +345,12 @@ def extract_outline(text: str, counters: list) -> list:
     """
     Pull back the first outline block from wiki text.
 
-    ` Chapter One
-    ` ` Heading
+    - Chapter One
+    - - Heading
     """
     for _ in BlockList(text):
-        if isinstance(_, CharacterBlock) and _.control_character == "`":
-            hierarchy = split_to_recursive_array(_.content, '` ')
+        if isinstance(_, CharacterBlock) and _.control_character == "-":
+            hierarchy = split_to_recursive_array(_.content, '- ')
             enumeration = enumerate_list(hierarchy, counters, [])
             outline = [(numbering, (slugify(_), _, slugify(_), ''))
                        for numbering, _ in enumeration]
@@ -369,7 +371,9 @@ def html_heading(numbering: list,
     env = Environment(autoescape=True)
     tpl = env.from_string(trim("""
         <div class="pull-right">
-            <a href="{{ base_edit_uri }}{{ slug }}">Edit</a>
+            <span>
+                <a href="{{ base_edit_uri }}{{ slug }}">Edit</a>
+            </span>
         </div>
         <{{ tag }} class="balance-text">
             <a id="{{ name }}" href="#{{ name }}">
@@ -405,12 +409,12 @@ def replace_title(text: str, old_title: str, new_title: str) -> str:
     is still a non-zero chance of matching a stray backtick and title string in
     other text. Replace one only if there are more than one.
     """
-    old = "` " + old_title
-    new = "` " + new_title
+    old = "- " + old_title
+    new = "- " + new_title
     lines = []
     matched = False
     for _ in text.splitlines():
-        if not matched and _.startswith("` ") and _.endswith(old):
+        if not matched and _.startswith("- ") and _.endswith(old):
             lines.append(_.replace(old, new))
             matched = True
         else:

@@ -10,27 +10,20 @@ class Config(object):
     No dependencies.
     """
 
-    nulls = '%^`'          # Produce no output: comments, references, outlines
-    setters = '$'          # Produce no output: settings
-    headers = '+-'         # Headings within a document part
-    quotes = '>'           # Block quotes
-    notes = "'\""          # Aside (margin note), Inline (visible) comment
-    aligns = '.;,:~{}'     # Grouped formatting divs
-    lists = '*#_'          # Recursively nested lists, non-recursive icon lists
-    tables = '!|'          # Tables, with format block, with format blocks
-    glosses = '/'          # Interlinear translations
-    caption = '='          # Attach a caption to the preceding block
-
-    captions = '+>!|@'     # Blocks that captions or bylines may follow
-
-    # Characters that can be repeated once (with spacing) to define a inline
-    # heading (also: u'=', but handled specially):
-
-    leaders = "~'\""
+    subheads = '@'    # Indicate a subheading within a section
+    nulls = '%^+-'    # Produce no output: comments, references, outlines
+    setters = '$'     # Produce no output: settings
+    quotes = '>'      # Block quotes
+    notes = '"'       # Aside (margin note), Inline (visible) comment
+    aligns = '.;,:~'  # Grouped aligment blocks
+    lists = '*#_'     # Recursively nested lists, non-recursive icon lists
+    tables = '!|'     # Tables, with format block, with format blocks
+    glosses = '/'     # Interlinear translations
+    caption = '='     # Attach a caption to the preceding block
 
     all_control_chars = (
-        nulls + setters + headers + quotes + notes + aligns +
-        lists + tables + caption + glosses
+        subheads + nulls + setters + quotes + notes + 
+        aligns + lists + tables + caption + glosses
         )
 
     dividers = [
@@ -50,6 +43,14 @@ class Config(object):
     }
 
     punctuation = ",.?!:;·"
+
+    # See wiki.shorthand
+    inline_shorthand_tuples = [
+        ('/', 'em'),
+        ('*', 'strong'),
+        ('_', 'u'),
+        ('`', 'kbd'),
+    ]
 
     # See wiki.icons
     fontawesome_icon_aliases = {
@@ -81,11 +82,3 @@ class Config(object):
         'L': 'arrow-circle-left',
         'R': 'arrow-circle-right',
     }
-
-    # See wiki.shorthand
-    inline_shorthand_tuples = [
-        ('/', 'em'),
-        ('*', 'strong'),
-        ('_', 'u'),
-        ('`', 'kbd'),
-    ]
