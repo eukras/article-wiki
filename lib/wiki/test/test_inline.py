@@ -9,14 +9,14 @@ from lib.wiki.inline import Inline, space_sentences
 
 def test_brackets():
     test = Inline()
-    assert '<b>bold face</b>' == test.brackets('*', "bold face")
-    assert '<b><u><i>bold-underline-italics</i></u></b>' == \
+    assert '<strong>bold face</strong>' == test.brackets('*', "bold face")
+    assert '<em><strong><u>bold-underline-italics</u></strong></em>' == \
         test.brackets('*_/', "bold-underline-italics")
 
 
 def test_happy_path():
     test = Inline()
-    out = '<b>To boldly</b> go where <u>none</u> have gone <i>before.</i>'
+    out = '<strong>To boldly</strong> go where <u>none</u> have gone <em>before.</em>'
     assert out == test.process(
         "*[To boldly] go where _[none] have gone /[before.]"
     )
@@ -34,12 +34,10 @@ def test_happy_path():
 
 def test_typography():
     test = Inline()
-    assert "x&mdash;x &ndash; x &rarr; x &larr; x &copy; &trade;" == \
-        test.typography("x --- x -- x --> x <-- x (C) (TM)")
+    assert "x&mdash;x &ndash; x &copy; &trade;" == \
+        test.typography("x --- x -- x (C) (TM)")
     assert "6&times;9 &hellip; 9&frac12; 9&frac14; 9&frac34;" == \
         test.typography("6x9 ... 9(1/2) 9(1/4) 9(3/4)")
-    assert "★ ★★★½ ★★★★★ (6*)" == \
-        test.typography("(*) (3.5*) (5*) (6*)")
     assert "“That’s ‘OK’,” I sez." == \
         test.typography("\"That's 'OK',\" I sez.")
     assert '&#8195;&#8195;&#8195;&#8195;' == \
@@ -71,6 +69,6 @@ def test_dashes():
     assert 'x &ndash; y' == test.process("x -- y")
     assert 'x&mdash;y' == test.process("x---y")
     assert '&ndash; x &ndash; y &ndash;' == test.process("-- x -- y --")
-    # assert '&ndash; x &ndash; y &ndash;' == test.process("--x--y--")
+    assert '&ndash;x&ndash;y&ndash;' == test.process("--x--y--")
     assert '&mdash;x&mdash;y&mdash;' == test.process("--- x --- y ---")
     assert '&mdash;x&mdash;y&mdash;' == test.process("---x---y---")

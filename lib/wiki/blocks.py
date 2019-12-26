@@ -428,7 +428,8 @@ class CharacterBlock(Block):
         """
         tuples = split_to_array(self.content, Config.all_control_chars)
         lines = [char + ' ' + one_line(line) for char, line in tuples]
-        return "\n".join(lines)
+        space_above = "\n" if self.control_character in Config.subheads else ""
+        return space_above + "\n".join(lines)
 
     def html(self, renderer, settings):
         """
@@ -774,7 +775,7 @@ def list_block(text, settings):
             "</li>",
             close_tag
         ]
-        return "".join(elements)
+        return "\n".join(elements)
 
     # May need a character-aware recursor to support mixed levels.
     char = text[0]

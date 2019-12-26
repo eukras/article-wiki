@@ -42,6 +42,7 @@ def test_repr_save_load_delete():
     user_slug = random_slug('test-user-')
     doc_slug = random_slug('test-doc-')
     doc = Document(data)
+    doc.set_host('http://example.org')
     doc.set_parts(user_slug, doc_slug, minimal_document)
 
     # Create
@@ -118,8 +119,8 @@ def test_set_part():
         'index': trim("""
             Index
 
-            ` Part One
-            ` Part Two
+            - Part One
+            - Part Two
             """),
         'part-one': trim("""
             Part One
@@ -146,8 +147,8 @@ def test_set_part():
         'index': trim("""
             Index
 
-            ` Part Three
-            ` Part Two
+            - Part Three
+            - Part Two
             """),
         'part-three': trim("""
             Part Three
@@ -168,8 +169,8 @@ def test_delete_part():
         'index': trim("""
             Index
 
-            ` Part One
-            ` Part Two
+            - Part One
+            - Part Two
             """),
         'part-one': trim("""
             Part One
@@ -189,7 +190,7 @@ def test_delete_part():
         'index': trim("""
             Index
 
-            ` Part Two
+            - Part Two
             """),
         'part-two': trim("""
             Part Two

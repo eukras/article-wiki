@@ -59,8 +59,7 @@ def test_process_simple():
         > Quote
         = Calvin, /Institutes/
 
-        + Headline
-        & Byline
+        @ Headline
 
         Paragraph
 
@@ -71,10 +70,10 @@ def test_process_simple():
     __ = html.fromstring(str(_))
     assert __.xpath("//article/section")
     assert __.xpath("//h1/a[contains(., 'Title')]")
-    assert __.xpath("//h2[contains(., 'Headline')]")
     assert __.xpath("//blockquote[contains(., 'Quote')]")
     assert __.xpath("//p[@class='caption'] and contains(., 'Calvin')")
-    assert __.xpath("//p[@class='caption']/i[contains(., 'Institutes')]")
+    assert __.xpath("//p[@class='caption']/em[contains(., 'Institutes')]")
+    assert __.xpath("//p[@class='subhead'][contains(., 'Headline')]")
     assert __.xpath("//p[contains(., 'Paragraph')]")
     assert __.xpath("count(//ul/li[contains(., 'Bullets')])") == 2
 
@@ -99,9 +98,9 @@ def test_is_index_page():
 
         OK
 
-        ` Part One
-        ` ` Part One Aye
-        ` Part Two
+        - Part One
+        - - Part One Aye
+        - Part Two
         """)
     assert is_index_part(page)
 

@@ -13,6 +13,8 @@ from lib.wiki.bibliography import \
 from lib.wiki.outline import Outline, default_counters
 from lib.wiki.utils import trim
 
+id_prefix = "PREFIX"
+
 
 def test_nonempty_lines():
     content = trim("""
@@ -79,7 +81,7 @@ def test_match():
             """),
     }
     outline = Outline(parts, default_counters())
-    bibliography = Bibliography(parts, outline)
+    bibliography = Bibliography(parts, outline, id_prefix)
     assert bibliography.match('author') == "Author. 1999."
     assert bibliography.match('author 2000') == "Author. 2000a."
 
@@ -90,7 +92,7 @@ def test_get_count():
         'other': 'OTHER',
     }
     outline = Outline(parts, default_counters())
-    bibliography = Bibliography(parts, outline)
+    bibliography = Bibliography(parts, outline, id_prefix)
     assert bibliography.get_count('index') == '*'
     assert bibliography.get_count('index') == '†'
     assert bibliography.get_count('index') == '‡'
@@ -102,17 +104,19 @@ def test_get_count():
 def test_citation():
     parts = {}
     outline = Outline(parts, default_counters())
-    bibliography = Bibliography(parts, outline)
+    bibliography = Bibliography(parts, outline, id_prefix)
     link = bibliography.citation(
         'Author /Title/', 'p.34', '.', 'Author. 2000.', ['1', 'a'], 3
     )
 
-    assert '<a id="author-2000_1.a_3" href="#ref_author-2000_1.a_3">' in link
-    assert '(Author <i>Title</i>, p.34).' in link  # <-- (?)
+    assert '<a id="PREFIX_author-2000_1.a_3" ' + \
+           'href="#ref_PREFIX_author-2000_1.a_3">' in link
+    assert '(Author <em>Title</em>, p.34).' in link  # <-- (?)
     assert '<sup>3</sup>' in link
     assert '</a>' in link
 
-    back_link = '<a id="ref_author-2000_1.a_3" href="#author-2000_1.a_3">'
+    back_link = '<a id="ref_PREFIX_author-2000_1.a_3" ' + \
+                'href="#PREFIX_author-2000_1.a_3">'
     assert back_link in bibliography.citations['Author. 2000.']['1.a'][0]
 
 
@@ -125,7 +129,7 @@ def test_html_simplest():
             """),
     }
     outline = Outline(parts, default_counters())
-    bibliography = Bibliography(parts, outline)
+    bibliography = Bibliography(parts, outline, id_prefix)
     out = bibliography.html()
     dom = html.fragment_fromstring(out, create_parent='body')[0]
     assert len(dom.cssselect('div.indent-hanging')) == 3

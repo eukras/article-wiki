@@ -1,4 +1,4 @@
-//  -----------------
+  -----------------
 //  Regular
 //  -----------------
 
@@ -493,7 +493,7 @@ kbd {
     margin-right: 0.2rem;
     margin-left: 0.2rem;
     border-radius: 0.3rem;
-    font-size: $fontSizeMinus1;
+    font-size: $fontSizeMinus2;
 }
 
 td kbd { 
@@ -503,6 +503,7 @@ td kbd {
     padding-left: 0;
     margin-right: 0;
     margin-left: 0;
+    font-size: $fontSizeMinus2;
 }
 
 dl dt {
@@ -652,14 +653,14 @@ ul.checkboxes {
 }
 
 ul.checkboxes li {
-    padding-left: 5.0rem;
-    text-indent: -5rem;
+    padding-left: 2.5rem;
+    text-indent: -2.9rem;
 }
 
 ul.checkboxes li:before
 {
     content: '\2751';
-    margin: 0 1em;    /* any design */
+    margin: 0 1rem;    /* any design */
 }
 
 /**

@@ -252,13 +252,13 @@ class Document(object):
 
                     okay_to_replace_line = all([
                         not matched_yet,
-                        old_line.startswith("` "),
-                        old_line.endswith("` " + old_title)
+                        old_line.startswith("- "),
+                        old_line.endswith("- " + old_title)
                     ])
                     if okay_to_replace_line:
                         matched_yet = True
-                        new_line = old_line.replace("` " + old_title,
-                                                    "` " + new_title)
+                        new_line = old_line.replace("- " + old_title,
+                                                    "- " + new_title)
                         lines.append(new_line)
                     else:
                         lines.append(old_line)
@@ -296,8 +296,8 @@ class Document(object):
 
                     okay_to_delete_line = all([
                         not matched_yet,
-                        old_line.startswith("` "),
-                        old_line.endswith("` " + title)
+                        old_line.startswith("- "),
+                        old_line.endswith("- " + title)
                     ])
                     if okay_to_delete_line:
                         matched_yet = True

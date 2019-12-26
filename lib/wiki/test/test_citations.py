@@ -15,12 +15,14 @@ from lib.wiki.outline import Outline, default_counters
 from lib.wiki.placeholders import DELIMITER
 from lib.wiki.utils import trim
 
+id_prefix = "PREFIX"
+
 
 def test_split_pattern():
     assert split_pattern("~[Smith]") == ("Smith", '', '')
     assert split_pattern("~[Smith, p.34].") == ("Smith", "p.34", ".")
-    assert split_pattern("~[Smith, Title, p.34].") == ("Smith, Title", "p.34",
-                                                       ".")
+    assert split_pattern("~[Smith, Title, p.34].") == \
+        ("Smith, Title", "p.34", ".")
 
 
 def test_constructor():
@@ -37,7 +39,7 @@ def test_constructor():
     }
 
     outline = Outline(parts, default_counters())
-    bibliography = Bibliography(parts, outline)
+    bibliography = Bibliography(parts, outline, id_prefix)
     citations = Citations(bibliography)
 
     assert bibliography.entries == SortedDict({
@@ -60,7 +62,7 @@ def test_constructor():
         }
 
     end_parts = citations.replace(new_parts)
-    assert '<i>Conversation</i>' in end_parts['index']
+    assert '<em>Conversation</em>' in end_parts['index']
     assert 'p.34' in end_parts['index']
     dom = html.fragment_fromstring(end_parts['index'], create_parent='body')[0]
     assert len(dom.cssselect('a')) == 1

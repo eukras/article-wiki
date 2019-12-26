@@ -138,11 +138,12 @@ class Inline(object):
         """
         url_chars = re.escape(r'.:\/_+?&=-#%~')
         return [
-            (re.compile(r"--&gt;"), "&rarr;"),
-            (re.compile(r"&lt;--"), "&larr;"),
+            # (re.compile(r"--&gt;"), "s⇐"),
+            # (re.compile(r"&lt;--"), ""),
 
             # en dash between numbers
             (re.compile(r"(?<=\d)-(?=\d)"), "&ndash;"),
+            (re.compile(r"(?<=\d)x(?=\d)"), "&times;"),
 
             (re.compile(r"(^|\s*)---($|\s*)"), "&mdash;"),
             (re.compile(r"(^|\s*)--($|\s*)"), "\\1&ndash;\\2"),
@@ -152,7 +153,6 @@ class Inline(object):
             (re.compile(r"\(3\/4\)"), "&frac34;"),
 
             (re.compile(r"\.\.\."), "&hellip;"),
-            (re.compile(r"(\d)x(\d)"), "\\1&times;\\2"),
 
             (re.compile(r"\(C\)"), "&copy;"),
             (re.compile(r"\(R\)"), "&reg;"),
@@ -166,17 +166,6 @@ class Inline(object):
             (re.compile(r"\(S\)"), "&#8239;"),
             (re.compile(r"\(2S\)"), "&#8239;" * 2),
             (re.compile(r"\(4S\)"), "&#8239;" * 4),
-
-            (re.compile(r"\(\*\)"), "★"),
-            (re.compile(r"\(1\*\)"), "★"),
-            (re.compile(r"\(1\.5\*\)"), "★" + "½"),
-            (re.compile(r"\(2\*\)"), "★" * 2),
-            (re.compile(r"\(2\.5\*\)"), "★" * 2 + "½"),
-            (re.compile(r"\(3\*\)"), "★" * 3),
-            (re.compile(r"\(3\.5\*\)"), "★" * 3 + "½"),
-            (re.compile(r"\(4\*\)"), "★" * 4),
-            (re.compile(r"\(4\.5\*\)"), "★" * 4 + "½"),
-            (re.compile(r"\(5\*\)"), "★" * 5),
 
             (re.compile(r"\(EN\)"), "&#8194;"),
             (re.compile(r"\(2EN\)"), "&#8194;" * 2),
@@ -201,6 +190,7 @@ class Inline(object):
 
             (re.compile(r'\\' + '\n'), "<br/>\n"),
 
+            # Web and email links
             (re.compile(r"(https?)://([\w%s]+)" % url_chars),
              '<a href="\\1://\\2">\\1://\\2</a>'),
             (re.compile(r"([\w\.\-\_]+)@([\w\.\-\_]+)"),
@@ -265,7 +255,11 @@ class Inline(object):
         Wrap the capitals in <span> for better control of letter heights.
         """
         return '<span class="small-caps">' + \
-            re.sub('([A-Z]+)', '<span>\\1</span>', self.typography(content)) + \
+            re.sub(
+                '([A-Z]+)',
+                '<span>\\1</span>',
+                self.typography(content)
+                ) + \
             '</span>'
 
 

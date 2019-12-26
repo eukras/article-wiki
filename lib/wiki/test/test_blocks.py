@@ -72,10 +72,10 @@ def test_divider():
 
 def test_character_block():
     block = CharacterBlock(trim("""
-        + X
+        @ X
         """))
-    assert block.text() == '\n+ X'  # <-- with leading space for a heading
-    expected = '<h2 class="balance-text">X</h2>'
+    assert block.text() == '\n@ X'  # <-- with leading space for a heading
+    expected = '<p class="subhead">X</p>'
     assert block.html_only(Html(), Settings()) == expected
 
 
@@ -89,7 +89,7 @@ def test_blocklist():
     "List of blocks..."
     # 1
     text = trim("""
-        + Heading
+        @ Heading
 
         Paragraph
 
@@ -125,7 +125,7 @@ def test_blocklist():
         ---
 
 
-        + Heading
+        @ Heading
 
         Paragraph
 
@@ -161,16 +161,16 @@ def test_find():
 
         = Summary
 
-        + Heading
+        @ Heading
 
         OK
 
-        - Subheading
+        @ Subheading
 
         OK
         """)
     blocks = BlockList(text)
-    headings = blocks.find('CharacterBlock', "+-")
+    headings = blocks.find('CharacterBlock', "@")
     assert class_list(headings) == [
         'CharacterBlock',
         'CharacterBlock',
@@ -304,8 +304,9 @@ def test_list_block():
         """)
     expect = trim("""
         <ol>
-        <li>Test 1</li>
-        <li>Test 2</li>
+        <li>
+        Test 1</li><li>Test 2
+        </li>
         </ol>
         """)
     actual = list_block(text, Settings())
@@ -320,10 +321,13 @@ def test_list_block_recursor():
         """)
     expect = trim("""
         <ol>
-        <li>Test 1</li>
-        <ol>
-        <li>Test 2</li>
+        <li>
+        Test 1<ol>
+        <li>
+        Test 2
+        </li>
         </ol>
+        </li>
         </ol>
         """)
     actual = list_block(text, Settings())

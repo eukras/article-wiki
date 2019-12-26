@@ -20,8 +20,8 @@ def test_replace():
         'index': trim("""
             Test document
 
-            ` The Simple Test
-            ` The More Complex Test
+            - The Simple Test
+            - The More Complex Test
             """),
         'test': trim("""
             This is a @[simple] test.

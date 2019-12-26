@@ -1051,10 +1051,9 @@ def new_article_button(user_slug: str) -> dict:
         'icon': 'plus',
     }
 
-
 def epub_button(user_slug: str, doc_slug: str) -> dict:
     return {
-        'name': 'eBook',
+        'name': '.Epub',
         'href': '/epub/{:s}/{:s}'.format(user_slug, doc_slug),
         'icon': 'download',
     }

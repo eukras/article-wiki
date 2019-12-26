@@ -56,11 +56,11 @@ def test_extract_outline():
     arg = trim("""
         Text
 
-        ` a
-        ` ` b
-        ` ` ` c
-        ` d
-        ` e
+        - a
+        - - b
+        - - - c
+        - d
+        - e
 
         More text
         """)
@@ -87,8 +87,8 @@ def test_outline():
         'index': trim("""
             Title
 
-            ` Chapter One
-            ` Chapter Two
+            - Chapter One
+            - Chapter Two
             """),
         'chapter-one': "Chapter One\n\n" + ('word ' * 998)
     }
@@ -106,9 +106,9 @@ def test_find_numbering():
         'index': trim("""
             Title
 
-            ` Chapter One
-            ` ` Chapter One Aye
-            ` Chapter Two
+            - Chapter One
+            - - Chapter One Aye
+            - Chapter Two
             """),
         'chapter-one': "Chapter One\n\n" + ('word ' * 998)
     }
@@ -139,9 +139,9 @@ def test_iterate_parts():
     index = trim("""
             Title
 
-            ` Chapter One
-            ` ` Chapter One Aye
-            ` Chapter Two
+            - Chapter One
+            - - Chapter One Aye
+            - Chapter Two
             """)
     arg = {
         'index': index,
@@ -178,15 +178,15 @@ def test_replace_title():
     text = trim("""
         Index
 
-        ` Chapter One
-        ` ` Chapter One Aye
-        ` Chapter Two
+        - Chapter One
+        - - Chapter One Aye
+        - Chapter Two
         """)
     expect = trim("""
         Index
 
-        ` The NEW Chapter One
-        ` ` Chapter One Aye
-        ` Chapter Two
+        - The NEW Chapter One
+        - - Chapter One Aye
+        - Chapter Two
         """)
     assert expect == replace_title(text, "Chapter One", "The NEW Chapter One")

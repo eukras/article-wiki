@@ -29,12 +29,12 @@ class Footnotes(object):
 
         Constructs: {part_numbering, {count: (link_text, footnote_text)}}
         """
+        assert isinstance(outline, Outline)
+        self.outline = outline
+
         assert isinstance(parts, dict)
         self.links, self.footnotes = self.collate_footnotes(parts)
         self.backlinks = SortedDict()
-
-        assert isinstance(outline, Outline)
-        self.outline = outline
 
         self.id_prefix = id_prefix
 

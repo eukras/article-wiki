@@ -518,7 +518,6 @@ class Demo(object):
 
         wiki = Wiki(self.settings)
         options = match_demo_options(pattern)
-        wide = "-wide" if 'wide' in options else ""
         fragment = ('index' not in options)
         part_slug = 'index' if 'index' in options else random_slug('demo-')
         lines = pattern.splitlines()
@@ -526,19 +525,45 @@ class Demo(object):
         output = wiki.process({part_slug: source}, fragment)
 
         env = Environment(autoescape=True)
-        tpl = env.from_string(trim("""
-            <div class="wiki-demo{{ wide }} space">
-                <div class="wiki-demo-source">
-                    <pre>{{ source|safe }}</pre>
+        if 'wide' in options:
+            tpl = env.from_string(trim("""
+                <div class="wiki-demo-wide space">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <pre>{{ source|safe }}</pre>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="wiki-demo-output">
+                                    {{ output|safe }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="wiki-demo-output">
-                    {{ output|safe }}
+            """))
+        else:
+            tpl = env.from_string(trim("""
+                <div class="wiki-demo space">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td width="50%">
+                                    <pre>{{ source|safe }}</pre>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td width="48%" class="wiki-demo-output">
+                                    {{ output|safe }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-        """))
+            """))
 
         return tpl.render(
-            wide=wide,
             source=escape(source),
             output=output
         )

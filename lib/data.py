@@ -100,7 +100,12 @@ class Data(object):
             config['REDIS_HOST'],
             port=config['REDIS_PORT'],
             db=config['REDIS_DATABASE'],
-            decode_responses=True,
+            decode_responses=True
+        )
+        self.redis_binary = redis.Redis(
+            config['REDIS_HOST'],
+            port=config['REDIS_PORT'],
+            db=config['REDIS_DATABASE']
         )
         self.time_zone = config['TIME_ZONE']
         self.strict = bool(strict)
@@ -529,7 +534,7 @@ class Data(object):
             self.epubCachePlaceholder_key(user_slug, doc_slug)
         )
 
-    def epubCache_get(self, user_slug: str, doc_slug: str) -> Union[dict, None]:
+    def epubCachePlaceholder_get(self, user_slug: str, doc_slug: str) -> Union[dict, None]:
         self.require_not_in_context_manager()
         return self.redis.get(
             self.epubCachePlaceholder_key(user_slug, doc_slug)
@@ -538,7 +543,7 @@ class Data(object):
     def epubCachePlaceholder_set(self, user_slug: str, doc_slug: str):
         key = self.epubCachePlaceholder_key(user_slug, doc_slug)
         self.redis.set(key, 'placeholder')
- 
+
     def epubCachePlaceholder_delete(self, user_slug: str, doc_slug: str):
         self.redis.delete(
             self.epubCachePlaceholder_key(user_slug, doc_slug)
@@ -558,13 +563,13 @@ class Data(object):
 
     def epubCache_get(self, user_slug: str, doc_slug: str) -> Union[dict, None]:
         self.require_not_in_context_manager()
-        return self.redis.get(
+        return self.redis_binary.get(
             self.epubCache_key(user_slug, doc_slug)
         )
 
     def epubCache_set(self, user_slug: str, doc_slug: str, text: str):
         key = self.epubCache_key(user_slug, doc_slug)
-        self.redis.set(key, text)
+        self.redis_binary.set(key, text)
 
     def epubCache_delete(self, user_slug: str, doc_slug: str):
         self.redis.delete(

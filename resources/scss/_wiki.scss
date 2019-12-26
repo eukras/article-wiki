@@ -107,51 +107,41 @@ footer {
 
 .wiki-demo {
     overflow-y: hidden;
-    display: flex;
-    flex-direction: row;
-
-    .wiki-demo-source {
-        border-right: .1rem dotted black;
-        padding-right: 2rem;
-        min-width: calc(50% - 2.2rem);
-        pre {
-            padding: 0;
-        }
-    }
-    .wiki-demo-output {
-        padding-left: 1rem;
-        min-width: calc(50% - 1.1rem);
-        article {
-            margin: 0;
-        }
-    }
-}
-
-.wiki-demo-wide {
-    overflow-y: hidden;
-
-    .wiki-demo-source {
-        padding-left: 2rem;
-        padding-right: 0;
-    }
-    .wiki-demo-output {
-        border-left: 0.1rem dotted black;
-        padding-left: 2.4rem;
-        padding-right: 0;
-        article {
-            margin: 0;
-        }
-    }
-}
-
-.wiki-demo-output section.depth-1,
-.wiki-demo-output section.depth-2,
-.wiki-demo-output section.depth-3 {
-    margin-top: 1rem;
 }
 
 .wiki-demo table {
-    min-width: 20em;
+    margin: 0;
+    padding: 0;
+}
+
+.wiki-demo td > *:first-child,
+.wiki-demo-wide td > *:first-child,
+.wiki-demo td article > *:first-child,
+.wiki-demo-wide td article > *:first-child,
+.wiki-demo td section > *:first-child,
+.wiki-demo-wide td section > *:first-child {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.wiki-demo pre,
+.wiki-demo-wide pre {
+    font-size: $fontSizeMinus3;
+}
+
+.wiki-demo pre {
+    padding-right: 1rem;
+    border-right: 0.7pt dotted black;
+    margin-right: 1rem;
+}
+.wiki-demo-wide pre {
+    padding-bottom: 1rem;
+    border-bottom: 0.7pt dotted black;
+    margin-bottom: 1rem;
+}
+
+.wiki-demo-output pre {
+    border: 0;
 }
 
 /**
