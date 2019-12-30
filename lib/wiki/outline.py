@@ -175,7 +175,7 @@ class Outline(object):
                                     {% if numbering|length > 1 or subtotal != "0" %}
                                         {% if subtotal != "0" %}
                                 <td class="word-count">
-                                    \\ <b>{{ subtotal }}</b>
+                                    \\&nbsp;<b>{{ subtotal }}</b>
                                 </td>
                                         {% endif %}
                                         {% for i in range(numbering|length - 2) %}
