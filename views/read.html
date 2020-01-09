@@ -40,24 +40,4 @@
 
 </div>
 
-{% if 'license' in metadata and 'author' in metadata %}
-
-<div class="license">
-
-    {% if metadata.license == 'CC-BY-NC' %}
-        {% with code='nc', name="NonCommercial" %}
-            {% include 'license-by.html' %}
-        {% endwith %}
-    {% elif metadata.license == 'CC-BY-SA' %}
-        {% with code='sa', name="ShareAlike" %}
-            {% include 'license-by.html' %}
-        {% endwith %}
-    {% elif metadata.license == 'CC-ZERO' %}
-        {% include 'license-zero.html' %}
-    {% endif %}
-
-</div>
-
-{% endif %}
-
 {% endblock %}

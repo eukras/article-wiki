@@ -1,3 +1,6 @@
 html {
     background-color: #A0b8A0;
 }
+
+::-moz-selection { background: #baffba; }
+::selection { background: #baffba; }

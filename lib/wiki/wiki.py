@@ -328,7 +328,7 @@ class Wiki(object):
             {% endif %}
 
         </header>
-        <section>
+        <section class="depth-0">
             {{ content_html|safe }}
         </section>
         """))

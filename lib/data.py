@@ -29,6 +29,8 @@ with data as _:
     _.userDocumentCache_delete(user_slug, doc_slug)
 """
 
+import datetime
+import json
 import os
 import time
 import uuid
@@ -63,6 +65,7 @@ def load_env_config() -> dict:
         'GOOGLE_ANALYTICS_TRACKING_ID',
         'PUBLIC_DIR',
         'SINGLE_USER',  # YES/NO
+        'SUBSCRIBE_LINK',
         'REDIS_HOST',
         'REDIS_PORT',
         'REDIS_DATABASE',
@@ -518,6 +521,68 @@ class Data(object):
             self.userDocumentCache_key(user_slug, doc_slug)
         )
 
+    # -----------------------------------------------------
+    # COMMENTS (JSON ZSET scored by time_created timestamp)
+    # -----------------------------------------------------
+
+    def userDocumentCommentZset_key(
+        self,
+        user_slug,
+        doc_slug
+    ):
+        return "udcz:%s:%s" % (user_slug, doc_slug)
+
+    def userDocumentCommentZset_add(
+        self,
+        user_slug,
+        doc_slug,
+        data,
+        created_dt
+    ):
+        key = self.userDocumentCommentZset_key(user_slug, doc_slug)
+        data_dict = {
+            json.dumps(data): created_dt.timestamp()
+        }
+        self.redis.zadd(key, data_dict)
+
+    def userDocumentCommentZset_countBetweenDates(
+        self,
+        user_slug,
+        doc_slug,
+        start_dt,
+        end_dt
+    ):
+        key = self.userDocumentCommentZset_key(user_slug, doc_slug)
+        start = start_dt.timestamp()
+        end = end_dt.timestamp()
+        return self.redis.zcount(key, int(start), int(end))
+
+    def userDocumentCommentZset_findBetweenDates(
+        self,
+        user_slug,
+        doc_slug,
+        start_dt,
+        end_dt
+    ):
+        key = self.userDocumentCommentZset_key(user_slug, doc_slug)
+        start = start_dt.timestamp()
+        end = end_dt.timestamp()
+        json_data = self.redis.zrangebyscore(key, int(start), int(end))
+        data = [json.loads(_) for _ in json_data]
+        return data
+
+    def userDocumentCommentZset_deleteForDate(
+        self,
+        user_slug,
+        doc_slug,
+        start_dt,
+        end_dt
+    ):
+        key = self.userDocumentCommentZset_key(user_slug, doc_slug)
+        start = start_dt.timestamp()
+        end = end_dt.timestamp()
+        return self.redis.zremrangebyscore(key, start, end)
+
     # ----------
     # GENERATION,
     # ----------
@@ -528,13 +593,15 @@ class Data(object):
         self.check_slugs(user_slug, doc_slug)
         return "udep:{:s}:{:s}".format(user_slug, doc_slug)
 
-    def epubCachePlaceholder_exists(self, user_slug: str, doc_slug: str) -> bool:
+    def epubCachePlaceholder_exists(
+            self, user_slug: str, doc_slug: str) -> bool:
         self.require_not_in_context_manager()
         return self.redis.exists(
             self.epubCachePlaceholder_key(user_slug, doc_slug)
         )
 
-    def epubCachePlaceholder_get(self, user_slug: str, doc_slug: str) -> Union[dict, None]:
+    def epubCachePlaceholder_get(
+            self, user_slug: str, doc_slug: str) -> Union[dict, None]:
         self.require_not_in_context_manager()
         return self.redis.get(
             self.epubCachePlaceholder_key(user_slug, doc_slug)
@@ -561,7 +628,8 @@ class Data(object):
             self.epubCache_key(user_slug, doc_slug)
         )
 
-    def epubCache_get(self, user_slug: str, doc_slug: str) -> Union[dict, None]:
+    def epubCache_get(self, user_slug: str,
+                      doc_slug: str) -> Union[dict, None]:
         self.require_not_in_context_manager()
         return self.redis_binary.get(
             self.epubCache_key(user_slug, doc_slug)

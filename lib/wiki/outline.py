@@ -128,75 +128,71 @@ class Outline(object):
         env = Environment(autoescape=True)
         tpl = env.from_string(trim("""
             {% if outline|length > 0 %}
-            <div class="popover-nav-modal">
-                <nav class="popover-nav-content">
-                    <h2>Table of Contents</h2>
-                    <table class="table table-of-contents table-condensed">
-                        <tbody>
-                            {% for numbering, name, slug, title, word_count, subtotal in outline %}
-                            <tr>
-                                {% if slug == 'index' %}
-                                <td></td>
-                                <td class="word-count" colspan="{{ (max_depth * 2) - 1 }}">
-                                    Index.
-                                </td>
-                                <td class="word-count">{{ word_count }}</td>
-                                {% else %}
+            <h2>Table of Contents</h2>
+            <table class="table table-of-contents table-condensed">
+                <tbody>
+                    {% for numbering, name, slug, title, word_count, subtotal in outline %}
+                    <tr>
+                        {% if slug == 'index' %}
+                        <td></td>
+                        <td class="word-count" colspan="{{ (max_depth * 2) - 1 }}">
+                            Index.
+                        </td>
+                        <td class="word-count">{{ word_count }}</td>
+                        {% else %}
 
-                                    {% for i in range(numbering|length - 1) %}
-                                <td></td>
-                                    {% endfor %}
-
-                                <td class="text-right">
-                                    <b>{{ numbering | join('.') }}</b>.
-                                </td>
-
-                                {% if subtotal == "0" %}
-                                <td colspan="{{ (max_depth - numbering|length) * 2 + 1 }}">
-                                {% else %}
-                                <td colspan="{{ (max_depth - numbering|length) * 2 }}">
-                                {% endif %}
-
-                                    {% if word_count == "0" %}
-                                    <a href="{{ edit_base_uri }}/{{ slug }}?title={{ title|urlencode }}" class="unmarked">
-                                        <i>[+] {{ title }}</i>
-                                    </a>
-                                    {% else %}
-                                    <a href="#{{ name }}" class="unmarked">
-                                        {{ title|safe }}
-                                    </a>
-                                    {% endif %}
-                                </td>
-
-                                <td class="word-count">
-                                    {% if word_count == "0" %}&mdash;{% else %}{{ word_count }}{% endif %}
-                                </td>
-
-                                    {% if numbering|length > 1 or subtotal != "0" %}
-                                        {% if subtotal != "0" %}
-                                <td class="word-count">
-                                    \\&nbsp;<b>{{ subtotal }}</b>
-                                </td>
-                                        {% endif %}
-                                        {% for i in range(numbering|length - 2) %}
-                                <td>
-                                </td>
-                                        {% endfor %}
-                                    {% endif %}
-                                {% endif %}
-                            </tr>
+                            {% for i in range(numbering|length - 1) %}
+                        <td></td>
                             {% endfor %}
-                            <tr>
-                                <td></td>
-                                <td class="word-count" colspan="{{ (max_depth * 2) - 1 }}">
-                                    Total words.
-                                </td>
-                                <td class="word-count"><b>{{ total_word_count }}</b></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </nav>
-            </div>
+
+                        <td class="text-right">
+                            <b>{{ numbering | join('.') }}</b>.
+                        </td>
+
+                        {% if subtotal == "0" %}
+                        <td colspan="{{ (max_depth - numbering|length) * 2 + 1 }}">
+                        {% else %}
+                        <td colspan="{{ (max_depth - numbering|length) * 2 }}">
+                        {% endif %}
+
+                            {% if word_count == "0" %}
+                            <a href="{{ edit_base_uri }}/{{ slug }}?title={{ title|urlencode }}" class="unmarked">
+                                <i>[+] {{ title }}</i>
+                            </a>
+                            {% else %}
+                            <a href="#{{ name }}" class="unmarked">
+                                {{ title|safe }}
+                            </a>
+                            {% endif %}
+                        </td>
+
+                        <td class="word-count">
+                            {% if word_count == "0" %}&mdash;{% else %}{{ word_count }}{% endif %}
+                        </td>
+
+                            {% if numbering|length > 1 or subtotal != "0" %}
+                                {% if subtotal != "0" %}
+                        <td class="word-count">
+                            \\&nbsp;<b>{{ subtotal }}</b>
+                        </td>
+                                {% endif %}
+                                {% for i in range(numbering|length - 2) %}
+                        <td>
+                        </td>
+                                {% endfor %}
+                            {% endif %}
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td class="word-count" colspan="{{ (max_depth * 2) - 1 }}">
+                            Total words.
+                        </td>
+                        <td class="word-count"><b>{{ total_word_count }}</b></td>
+                    </tr>
+                </tbody>
+            </table>
             {% endif %}
             """))
         inline = Inline()

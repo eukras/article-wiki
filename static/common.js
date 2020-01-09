@@ -8,14 +8,6 @@ $(document).ready(function() {
 
     $(window).scroll(function() {
         var scaledPixelWidth = $(document).width();
-        //  if ($(this).scrollTop() > offset) {
-            //  if (scaledPixelWidth > 768) {
-                //  $('.bottom-menu').fadeIn(duration);
-            //  }
-        //  } else {
-            //  $('.bottom-menu').fadeOut(duration);
-        //  }
-        //  update bar
         var s = $(window).scrollTop(),
             d = $(document).height(),
             c = window.innerHeight;
@@ -81,7 +73,7 @@ $(document).ready(function() {
     });
 
     //  Simple theme cycling.
-    $('#button-themes').click(function () {
+    $('.button-themes').click(function () {
         cycleTheme();
     });
 
@@ -95,49 +87,208 @@ $(document).ready(function() {
     setSvgBackground();
 
     /**
-     * On a keystroke, or if menu button is clicked, toggle popover.
+     * Move a copy of the table of contents into the nav popover
+     */
+
+    $('.table-of-contents').clone().appendTo('#popover-table-of-contents');
+
+    /**
+     * On a keystroke, or if menu button is clicked, toggle nav popover 
      */
 
     document.addEventListener('keydown', handleKey);
 
     function handleKey(event) {
       if (event.key === 'Esc' || event.key === 'Escape') {
-        toggleNavPopover();
+        toggleMenuPopover();
       }
     }
 
-    $('.popover-nav-modal-toggle').click(function() {
-       toggleNavPopover();
+    $('#menu-button').click(function() {
+        toggleMenuPopover();
     });
 
-    function toggleNavPopover() {
-        var modals = document.getElementsByClassName('popover-nav-modal');
-        //  console.log(modals);
-        if (modals.length > 0) {
-            modals[0].classList.toggle('visible');
-        }
-    }
+    $('#popover-comment-button').click(function() {
+        $('div#popover-contents-modal').hide();
+        $('div#popover-comment-button').hide();
+        $('div#popover-comment-close').show();
+        $('div#popover-comment-modal').show();
+        $('textarea[name="comment"]').val('').focus();
+    });
 
-    function closeNavPopover() {
-        var modals = document.getElementsByClassName('popover-nav-modal');
-        if (modals.length > 0) {
-            modals[0].classList.remove('visible');
-        }
-    }
+    $('#popover-comment-close').click(function() {
+        $('div#popover-contents-modal').hide();
+        $('div#popover-comment-button').hide(); // <-- nothing selected
+        $('div#popover-comment-modal').hide();
+        $('div#popover-comment-close').hide();
+    });
 
-    $('#menu-button').click(function() {
-        toggleNavPopover();
+    $('#popover-suggest-edit-open').click(function() {
+        $('#popover-suggest-preview-content').hide();
+        $('#popover-suggest-edit-content').show();
+        $('textarea[name="changes"]').focus();
+    });
+
+    $('#popover-suggest-edit-close').click(function() {
+        $('#popover-suggest-preview-content').show();
+        $('#popover-suggest-edit-content').hide();
+        $('textarea[name="comment"]').focus();
+    });
+
+    $('#popover-comment-submit').click(function(event) {
+        event.stopPropagation();
+        const data = {
+          user_slug: $('input[name="user_slug"]').val(),
+          doc_slug: $('input[name="doc_slug"]').val(),
+          original: $('input[name="original"]').val().trim(),
+          changes: $('textarea[name="changes"]').val().trim(),
+          comment: $('textarea[name="comment"]').val().trim(),
+          contact: $('input[name="contact"]').val().trim(),
+        };
+
+        //  Hide old errors
+        $('#err-changes,#err-comment,#err-contact').hide();
+
+        //  Validate form
+        errors = {changes: "", comment: "", contact: ""};
+        if (data.changes.length == 0 || data.changes.length > 2000) {
+            errors.changes = "Required field, up to 2000 characters (" + 
+                data.changes.length + " found)";
+        }
+        if (data.comment.length == 0 || data.comment.length > 2000) {
+            errors.comment = "Required field, up to 2000 characters (" + 
+                data.comment.length + " found)";
+        }
+        if (data.contact.length == 0 || data.contact.length > 200) {
+            errors.contact = "Required field, up to 200 characters (" +
+                data.contact.length + " found)";
+        } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(data.contact)) {
+            errors.contact = "Required field, must be an email address";
+        }
+        
+        //  Show errors if any...
+        if (errors.changes != "") {
+            $('#err-changes').text(errors.changes).show();
+        }
+        if (errors.comment != "") {
+            $('#err-comment').text(errors.comment).show();
+        }
+        if (errors.contact != "") {
+            $('#err-contact').text(errors.contact).show();
+        }
+        okay = errors.changes + errors.comment + errors.contact == "";
+
+        if (okay) { 
+            axios.post('/api/comments', data)
+              .then(function (response) {
+                toggleMenuPopover();
+              })
+              .catch(function (error) {
+                alert("Could not submit your comment. Please try again in a little while.");
+                console.log(error);
+              });
+        } else {
+            alert("Check error messages!");
+        }
     });
 
     /**
      * When the table of contents is clicked, make sure any popover closes.
      */
-    $('.table-of-contents a').click(function(event) {
+    $('#popover-table-of-contents a').click(function(event) {
         //  allow event to continue
-        closeNavPopover();
+        toggleMenuPopover();
+    });
+
+    /**
+     * 
+     */
+    $('body').click(function(event) {
+
+        const element = event.target;
+
+        if (["A", "BUTTON"].includes(element.tagName)) {
+            return true;  // <-- stop; let event continue
+        }
+
+        let is_commentable = (
+            $(element).filter('header *').length > 0
+        ||  $(element).filter('section.depth-0 *').length > 0
+        ||  $(element).filter('section.depth-1 *').length > 0
+        ||  $(element).filter('section.depth-2 *').length > 0
+        ||  $(element).filter('section.depth-3 *').length > 0
+        );
+
+        if (is_commentable && !selectionRangeExists()) {
+
+            const block_tags = [ 'P', 'DIV', 'BLOCKQUOTE', 'LI', 'TD', 'H1', ];
+            const stop_tags = [ 'HEADER', 'SECTION', 'BODY', ];
+            let element = $(event.target)[0];
+            while (!block_tags.includes(element.tagName)) {
+                if (element.parentElement === null) {
+                    return;
+                } else {
+                    element = element.parentElement;
+                }
+            }
+            const text = $(element).text().trim();
+            selectElement(element);
+            $('div#popover-comment-button').show();
+            $('input[name="original"]').val(text)
+            $('textarea[name="preview"]').val(text)
+            $('textarea[name="changes"]').val(text)
+
+        } else {
+
+            $('div#popover-comment-button').hide();
+
+        }
+    });
+
+    $('.comment-delete-toggle').click(function(event) {
+        const button = $(this).next();
+        if ($(button).attr('disabled')) {
+            $(button).removeAttr('disabled');
+        } else {
+            $(button).attr('disabled', true);
+        }
+    });
+
+    $('.comment-delete').click(function(event) {
+        const user_slug = $(this).attr('data-user_slug');
+        const doc_slug = $(this).attr('data-doc_slug');
+        const timestamp = $(this).attr('data-timestamp');
+        const url = ['/api/comment/delete', user_slug, doc_slug, timestamp];
+        const comment = $(this).parents('.comment');
+        $(this).attr('disabled', true);
+        axios.get(url.join('/'))
+          .then(function (response) {
+            $(comment).fadeOut(300, function() {
+                $(this).remove();
+            });
+          })
+          .catch(function (error) {
+            alert("Could not delete your comment. Please try again in a little while.");
+            console.log(error);
+          });
     });
 
 });
+
+function toggleMenuPopover() {
+    //  No popovers: show contents
+    //  Popovers: hide them
+    const num_contents = $('div#popover-contents-modal:visible').length;
+    const num_comments = $('div#popover-comment-modal:visible').length;
+    if (num_comments > 0 || num_contents > 0) {
+        $('div#popover-contents-modal').hide();
+    } else {
+        $('div#popover-contents-modal').show();
+    }
+    $('div#popover-comment-modal').hide();
+    //  $('div#popover-comment-button').hide();
+    $('div#popover-comment-close').hide();
+}
 
 function cleanupText(s) { 
     return s.replace(/…/g, '...')
@@ -297,6 +448,33 @@ function cycleTheme() {
     html.addClass(classes[0]);  // <-- If no matches, use first theme
     setSvgBackground()
 }
+
+//  ----------------------------------------
+//  Block selector for comments
+//  ----------------------------------------
+
+function selectionRangeExists() {
+    selection = window.getSelection();
+    return selection.type == "Range";
+}
+
+function selectElement(element)
+{
+    if (document.body.createTextRange) {
+        const range = document.body.createTextRange();
+        range.moveToElementText(element);
+        range.select();
+    } else if (window.getSelection) {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    } else {
+        console.warn("Could not select text in node: Unsupported browser.");
+    }
+}
+
 
 //  ----------------------------------------
 //  Keystroke and editing functions

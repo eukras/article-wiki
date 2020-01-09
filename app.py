@@ -16,11 +16,16 @@ contents.
 
 from copy import copy
 from datetime import datetime
+# from dateutil.relativedelta import relativedelta
+from nltk import tokenize
 
 import codecs
+import dateutil
+import difflib
+# import json
 import logging
-# import pprint
 import os
+# import pprint
 import sys
 import tempfile
 
@@ -89,7 +94,6 @@ bottle.install(flash.message_plugin)
 def before_request():
     """
     If a theme is set, make sure the views know about it.
-    Also set the FQDN as a global for
     """
     theme = bottle.request.get_cookie('article-wiki-theme')
     if isinstance(theme, str):
@@ -790,6 +794,132 @@ def delete_part(user_slug, doc_slug, part_slug):
         document.delete()
         bottle.redirect('/user/{:s}'.format(user_slug))
 
+# -------------
+# USER COMMENTS
+# -------------
+
+
+@bottle.post('/api/comments')
+def post_comment():
+    """
+    Receive an HTTP POST of comment data; just dump/log to storage.
+    """
+    aw_login = get_login()
+    user_slug = bottle.request.json['user_slug']
+    doc_slug = bottle.request.json['doc_slug']
+    original = bottle.request.json['original']
+    changes = bottle.request.json['changes']
+    comment = bottle.request.json['comment']
+    contact = bottle.request.json['contact']
+    is_edit = original != changes
+    utc = datetime.utcnow()
+
+    # Confirm user_slug/doc_slug
+    require_user(user_slug)
+    _ = require_document(user_slug, doc_slug)
+
+    # validate or fail
+    if (len(original) == 0 or len(original) > 2000):
+        bottle.abort(HTTP_BAD_REQUEST, "Invalid original text")
+    if (len(changes) == 0 or len(changes) > 2000):
+        bottle.abort(HTTP_BAD_REQUEST, "Invalid changes")
+    if (len(comment) == 0 or len(comment) > 2000):
+        bottle.abort(HTTP_BAD_REQUEST, "Invalid comment")
+    if (len(contact) == 0 or len(contact) > 2000):
+        bottle.abort(HTTP_BAD_REQUEST, "Invalid contact")
+
+    log_dict = {
+        'time_created': utc.isoformat(),
+        'time_reviewed': None,
+        'aw_login': aw_login['username'] if aw_login else "",
+        'user_slug': user_slug,
+        'doc_slug': doc_slug,
+        'original': original,
+        'changes': changes if is_edit else "",
+        'comment': comment,
+        'contact': contact,
+        'ip_address': bottle.request.environ.get('REMOTE_ADDR'),
+        'google_tracker': bottle.request.get_cookie('_ga', ''),
+    }
+    data.userDocumentCommentZset_add(
+        user_slug, doc_slug, log_dict, utc
+    )
+
+
+@bottle.get('/comments/<user_slug>/<doc_slug>/<start_str>/<end_str>')
+def show_comments(user_slug, doc_slug, start_str, end_str):
+    """
+    Show comments unless too many
+    """
+    require_user(user_slug)  # else 404
+    _ = require_document(user_slug, doc_slug)  # else 404
+    require_authority_for_admin()  # else 403
+
+    # Require valid dates:
+    try:
+        start_dt = datetime.strptime(start_str, "%Y-%m-%d")
+        end_dt = datetime.strptime(end_str, "%Y-%m-%d")
+    except Exception:
+        bottle.abort(HTTP_BAD_REQUEST, "Dates must be yyyy-mm-dd")
+
+    # If too many comments, divide...
+    total = data.userDocumentCommentZset_countBetweenDates(
+        user_slug, doc_slug, start_dt, end_dt
+    )
+    if total > 1000 and start_dt != end_dt:
+        bottle.abort(HTTP_BAD_REQUEST, "Too many comments in date range")
+    else:
+        comments_base = data.userDocumentCommentZset_findBetweenDates(
+            user_slug, doc_slug, start_dt, end_dt
+        )
+
+        def decorate(comment):
+            created_dt = dateutil.parser.parse(comment['time_created'])
+            fmt = "%Y-%m-%d %H:%M:%S (%a)"
+            comment['time_created_fmt'] = created_dt.strftime(fmt)
+            comment['time_created_ts'] = created_dt.timestamp()
+            if comment['changes'] == "":
+                comment['diff_html'] = ""
+            else:
+                seq1 = tokenize.sent_tokenize(comment['original'])
+                seq2 = tokenize.sent_tokenize(comment['changes'])
+                d = difflib.HtmlDiff(tabsize=4, wrapcolumn=40)
+                comment['diff_html'] = d.make_table(seq1, seq2)
+            return comment
+
+        comments = [decorate(comment) for comment in comments_base]
+
+        header_buttons = [{
+            'name': 'Back',
+            'href': '/read/{:s}/{:s}'.format(user_slug, doc_slug),
+            'icon': 'arrow-left'
+        }]
+
+        return views.get_template('comments.html').render(
+            title="Comments on '%s'" % doc_slug,
+            config=config,
+            header_buttons=header_buttons,
+            user_slug=user_slug,
+            doc_slug=doc_slug,
+            start_str=start_str,
+            end_str=end_str,
+            comments=comments,
+        )
+
+@bottle.get('/api/comment/delete/<user_slug>/<doc_slug>/<time_created_ts>')
+def delete_comment(user_slug, doc_slug, time_created_ts):
+    """
+    Require the exact timestamp, incl. microseconds
+    """
+    require_user(user_slug)
+    require_authority_for_user(user_slug)
+    _ = require_document(user_slug, doc_slug)
+
+    start_dt = end_dt = datetime.fromtimestamp(float(time_created_ts))
+    comment = data.userDocumentCommentZset_deleteForDate(
+        user_slug, doc_slug, start_dt, end_dt
+        )
+
 
 # -------------------------------------------------------------
 # IMPORT AND EXPORT FUNCTIONS
@@ -885,7 +1015,7 @@ def post_upload_txt(user_slug, doc_slug):
     upload.save('/tmp')
     try:
         contents = codecs.open(filepath, 'r', 'utf-8').read()
-    except BaseException:
+    except Exception:
         msg = "Failed to read path '{:s}'."
         bottle.abort(HTTP_NOT_FOUND, msg.format(user_slug))
     os.unlink(filepath)
@@ -899,9 +1029,7 @@ def post_upload_txt(user_slug, doc_slug):
     uri = '/read/{:s}/{:s}'.format(user_slug, doc_slug)
     bottle.redirect(uri)
 
-# TODO: - Add .epub download to popover and end-of-page?
 # ----- - TODO: Add mobi as well; same process?
-#       - Add 'Generating...' note; use child process.
 
 
 @bottle.get('/epub/<user_slug>/<doc_slug>')
@@ -923,7 +1051,7 @@ def generate_epub(user_slug, doc_slug):
         bottle.response.set_header('Content-Disposition', attach_as_file)
         try:
             return data.epubCache_get(user_slug, doc_slug)
-        except:
+        except Exception:
             data.epubCache_delete(user_slug, doc_slug)  # <--not right, kill it
             bottle.abort(HTTP_NOT_FOUND, "Temporary error generating ebook")
 
@@ -970,7 +1098,7 @@ def generate_epub(user_slug, doc_slug):
         bottle.response.set_header('Content-Disposition', attach_as_file)
         try:
             return data.epubCache_get(user_slug, doc_slug)
-        except:
+        except Exception:
             data.epubCache_delete(user_slug, doc_slug)  # <--not right, kill it
             bottle.abort(HTTP_NOT_FOUND, "Temporary error generating ebook")
 
@@ -1051,12 +1179,14 @@ def new_article_button(user_slug: str) -> dict:
         'icon': 'plus',
     }
 
+
 def epub_button(user_slug: str, doc_slug: str) -> dict:
     return {
         'name': '.Epub',
         'href': '/epub/{:s}/{:s}'.format(user_slug, doc_slug),
         'icon': 'download',
     }
+
 
 def edit_button(user_slug: str, doc_slug: str, part_slug: str) -> dict:
     return {

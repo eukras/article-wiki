@@ -12,7 +12,16 @@
         {{ button.name }}
     </a>
     {% endfor %}
+    <a
+        href="{{ config.SUBSCRIBE_LINK }}"
+        target="_blank"
+        class="button"
+    >
+        <i class="fa fa-envelope"></i>
+        Subscribe
+    </a>
 </nav>
+
 {% endif %}
 
 {% block page %}
@@ -29,24 +38,149 @@
         {{ button.name }}
     </a>
     {% endfor %}
-    <button id="button-themes" class="button">
+    <button class="button button-themes">
         <i class="fa fa-adjust"></i>
         Theme
-    </a>
+    </button>
 </nav>
 {% endif %}
 
 </div>
 
 <!-- Nav elements -->
-<div id="menu" class="side-nav menu-nav visible-over-popover-nav-modal no-print">
-    <div title="Show/hide menu [Esc]" id="menu-button" class="clickable">
-        <i class="fa fa-bars"></i>
+<div id="menu" class="side-nav menu-nav visible-over-popover-contents-modal no-print">
+    <div title="Show/hide menu [ESC]" id="menu-button" class="clickable">
+        <i class="fa fa-bars"></i>&nbsp; ESC
     </div>
 </div> 
 
 <div id="progress" class="side-nav bottom-menu progress-nav no-print clickable">
     <span id="progress-percent">...</span> <i class="fa fa-arrow-up"></i>
 </div> 
+
+<!-- Nav system popovers -->
+
+<div
+    id="popover-contents-modal"
+    style="display: none;"
+>
+    <div class="popover-body">
+
+        <h1>Shortcuts</h1>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td class="nav-label">
+                        <button class="popover-button" href="/">
+                            <i class="fa fa-home"></i>&nbsp; Home
+                        </button>
+                    </td>
+                    <td class="nav-label">
+                        <button class="popover-button button-themes">
+                            <i class="fa fa-adjust"></i>&nbsp; Theme
+                        </button>
+                    </td>
+                    <td class="nav-label">
+                        <button class="popover-button"
+                            href="/epub/{{user_slug}}/{{doc_slug}}"
+                        >
+                            <i class="fa fa-book"></i>&nbsp; .Epub
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div id="popover-table-of-contents"></div>
+
+    </div>
+</div>
+
+<!-- Comment system popovers -->
+
+<div
+    id="popover-comment-button"
+    style="display: none;"
+>
+    <i class="fa fa-comment"></i>
+</div>
+
+<div
+    id="popover-comment-close"
+    style="display: none;"
+>
+    <i class="fa fa-times"></i>
+</div>
+
+<div
+    id="popover-comment-modal"
+    style="display: none;"
+>
+    <div class="popover-body">
+
+        <h1>Feedback</h1>
+
+        <p>You can suggest an edit or leave a comment here.&nbsp; This is only
+visible to the author of the article, when they next check in.&nbsp; For urgent
+queries email the author; for public discussion tag them on social media.</p>
+
+        <form>
+            <input type="hidden" name="user_slug" value="{{ user_slug }}" />
+            <input type="hidden" name="doc_slug" value="{{ doc_slug }}" />
+            <input type="hidden" name="original" value="" />
+
+            <div
+                id="popover-suggest-preview-content"
+            >
+                <p id="popover-suggest-edit-open" class="clickable space">
+                    Suggest an edit?
+                </p>
+                <textarea
+                    class="popover-comment-readonly"
+                    disabled="disabled"
+                    name="preview"
+                ></textarea>
+            </div>
+            <div
+                id="popover-suggest-edit-content"
+                style="display: none"
+            >
+                <p id="popover-suggest-edit-close" class="clickable space">
+                    Suggest an edit?
+                </p>
+                <textarea
+                    class="popover-comment-textarea"
+                    name="changes"
+                >
+                </textarea>
+                <div id="err-changes" style="display: none;"></div>
+            </div>
+            <p class="space">Your comment?</p>
+            <textarea
+                class="popover-comment-textarea"
+                name="comment"
+            ></textarea>
+            <div id="err-comment" style="display: none;"></div>
+            <p class="space">Email contact?&nbsp; (For questions, not spam.)</p>
+            <input
+                class="popover-comment-input"
+                name="contact"
+            />
+            <div id="err-contact" style="display: none;"></div>
+            <div class="space">
+                <button
+                    id="popover-comment-submit"
+                    class="popover-button"
+                    type="button"
+                >
+                    Submit
+                </button>
+            </div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+        </form>
+    </div>
+</div>
 
 {% endblock %}

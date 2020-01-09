@@ -1,0 +1,60 @@
+{% extends "page.html" %}
+
+{% block page %}
+
+<div class="wiki">
+<article>
+
+<header>
+    <h2>Reader Comments</h2>
+    <div class="text-left">{{user_slug}} / {{doc_slug}}</div>
+    <div class="text-left">{{start_str}} to {{end_str}}</div>
+</header>
+
+<main>
+
+{% for _ in comments %}
+
+<div class="comment">
+    <div style="float: right">
+        <button class="comment-delete-toggle">Unlock</button>
+        <button
+            class="comment-delete"
+            disabled="disabled"
+            data-user_slug="{{ user_slug }}"
+            data-doc_slug="{{ doc_slug }}"
+            data-timestamp="{{ _.time_created_ts }}"
+        >Delete</button>
+    </div>
+    <h4>
+        <span class="comment-created_fmt">{{ _.time_created_fmt }}</span> 
+        / <span class="comment-aw_login">~{{ _.aw_login }}</span>
+    </h4>
+    <div>
+        <span class="comment-contact" target="_blank">
+            <a href="mailto:{{ _.contact }}">
+                {{ _.contact }}
+            </a>
+        </span>
+        / <span class="comment-google_tracker">{{ _.google_tracker }}</span>
+        / <span class="comment-ip_address">{{ _.ip_address }}</span>
+    </div>
+    {% if _.comment != "" %}
+    <div class="comment-comment">{{ _.comment }}</div>
+    {% endif %}
+    {% if _.changes == "" %}
+    <div class="comment-original">{{ _.original }}</div>
+    {% else %}
+    <div class="comment-diff_html">{{ _.diff_html|safe }}</div>
+    {% endif %}
+</div>
+
+{% endfor %}
+
+</main>
+
+</article>
+</div>
+
+
+{% endblock %}

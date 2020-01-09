@@ -7,8 +7,7 @@
         $hl: #67679e;
 
         ::selection {
-            background-color: #98a898;
-            color: #b0e8b0;
+            background-color: #2d828a;
         }
 
         color: $fg;
@@ -20,18 +19,43 @@
             opacity: 0.25;
         }
 
+        div#popover-contents-modal {
+            background-color: $bg;
+        }
+
         a.button, input[type="submit"], button {
             color: #aaa;
         }
 
         a {
-            color: #999;
+            color: #aaa;
             text-decoration: none;
         }
 
         a:hover { 
             color: #ddd;
             text-decoration: none;
+        }
+
+
+        div#popover-comment-button,
+        div#popover-comment-close {
+            background-color: $bg;
+            color: $fg;
+            border: 3px $hl solid;
+            box-shadow: 0 0 0.9rem $hl;
+        }
+
+        div#popover-comment-button i,
+        div#popover-comment-close i {
+            color: $fg;
+        }
+
+        button.popover-button {
+            background-color: $bg;
+            color: $fg;
+            box-shadow: 0 0 0.9rem $hl;
+            border: 3px $hl solid;
         }
 
         #page, #editor {
@@ -65,11 +89,7 @@
 
 
         #page {
-            border: 0.1rem solid rgba(128, 128, 128, 0.3);
-        }
-
-        h2 {
-            background-color: #1a1a1a;
+            border: 1pt solid rgba(128, 128, 128, 0.3);
         }
 
         h1, h2, h3, h4, h5, h6, .fa {
@@ -77,12 +97,16 @@
         }
 
         hr.div-solid {
-            border-bottom: 0.1rem dotted rgba(128, 128, 128, 0.3);
+            border-bottom: 1pt solid $fg;
+        }
+
+        hr.div-dotted {
+            border-bottom: 1pt dotted $hl;
         }
 
         ins {
             text-decoration: none;
-            border-bottom: 1px dotted $fg;
+            border-bottom: 1pt dotted $fg;
             color: lightgreen;
         }
         del {
@@ -91,7 +115,8 @@
         }
 
         tt, textarea {
-            background-color: black;
+            color: black;
+            background-color: beige;
         }
 
         tt, td tt {
@@ -147,11 +172,12 @@
             }
         }
     
-        .popover-nav-modal {
+        div#popover-nav-modal,
+        div#popover-comment-modal {
             background-color: $bg;
         }
     
-        .popover-nav-content {
+        div.popover-body {
             background-color: $bg;
         }
     }

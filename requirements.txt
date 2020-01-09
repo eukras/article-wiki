@@ -9,6 +9,7 @@ faker
 html-parser
 Jinja2
 lxml
+nltk
 Pillow
 python-dotenv
 python-slugify

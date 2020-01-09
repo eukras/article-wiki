@@ -172,6 +172,7 @@ form {
  *
  */
 
+#menu,
 #progress {
     font-family: $fontFamilySansSerif;
 }
@@ -245,4 +246,62 @@ form {
     .modal {
         display: none;
     }
+}
+
+/* Comments */
+
+/**
+<div class="comment">
+    <h4>
+        <span class="comment-created_fmt">{{ _.time_created_fmt }}</span> 
+        <span class="comment-aw_login">~{{ _.aw_login }}</span>
+        <span class="comment-ip_address">{{ _.ip_address }}</span>
+    </h4>
+    <div>
+        <span class="comment-contact">{{ _.contact }}</span>
+        <span class="comment-google_tracker">{{ _.google_tracker }}</span>
+    </div>
+    <div style="comment-comment">{{ _.comment }}</div>
+    {% if _.changes == "" %}
+    <div style="comment-original">{{ _.original }}</div>
+    {% else %}
+    <div style="comment-diff_html">{{ _.diff_html|safe }}</div>
+    {% endif %}
+</div>
+**/ 
+
+.comment {
+    margin-top: 1.5rem;
+    border-top: 1px solid rgba(128, 128, 128, 0.3);
+    padding-top: 0.5rem;
+}
+
+.comment .comment-google_tracker,
+.comment .comment-ip_address {
+    opacity: 0.3;
+    font-family: $fontFamilySansSerif;
+    font-size: $fontSizeMinus2;
+}
+
+.comment .comment-comment {
+    white-space: pre-line;
+    background-color: rgba(128, 128, 128, 0.1);
+    padding: 1rem;
+    margin: 0.5rem 0;
+}
+
+.comment .comment-original {
+    opacity: 0.3;
+    font-family: $fontFamilySansSerif;
+    font-size: $fontSizeMinus1;
+}
+
+span.diff_add {
+    background-color: rgba(98, 236, 141, 0.3);
+}
+span.diff_chg {
+    background-color: rgba(255, 196, 88, 0.3);
+}
+span.diff_sub {
+    background-color: rgba(255, 86, 80, 0.3);
 }
