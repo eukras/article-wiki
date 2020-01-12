@@ -134,6 +134,9 @@ sudo systemctl start article-wiki.service
 sudo journalctl -fu article-wiki.service  # <-- Logs
 ```
 
+* Best debugging: `uwsgi --ini=uwsgi.ini`.
+* On AWS, using system python3/pip3, `pip3 install -r requirements.txt`.
+* If a cache issue `pip3 install --no-cache-dir -r requirements.txt`.
 
 ## Dockerize Application
 
