@@ -108,6 +108,11 @@ $(document).ready(function() {
         toggleMenuPopover();
     });
 
+    $('.href-button').click(function() {
+       alert('Click');
+       location.href = $(this).attr('href');
+    });
+
     $('#popover-comment-button').click(function() {
         $('div#popover-contents-modal').hide();
         $('div#popover-comment-button').hide();
