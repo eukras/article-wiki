@@ -228,14 +228,31 @@ ul > ul, ol > ol {
     margin: 0 auto;
 }
 
+hgroup {
+    margin: 2.75rem 0 .75rem 0;
+}
 
-h1, h2, h3, h4, h5, h6 {
-    text-wrap: balanced;  /** Future, 2019**/
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    text-wrap: balanced;  /** Future? **/
     margin-top: 0;
     padding-top: 0.7rem;
     margin-bottom: 0;
     padding-bottom: 0.3rem;
     margin-top: 1rem;
+}
+
+hgroup {
+    h1,
+    h2 {
+        a {
+            line-height: 1.9rem;
+        }
+    } 
 }
 
 @media print {
