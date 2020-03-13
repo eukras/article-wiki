@@ -768,14 +768,11 @@ def list_block(text, settings):
                 if list_tag == 'ol' and depth == 1:
                     settings.set('CONTINUE', settings.get('CONTINUE') + 1)
         close_tag = "</%s>" % list_tag
-        elements = [
-            open_tag,
-            "<li>",
-            "</li><li>".join(display_items),
-            "</li>",
-            close_tag
-        ]
-        return "\n".join(elements)
+        lines = [open_tag]
+        for item in display_items:
+            lines.append("<li>" + item + "</li>")
+        lines.append(close_tag)
+        return "\n".join(lines)
 
     # May need a character-aware recursor to support mixed levels.
     char = text[0]
