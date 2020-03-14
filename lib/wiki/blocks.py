@@ -31,10 +31,12 @@ from lib.wiki.functions.base import \
     Function, \
     Float, \
     Left, \
+    Print, \
     Quote, \
     Right, \
     Text, \
     Verbatim, \
+    Web, \
     Wrapper
 from lib.wiki.functions.table import \
     Table
@@ -115,8 +117,10 @@ class BlockList(object):
             Float,
             Indent,
             Left,
+            Print,
             Quote,
             Right,
+            Web,
         ]}
 
         functions = {_.__name__.upper(): _ for _ in [

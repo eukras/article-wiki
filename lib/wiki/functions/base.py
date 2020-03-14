@@ -306,3 +306,47 @@ class Box(Wrapper):
         Wrap inner HTML.
         """
         return "<div class=\"box-dotted\">%s</div>" % html
+
+class Web(Wrapper):
+    """
+    Restrict text to appearing online only.
+    """
+
+    examples = [
+        trim("""
+            WEB ---
+            This text will only appear in web format.
+            ---
+        """),
+    ]
+
+    option_list = {
+    }
+
+    def wrap(self, html):
+        """
+        Restrict text to appearing online only.
+        """
+        return "<div class=\"web-only\">%s</div>" % html
+
+class Print(Wrapper):
+    """
+    Restrict text to only appearing in print.
+    """
+
+    examples = [
+        trim("""
+            PRINT ---
+            This text will only appear in print/PDF/eBook format.
+            ---
+        """),
+    ]
+
+    option_list = {
+    }
+
+    def wrap(self, html):
+        """
+        Restrict text to only appearing in print.
+        """
+        return "<div class=\"print-only\">%s</div>" % html
