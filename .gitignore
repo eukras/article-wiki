@@ -1,5 +1,6 @@
 ENV.vars
 **.pyc
+**.xcf
 __pycache__
 .cache
 .env
