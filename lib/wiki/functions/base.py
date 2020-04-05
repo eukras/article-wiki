@@ -117,21 +117,16 @@ class Articles(Function):
             {% for a in articles %}
                 <div class="article-card">
 
-                    <div class="article-card-title balance-text">
-                        <a
-                            href="/read/{{ a['user'] }}/{{ a['slug'] }}"
-                        >
+                    <a
+                        href="/read/{{ a['user'] }}/{{ a['slug'] }}"
+                    >
+                        <div class="article-card-title balance-text">
                             {{ a['title'] }}
-                        </a>
-                    </div>
-
-                    <div class="article-card-summary balance-text">
-                        <a
-                            href="/read/{{ a['user'] }}/{{ a['slug'] }}"
-                        >
+                        </div>
+                        <div class="article-card-summary balance-text">
                             {{ a['summary'] }}
-                        </a>
-                    </div>
+                        </div>
+                    </a>
 
                     {% set words = a.word_count | int %}
                     <div class="article-card-details">
@@ -149,13 +144,6 @@ class Articles(Function):
             {% endfor %}
             </nav>
         """))
-
-        # style="white-space: normal; float: none; display: block; position: static;"
-        # <img
-            # title="{{ a['title'] }}: {{ a['summary'] }}"
-            # src="/image/card/{{ a['user'] }}/{{ a['slug'] }}.jpg"
-        # />
-
 
         return tpl.render(
             articles=articles
