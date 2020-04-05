@@ -2,10 +2,12 @@ beaker
 bleach
 bottle
 bottle_utils
+cachetools
 click
 cssselect
 ebooklib
 faker
+feedgen
 html-parser
 Jinja2
 lxml
@@ -18,3 +20,4 @@ redis
 roman
 sortedcontainers
 wheel
+validators
