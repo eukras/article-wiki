@@ -14,37 +14,48 @@ contents.
 # SETUP
 # -----
 
+from cachetools.func import ttl_cache
 from copy import copy
 from datetime import datetime
 # from dateutil.relativedelta import relativedelta
+from feedgen.feed import FeedGenerator
 from nltk import tokenize
+
+import urllib.parse
 
 import codecs
 import dateutil
 import difflib
+import hmac
+import io
 # import json
 import logging
 import os
+# import pickle
 # import pprint
 import sys
 import tempfile
 
 import bottle
 
+from PIL import Image, ImageDraw
 from bottle_utils import flash
 
 from beaker.middleware import SessionMiddleware
 from jinja2 import Environment as JinjaTemplates, PackageLoader, escape
 from slugify import slugify
 
+from lib.bokeh import make_background
 from lib.data import Data, load_env_config
 from lib.document import Document
 from lib.ebook import write_epub
+from lib.overlay import make_cover, make_card, make_quote
 from lib.storage import \
     compress_archive_dir, \
     make_zip_name, \
     write_archive_dir
 from lib.wiki.blocks import BlockList, get_title_data
+from lib.wiki.helpers import web_buttons
 from lib.wiki.inline import Inline
 from lib.wiki.settings import Settings
 from lib.wiki.wiki import \
@@ -60,7 +71,10 @@ HTTP_BAD_REQUEST = 400
 HTTP_UNAUTHORIZED = 401
 HTTP_NOT_FOUND = 404
 
+HASH = 97586
+
 config = load_env_config()
+
 if "pytest" in sys.modules:
     logging.info("Running in PyTest: Reconfiguring to use test database.")
     config['REDIS_DATABASE'] = config['REDIS_TEST_DATABASE']
@@ -281,7 +295,8 @@ def show_editor(source: str,
         slug = 'biblio'
     else:
         slug = part_slug
-    html = wiki.process({slug: copy(text), }, fragment=False, preview=True)
+    html = wiki.process(user_slug, doc_slug, {slug: copy(text), },
+                        fragment=False, preview=True)
     template = views.get_template('editor.html')
     return template.render(
         page_title="Editing: {:s}".format(title),
@@ -434,46 +449,8 @@ def home_page():
 
     v.0.1.0 -- Unused until we support SINGLE_USER = NO.
     """
-    # Single user mode means the admin user's homepage is the site home page.
-    if config['SINGLE_USER'] == "YES":
-        bottle.redirect('/user/{:s}'.format(data.admin_user))
-    header_buttons = [playground_button(), help_button()]
-    login = get_login()
-    if login:
-        header_buttons += [user_button(login['username'])]
-        if login['is_admin'] in ['True', True]:
-            header_buttons += [
-                edit_button(login['username'], 'fixtures', 'homepage')
-            ]
-    else:
-        header_buttons += [login_button(), playground_button()]
-    article_list = data.userDocumentLastChanged_list()
-
-    #  Show <admin-user>/fixtures/homepage:
-    fixtures = data.userDocument_get(data.admin_user, 'fixtures')
-    if isinstance(fixtures, dict) and 'homepage' in fixtures:
-        document = {'index': fixtures['homepage']}
-    else:
-        document = {'index': trim("""
-            Homepage
-
-            (Text goes here...)
-        """)}
-    settings = Settings({
-        'config:host': domain_name(bottle.request),
-        'config:user': data.admin_user,
-        'config:document': 'fixtures',
-    })
-    wiki = Wiki(settings)
-    content_html = wiki.process(document)
-
-    return views.get_template('home.html').render(
-        config=config,
-        header_buttons=header_buttons,
-        article_list=article_list,
-        content_html=content_html,
-        pluralize=pluralize
-    )
+    # SINGLE_USER mode means the admin user's homepage is the site home page.
+    bottle.redirect('/user/{:s}'.format(data.admin_user))
 
 
 @bottle.get('/user/<user_slug>')
@@ -481,15 +458,22 @@ def user_page(user_slug):
     """
     Show <user_slug>/fixtures/author + user documents.
     """
-    header_buttons = [login_or_logout_button(), playground_button()]
+    header_buttons = [login_or_logout_button()]
     login = get_login()
     if login and login['username'] == user_slug:
         header_buttons += [
             new_article_button(user_slug),
         ]
+
     header_buttons += [
-        edit_button(user_slug, 'fixtures', 'author')
+        edit_button(user_slug, 'fixtures', 'author'),
     ]
+
+    if not login:
+        header_buttons += [
+            subscribe_button(),
+            rss_button(user_slug)
+        ]
 
     footer_buttons = []
     if config['ARTICLE_WIKI_CREDIT'] == 'YES':
@@ -540,9 +524,8 @@ def user_page(user_slug):
 
     blocks = BlockList(clean_text(text))
     page_title, page_summary = blocks.pop_titles()
-    content_html = wiki.process({'index': blocks.text()},
-                                fragment=True,
-                                preview=True)
+    content_html = wiki.process(None, None, {'index': blocks.text()},
+                                fragment=True, preview=True)
     inline = Inline()
 
     return views.get_template('user.html').render(
@@ -569,13 +552,21 @@ def read_document(user_slug, doc_slug):
 
     header_buttons = [
         home_button(),
-        epub_button(user_slug, doc_slug),
-        edit_button(user_slug, doc_slug, 'index')
+        edit_button(user_slug, doc_slug, 'index'),
     ]
+
+    login = get_login()
+    if not login:
+        header_buttons += [
+            subscribe_button(),
+            rss_button(user_slug)
+        ]
 
     footer_buttons = [biblio_button(user_slug, doc_slug)]
     if has_authority_for_user(user_slug):
-        footer_buttons += [upload_button(user_slug, doc_slug)]
+        footer_buttons += [
+            upload_button(user_slug, doc_slug)
+        ]
     footer_buttons += [download_button(user_slug, doc_slug)]
 
     settings = Settings({
@@ -590,10 +581,11 @@ def read_document(user_slug, doc_slug):
     if not html or not metadata:
         wiki = Wiki(settings)
         doc_parts = require_document(user_slug, doc_slug)
-        html = wiki.process(doc_parts)
+        html = wiki.process(user_slug, doc_slug, doc_parts)
         data.userDocumentCache_set(user_slug, doc_slug, html)
-        metadata = wiki.compile_metadata(config.TIME_ZONE, user_slug, doc_slug)
-        metadata['url'] = '/read/{:s}/{:s}'.format(user_slug, doc_slug),
+        metadata = wiki.compile_metadata(
+            config['TIME_ZONE'], user_slug, doc_slug)
+        metadata['url'] = '/read/{:s}/{:s}'.format(user_slug, doc_slug)
         data.userDocumentMetadata_set(user_slug, doc_slug, metadata)
 
     uri = '/read/{:s}/{:s}'.format(user_slug, doc_slug)
@@ -601,7 +593,8 @@ def read_document(user_slug, doc_slug):
     author_uri = '/user/{:s}'.format(user_slug)
     metadata['author_url'] = abs_url(bottle.request, author_uri)
     metadata['home_url'] = abs_url(bottle.request, '/')
-    metadata['image_url'] = abs_url(bottle.request, '/static/site-image.png')
+    image_uri = '/image/card/{:s}/{:s}.jpg'.format(user_slug, doc_slug)
+    metadata['image_url'] = abs_url(bottle.request, image_uri)
 
     # @todo: function to split on multi authors as well as emails.
     title = metadata.get('title', 'Untitled')
@@ -617,6 +610,7 @@ def read_document(user_slug, doc_slug):
         metadata=metadata,
         user_slug=user_slug,
         doc_slug=doc_slug,
+        web_buttons=web_buttons(user_slug, doc_slug),
         header_buttons=header_buttons,
         footer_buttons=footer_buttons,
         content_html=html
@@ -906,6 +900,7 @@ def show_comments(user_slug, doc_slug, start_str, end_str):
             comments=comments,
         )
 
+
 @bottle.get('/api/comment/delete/<user_slug>/<doc_slug>/<time_created_ts>')
 def delete_comment(user_slug, doc_slug, time_created_ts):
     """
@@ -916,9 +911,9 @@ def delete_comment(user_slug, doc_slug, time_created_ts):
     _ = require_document(user_slug, doc_slug)
 
     start_dt = end_dt = datetime.fromtimestamp(float(time_created_ts))
-    comment = data.userDocumentCommentZset_deleteForDate(
+    data.userDocumentCommentZset_deleteForDate(
         user_slug, doc_slug, start_dt, end_dt
-        )
+    )
 
 
 # -------------------------------------------------------------
@@ -1074,8 +1069,8 @@ def generate_epub(user_slug, doc_slug):
 
     else:
 
-        # Generate and cache; requests for a a lot of simultaneous
-        # books that must all be fgenerated could slow this down; add
+        # Generate and cache; requests for a lot of simultaneous
+        # books that must all be generated could slow this down; add
         # a job queue later if that becomes necessary.
 
         data.epubCachePlaceholder_set(user_slug, doc_slug)  # with expiry
@@ -1156,6 +1151,22 @@ def help_button() -> dict:
     }
 
 
+def subscribe_button() -> dict:
+    return {
+        'name': 'Subscribe',
+        'href': config.get('SUBSCRIBE_LINK', ''),
+        'icon': 'envelope'
+    }
+
+
+def rss_button(user_slug) -> dict:
+    return {
+        'name': 'RSS',
+        'href': '/rss/%s.xml' % user_slug,
+        'icon': 'rss'
+    }
+
+
 def playground_button() -> dict:
     return {
         'name': 'Playground',
@@ -1180,12 +1191,12 @@ def new_article_button(user_slug: str) -> dict:
     }
 
 
-def epub_button(user_slug: str, doc_slug: str) -> dict:
-    return {
-        'name': '.Epub',
-        'href': '/epub/{:s}/{:s}'.format(user_slug, doc_slug),
-        'icon': 'download',
-    }
+# def epub_button(user_slug: str, doc_slug: str) -> dict:
+    # return {
+    # 'name': '.Epub',
+    # 'href': '/epub/{:s}/{:s}'.format(user_slug, doc_slug),
+    # 'icon': 'download',
+    # }
 
 
 def edit_button(user_slug: str, doc_slug: str, part_slug: str) -> dict:
@@ -1231,9 +1242,167 @@ def export_archive_button(user_slug: str) -> dict:
 def source_button() -> dict:
     return {
         'name': 'Source',
-        'href': 'http://github.com/eukras/article-wiki',
+        'href': 'https://github.com/eukras/article-wiki',
         'icon': 'github'
     }
+
+# -----
+# ADMIN
+# -----
+
+
+@bottle.get('/admin/expire-cache')
+def expire():
+    """
+    Expire caches
+    """
+    require_authority_for_admin()  # else 403
+    data.epubCache_deleteAll()
+    return "OK"
+
+# -----
+# TESTS
+# -----
+
+
+COVER_DIMENSIONS = (1600, 2200)
+MEDIA_DIMENSIONS = (1200, 630)
+
+COLOR_TEXT = (248, 248, 248)        # <-- Alabaster
+COLOR_SHADOW = (154, 174, 154)      # <-- Some greeny gray thing
+COLOR_BACKGROUND = (160, 184, 160)  # <-- Norway, Summer Green, Pewter
+
+
+def send_image(image: ImageDraw):
+    """
+    Download image without streaming it
+    """
+    stream = io.BytesIO()
+    image.save(stream, 'JPEG', quality=85)
+    stream.seek(0)
+    bottle.response.set_header('Content-Type', 'image/jpeg')
+    return stream
+
+
+@bottle.get('/image/cover/<user_slug>/<doc_slug>.jpg')
+def generate_cover(user_slug: str, doc_slug: str):
+    image = cache_generate_cover(user_slug, doc_slug)
+    return send_image(image)
+
+
+@ttl_cache(ttl=3600)
+def cache_generate_cover(user_slug: str, doc_slug: str):
+    metadata = data.userDocumentMetadata_get(user_slug, doc_slug)
+    if metadata:
+        image = make_background(COVER_DIMENSIONS, COLOR_BACKGROUND)
+        image = make_cover(image, [
+            metadata['title'],
+            metadata['summary'],
+            metadata['author'],
+            metadata['date'],
+        ], [
+            COLOR_TEXT,
+            COLOR_SHADOW
+        ])
+        return image
+    else:
+        bottle.abort(HTTP_BAD_REQUEST, "No metadata")
+
+
+@bottle.get('/image/card/<user_slug>/<doc_slug>.jpg')
+def generate_card(user_slug, doc_slug):
+    image = cache_generate_card(user_slug, doc_slug)
+    return send_image(image)
+
+
+@ttl_cache(ttl=3600)
+def cache_generate_card(user_slug, doc_slug):
+    metadata = data.userDocumentMetadata_get(user_slug, doc_slug)
+    if metadata:
+        image = make_background(MEDIA_DIMENSIONS, COLOR_BACKGROUND)
+        byline = bottle.request.urlparts.netloc
+        image = make_card(
+            image, [
+                metadata['title'],
+                metadata['summary'],
+            ], [
+                COLOR_TEXT,
+                COLOR_SHADOW
+            ],
+            byline
+        )
+        return image
+    else:
+        bottle.abort(HTTP_BAD_REQUEST, "No metadata")
+
+
+@bottle.get('/image/quote/<checksum>/<encoded>.jpg')
+def generate_quote(checksum, encoded):
+    image = cache_generate_quote(checksum, encoded)
+    return send_image(image)
+
+
+@ttl_cache(ttl=3600)
+def cache_generate_quote(checksum, encoded):
+
+    decoded = urllib.parse.unquote_plus(encoded)
+    key = bytes(config['APP_HASH'], 'utf-8')
+    message = bytes(decoded, 'utf-8')
+    required = hmac.new(key, message, 'sha224').hexdigest()[:16]
+    if checksum != required:
+        bottle.abort(HTTP_NOT_FOUND, "No image")
+
+    image_path = os.path.join(os.getcwd(), 'resources/quote.png')
+    byline = bottle.request.urlparts.netloc
+    image = Image.open(image_path).convert('RGB')
+    image = make_quote(
+        image, [
+            decoded,
+        ], [
+            COLOR_BACKGROUND,
+            (238, 238, 238)
+        ],
+        byline
+    )
+    return image
+
+
+@bottle.get('/rss/<user_slug>.xml')
+def rss_latest(user_slug):
+    content_type = 'application/rss+xml; charset=utf-8'
+    bottle.response.set_header('Content-Type', content_type)
+    return cache_rss_latest(user_slug)
+
+
+@ttl_cache(ttl=3600)
+def cache_rss_latest(user_slug):
+
+    articles = data.userDocumentLastChanged_list(user_slug)
+    netloc = bottle.request.urlparts.netloc
+
+    fg = FeedGenerator()
+    fg.id(abs_url(bottle.request, '/user/%s' % user_slug))
+    fg.title('Nigel Chapman (%s)' % netloc)
+    fg.subtitle('Long reads on Christian thought')  # <-- Set METADATA for this
+    # fg.author( {'name':'Nigel Chapman','email':'nigel@chapman.id.au'} )
+    fg.logo('https://%s/static/site-image.png' % (netloc))
+    fg.link(href='https://%s' % netloc, rel='self')
+    # fg.link(href='https://%s/rss/%s.xml' % (netloc, user_slug), rel='self')
+    fg.language('en')
+    fg.ttl(24 * 3600)
+
+    for a in articles:
+        fe = fg.add_entry()
+        article_uri = 'read/%s/%s' % (a['user'], a['slug'])
+        fe.id(abs_url(bottle.request, article_uri))
+        fe.title(a['title'])
+        fe.description(a['summary'])
+        fe.link(href=abs_url(bottle.request, article_uri))
+        fe.author(name=a['email'], email=a['author'])  # <-- Wierdly backwards
+        fe.published(a['published_time'])
+
+    feed_xml = fg.rss_str(pretty=True)
+    return feed_xml
 
 
 # ---

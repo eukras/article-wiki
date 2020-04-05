@@ -23,6 +23,7 @@ from jinja2 import Environment
 from slugify import slugify
 
 from lib.wiki.functions.base import \
+    Articles, \
     Box, \
     Center, \
     Compact, \
@@ -124,6 +125,7 @@ class BlockList(object):
         ]}
 
         functions = {_.__name__.upper(): _ for _ in [
+            Articles,
             Grid,
             Table,
             Text,

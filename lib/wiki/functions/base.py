@@ -6,10 +6,16 @@ in the structure of a Function Block.
 inheritance)
 """
 
-from html import escape
+import hmac
+import json
+import urllib.parse
 
-from lib.wiki.utils import trim
+from html import escape
+from jinja2 import Environment
+
+from lib.data import Data, load_env_config
 from lib.wiki.renderer import wrap
+from lib.wiki.utils import trim
 
 
 class Function(object):
@@ -73,6 +79,87 @@ class Verbatim(Function):
     def html(self, renderer):
         "Simplest possible case..."
         return "<pre>%s</pre>" % escape(self.text)
+
+
+class Articles(Function):
+    """
+    Take lines of the form user_slug/doc_slug.
+    Present links to books, using their covers and metadata.
+    """
+    examples = [
+        trim("""
+        ARTICLES ---
+        eukras/article-wiki
+        ---
+        """)
+    ]
+
+    def html(self, renderer):
+
+        config = load_env_config()
+        data = Data(config)
+
+        articles = []
+        for line in self.text.splitlines():
+            parts = line.split('/')
+            if len(parts) == 2:
+                user_slug, doc_slug = parts
+                metadata = data.userDocumentMetadata_get(user_slug, doc_slug)
+                if metadata:
+                    articles += [metadata]
+
+        if len(articles) == 0:
+            return ""
+
+        env = Environment(autoescape=False)
+        tpl = env.from_string(trim("""
+            <nav class="article-cards">
+            {% for a in articles %}
+                <div class="article-card">
+
+                    <div class="article-card-title balance-text">
+                        <a
+                            href="/read/{{ a['user'] }}/{{ a['slug'] }}"
+                        >
+                            {{ a['title'] }}
+                        </a>
+                    </div>
+
+                    <div class="article-card-summary balance-text">
+                        <a
+                            href="/read/{{ a['user'] }}/{{ a['slug'] }}"
+                        >
+                            {{ a['summary'] }}
+                        </a>
+                    </div>
+
+                    {% set words = a.word_count | int %}
+                    <div class="article-card-details">
+                        {{ a['date'] }} &middot; {{ "{:,d}".format(words) }} words
+                    </div>
+                    <div class="article-card-download">
+                        <a 
+                            href="/epub/{{ a['user'] }}/{{ a['slug'] }}"
+                        >
+                            <i class="fa fa-arrow-circle-down" ></i> eBook
+                        </a>
+                    </div>
+
+                </div>
+            {% endfor %}
+            </nav>
+        """))
+
+        # style="white-space: normal; float: none; display: block; position: static;"
+        # <img
+            # title="{{ a['title'] }}: {{ a['summary'] }}"
+            # src="/image/card/{{ a['user'] }}/{{ a['slug'] }}.jpg"
+        # />
+
+
+        return tpl.render(
+            articles=articles
+        )
 
 
 class Wrapper(Function):
@@ -270,14 +357,27 @@ class Compact(Wrapper):
         return "<div class=\"compact%s\">%s</div>" % (columns, html)
 
 
-class Feature(Wrapper):
-    "Label content as featured for CSS."
+class Feature(Function):
+    """
+    Use /image/quote to render a string as an image overlay, suitable for
+    sharing on social media.
+    """
 
-    def wrap(self, html):
+    def html(self, renderer):
         """
-        Wrap inner HTML.
+        Show an image/quote tag for the text.
         """
-        return "<div class=\"wiki-feature\">%s</div>" % html
+        config = load_env_config()
+        key = bytes(config['APP_HASH'], 'utf-8')
+        message = bytes(self.text, 'utf-8')
+        checksum = hmac.new(key, message, 'sha224').hexdigest()[:16]
+        encoded = urllib.parse.quote_plus(message)
+        # print(json.dumps(self.text), key, checksum)
+        return trim("""
+            <div class="wiki-feature no-print">
+                <img title="%s" src="/image/quote/%s/%s.jpg" />
+            </div>
+            """) % (escape(self.text), checksum, encoded)
 
 
 class Box(Wrapper):
@@ -307,6 +407,7 @@ class Box(Wrapper):
         """
         return "<div class=\"box-dotted\">%s</div>" % html
 
+
 class Web(Wrapper):
     """
     Restrict text to appearing online only.
@@ -328,6 +429,7 @@ class Web(Wrapper):
         Restrict text to appearing online only.
         """
         return "<div class=\"web-only\">%s</div>" % html
+
 
 class Print(Wrapper):
     """

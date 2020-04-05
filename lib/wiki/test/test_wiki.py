@@ -66,7 +66,7 @@ def test_process_simple():
         * Bullets
         * Bullets
         """)}
-    _ = wiki.process(document)
+    _ = wiki.process('user-slug', 'doc-slug', document)
     __ = html.fromstring(str(_))
     assert __.xpath("//article/section")
     assert __.xpath("//h1/a[contains(., 'Title')]")

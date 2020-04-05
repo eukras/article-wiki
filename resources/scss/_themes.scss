@@ -37,6 +37,13 @@
             text-decoration: none;
         }
 
+        a.web-link {
+            background-color: inherit;
+        }
+
+        a.web-marker {
+            background-color: #093233;
+        }
 
         div#popover-comment-button,
         div#popover-comment-close {

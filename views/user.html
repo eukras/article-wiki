@@ -17,6 +17,9 @@
 
 {{ content_html|safe }}
 
+
+{# -----
+
 {% if changes_list|length > 0 %}
 
 <h2>Latest Changes ({{ changes_list|length }})</h2>
@@ -46,6 +49,8 @@
 {% endwith %}
 
 {% endif %}
+
+----- #}
 
 </div> <!-- .wiki -->
 

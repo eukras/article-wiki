@@ -3,15 +3,16 @@ Construct footnotes from ^[Links] in document parts.
 """
 
 import re
+import validators
 
-from jinja2 import Environment
+from jinja2 import Environment, escape
 from sortedcontainers import SortedDict
 
 from lib.wiki.blocks import BlockList
 from lib.wiki.config import Config
 from lib.wiki.counters import Numbers
 from lib.wiki.geometry import split_to_array
-from lib.wiki.inline import Inline
+from lib.wiki.inline import Inline, strip_markup
 from lib.wiki.outline import Outline
 from lib.wiki.utils import trim
 
@@ -87,22 +88,45 @@ class Footnotes(object):
         if part_slug in self.footnotes:
             if count in self.footnotes[part_slug]:
                 footnote_text = self.footnotes[part_slug][count]
-        ref_text = self.inline.process(footnote_text)
 
-        ref_link = '<a id="%s_footnote_%s" href="#%s_link_%s">%s</a>' % \
-                   (self.id_prefix, nav_id, self.id_prefix, nav_id, count)
+        if validators.url(footnote_text):
+            ref_text = footnote_text
+            # print('URL', ref_text)
+        else:
+            ref_text = self.inline.process(footnote_text)
+            # print('NOT URL', footnote_text, ref_text)
+
+        _ = '<a class="%s" id="%s_footnote_%s" href="#%s_link_%s">%s</a>'
+        ref_link = _ % ('web-marker', self.id_prefix,
+                        nav_id, self.id_prefix, nav_id, count)
 
         if number not in self.backlinks:
             self.backlinks[number] = {}
+
         self.backlinks[number][count] = (ref_link, ref_text)
 
-        link = trim("""
-            <a id="%s_link_%s" href="#%s_footnote_%s">%s%s<sup>%s</sup></a>
-            """) % (
-            self.id_prefix, nav_id,
-            self.id_prefix, nav_id, self.inline.process(link_markup),
-            punctuation, count
-        )
+        if validators.url(footnote_text):
+
+            link = trim("""
+                <a class="web-link" title="%s" href="%s"
+                   target="_blank">%s</a>%s<a class="web-marker"
+                   id="%s_link_%s" href="#%s_footnote_%s"><sup>%s</sup></a>
+                """) % (
+                strip_markup(footnote_text), footnote_text, link_markup,
+                punctuation, self.id_prefix, nav_id, self.id_prefix, nav_id,
+                count
+            )
+
+        else:
+
+            link = trim("""
+                <a class="web-link" title="%s" id="%s_link_%s"
+                    href="#%s_footnote_%s">%s%s<sup>%s</sup></a>
+                """) % (
+                strip_markup(footnote_text), self.id_prefix, nav_id,
+                self.id_prefix, nav_id, self.inline.process(link_markup),
+                punctuation, count
+            )
 
         return link
 
@@ -121,9 +145,11 @@ class Footnotes(object):
 
     def html(self):
         """
-        From a list of backlinks.
+        Render a lit of footnotes for the entire document.
 
-        TODO: First letters?
+        TODO: This has been obsoleted by self.html_parts() now; retaining here
+        as a reminder to consider a SETTING that allows either per-section or
+        end-of-document footnotes.
         """
         assert isinstance(self.backlinks, dict)
         for _ in list(self.backlinks.items()):
@@ -142,18 +168,16 @@ class Footnotes(object):
                 {% endfor %}
             {% else %}
                 <h1><a href="#{{ id_prefix }}-footnotes">Footnotes</a></h1>
-                <div class="columns-x2">
                 {% for number, entries in backlinks %}
-                    <div class="no-widows">
-                        <div class="footnote-title"><b>{{ number }}</b></div>
-                    {% for count, (ref_link, ref_text) in entries %}
-                        <div class="footnote-item">
-                            <sup>{{ ref_link|safe }}</sup> {{ ref_text|safe }}
-                        </div>
-                    {% endfor %}
+                <div class="no-widows">
+                    <div class="footnote-title"><b>{{ number }}</b></div>
+                {% for count, (ref_link, ref_text) in entries %}
+                    <div class="footnote-item">
+                        <sup>{{ ref_link|safe }}</sup> {{ ref_text|safe }}
                     </div>
                 {% endfor %}
                 </div>
+                {% endfor %}
             {% endif %}
             </section>
             """)
@@ -165,6 +189,21 @@ class Footnotes(object):
                 backlinks=list(self.sort()),
                 id_prefix=self.id_prefix
             )
+
+    def html_parts(self) -> list:
+        """
+        Retrieve the HTML for each section, in a dictionary
+        """
+        parts = {}
+        backlinks = list(self.sort())
+        for number, entries in backlinks:
+            numbering = number.split('.')
+            slug = self.outline.find_slug(numbering)
+            parts[slug] = ""
+            for count, (ref_link, ref_text) in entries:
+                pattern = '<div class="footnote-item"><sup>%s</sup> %s</div>'
+                parts[slug] += pattern % (ref_link, ref_text)
+        return parts
 
 
 # -----------------

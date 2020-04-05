@@ -10,11 +10,15 @@ from datetime import datetime
 
 from ebooklib import epub
 
+from lib.bokeh import make_background
 from lib.data import Data, load_env_config
-from lib.cover import make_epub_cover
+from lib.overlay import make_cover
 from lib.wiki.settings import Settings
 from lib.wiki.wiki import Wiki
 
+COLOR_TEXT = (248, 248, 248)        # <-- Alabaster
+COLOR_SHADOW = (154, 174, 154)      # <-- Some greeny gray thing
+COLOR_BACKGROUND = (160, 184, 160)  # <-- Norway, Summer Green, Pewter
 
 def write_epub(user_slug, doc_slug, file_path):
 
@@ -44,12 +48,14 @@ def write_epub(user_slug, doc_slug, file_path):
         'config:document': doc_slug,
     })
     wiki = Wiki(settings)
-    xhtml = wiki.process(document)
+    xhtml = wiki.process(user_slug, doc_slug, document)
     metadata = wiki.compile_metadata(config['TIME_ZONE'], user_slug, doc_slug)
     metadata['url'] = '/read/{:s}/{:s}'.format(user_slug, doc_slug),
 
     title = metadata.get('title', 'Untitled')
+    summary = metadata.get('summary', '')
     author = metadata.get('author', 'Anonymous')
+    date = metadata.get('date', '')
 
     # -------------------------
     # 0. CREATE BOOK
@@ -77,15 +83,10 @@ def write_epub(user_slug, doc_slug, file_path):
     # 1. Create Cover
 
     tmp_cover_file = "/tmp/%s-%s-cover.png" % (user_slug, doc_slug)
-    script_dir = os.path.dirname(__file__)
-    app_root = os.path.dirname(script_dir)
-    make_epub_cover(
-        title,
-        author,
-        os.path.join(app_root, 'resources/ttf'),
-        os.path.join(app_root, 'resources/cover.png'),
-        tmp_cover_file
-    )
+    image = make_background((1600, 2200), (160, 184, 160))
+    cover = make_cover(image, [title, summary, author, date],
+                       [COLOR_TEXT, COLOR_SHADOW])
+    cover.save(tmp_cover_file, "JPEG")
     chapter_file_name = doc_slug + '.xhtml'
 
     assert os.path.exists(tmp_cover_file)

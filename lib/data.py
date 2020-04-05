@@ -29,7 +29,7 @@ with data as _:
     _.userDocumentCache_delete(user_slug, doc_slug)
 """
 
-import datetime
+# import datetime
 import json
 import os
 import time
@@ -56,6 +56,7 @@ def load_env_config() -> dict:
         'ADMIN_USER',
         'ADMIN_USER_PASSWORD',
         'APP_NAME',
+        'APP_HASH',
         'ARTICLE_WIKI_CREDIT',  # YES/NO
         'ARTICLE_WIKI_URL',
         'COOKIE_NAME',
@@ -584,10 +585,11 @@ class Data(object):
         return self.redis.zremrangebyscore(key, start, end)
 
     # ----------
-    # GENERATION,
+    # GENERATION
     # ----------
 
-    # set a placeholder to say that we're caching epubs...
+    # Set a placeholder to say that we're caching epubs...
+    # Can be adapted to images.
 
     def epubCachePlaceholder_key(self, user_slug: str, doc_slug: str):
         self.check_slugs(user_slug, doc_slug)
@@ -637,9 +639,15 @@ class Data(object):
 
     def epubCache_set(self, user_slug: str, doc_slug: str, text: str):
         key = self.epubCache_key(user_slug, doc_slug)
-        self.redis_binary.set(key, text)
+        self.redis_binary.set(key, text, ex=3600)  # <-- keep for an hour
 
     def epubCache_delete(self, user_slug: str, doc_slug: str):
         self.redis.delete(
             self.epubCache_key(user_slug, doc_slug)
         )
+
+    def epubCache_deleteAll(self, user_slug: str, doc_slug: str):
+        for user_slug in self.userSet_list():
+            for doc_slug in self.userDocumentSet_list(user_slug):
+                self.epubCache_delete(user_slug, doc_slug)
+

@@ -163,7 +163,7 @@ class Document(object):
                 'config:user': self.user_slug,
                 'config:document': self.doc_slug
             }))
-            html = wiki.process(self.parts)
+            html = wiki.process(self.user_slug, self.doc_slug, self.parts)
             self.data.userDocumentCache_set(self.user_slug, self.doc_slug,
                                             html)
 

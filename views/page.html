@@ -12,14 +12,6 @@
         {{ button.name }}
     </a>
     {% endfor %}
-    <a
-        href="{{ config.SUBSCRIBE_LINK }}"
-        target="_blank"
-        class="button"
-    >
-        <i class="fa fa-envelope"></i>
-        Subscribe
-    </a>
 </nav>
 
 {% endif %}
@@ -66,37 +58,20 @@
 >
     <div class="popover-body">
 
-        <h1>Shortcuts</h1>
+        {% if web_buttons is defined %}
+        {{ web_buttons }}
+        {% endif %}
 
-        <table>
-            <tbody>
-                <tr>
-                    <td class="nav-label">
-                        <button
-                            class="popover-button href-button"
-                            href="/"
-                        >
-                            <i class="fa fa-home"></i>&nbsp; Home
-                        </button>
-                    </td>
-                    <td class="nav-label">
-                        <button class="popover-button button-themes">
-                            <i class="fa fa-adjust"></i>&nbsp; Theme
-                        </button>
-                    </td>
-                    <td class="nav-label">
-                        <button
-                            class="popover-button href-button"
-                            href="/epub/{{user_slug}}/{{doc_slug}}"
-                        >
-                            <i class="fa fa-book"></i>&nbsp; .Epub
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div id="popover-table-of-contents">
+            <div class="text-center">
+                <i>When reading an article, the ESC button<br/>
+                shows you the table of contents.<i>
+            </div>
+        </div>
 
-        <div id="popover-table-of-contents"></div>
+        {% if web_buttons is defined %}
+        {{ web_buttons }}
+        {% endif %}
 
     </div>
 </div>

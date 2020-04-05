@@ -29,6 +29,7 @@ from lib.wiki.entities import Entities
 from lib.wiki.footnotes import Footnotes
 # from lib.wiki.index import Index
 from lib.wiki.inline import Inline
+from lib.wiki.helpers import web_buttons
 from lib.wiki.links import Links
 from lib.wiki.outline import Outline, default_counters
 from lib.wiki.placeholders import Placeholders
@@ -79,7 +80,8 @@ class Wiki(object):
         self.bibliography = None
         self.citations = None
 
-    def process(self, parts_dict, fragment=False, preview=False):
+    def process(self, user_slug, doc_slug, parts_dict,
+                fragment=False, preview=False):
         """
         Generate a complete HTML document from a dictionary.
 
@@ -101,16 +103,16 @@ class Wiki(object):
         # Add placeholders for elements not processed by the wiki
         # -------------------------------------------------------
 
-        demo = Demo()
-        backslashes = Backslashes()
-        entities = Entities()
-        verbatim = Verbatim()
+        self.demo = Demo()
+        self.backslashes = Backslashes()
+        self.entities = Entities()
+        self.verbatim = Verbatim()
 
-        # Demo is first: entities(backslashes(verbatim(demo)))
-        parts = pipe([entities,
-                      backslashes,
-                      verbatim,
-                      demo], 'insert', parts)
+        # Demo is first: entities(self.backslashes(verbatim(demo)))
+        parts = pipe([self.entities,
+                      self.backslashes,
+                      self.verbatim,
+                      self.demo], 'insert', parts)
 
         self.settings.extract(parts)
 
@@ -159,6 +161,7 @@ class Wiki(object):
             self.settings.set('TITLE', title)
             self.settings.set('SUMMARY', summary)
             html_parts['index'] = self.make_index(parts['index'])
+            html_parts['index'] += web_buttons(user_slug, doc_slug)
             if not self.outline.single_page():
                 edit_base_uri = self.settings.get_base_uri('edit')
                 html_parts['index'] += self.outline.html(edit_base_uri)
@@ -185,21 +188,29 @@ class Wiki(object):
                            self.links,
                            self.citations], 'replace', html_parts)
 
-        html_parts = pipe([demo,
-                           verbatim,
-                           backslashes,
-                           entities], 'replace', html_parts)
+        html_parts = pipe([self.demo,
+                           self.verbatim,
+                           self.backslashes,
+                           self.entities], 'replace', html_parts)
+
+        footnote_parts = self.footnotes.html_parts()
+        footnote_parts = pipe([self.verbatim,
+                               self.backslashes,
+                               self.entities
+                               ], 'replace', footnote_parts)
 
         html = '<article>\n'
         html += html_parts['index'] if 'index' in html_parts else ''
 
-        # logging.error("parts: {}".format(", ".join(parts.keys())))
-        # logging.error("html_parts: {}".format(", ".join(html_parts.keys())))
-        # logging.error("outline: {!r}".format(self.outline.elements))
-
         for (numbering, slug, _, _, _) in self.outline:
             if slug in parts and slug not in ['index', 'biblio']:
                 html += html_parts[slug]
+                footnote_html = footnote_parts.get(slug)
+                if footnote_html:
+                    html += "<footer>"
+                    html += "<hr class=\"div-left div-solid\" />"
+                    html += footnote_html
+                    html += "</footer>"
 
         html += self.make_footer()
 
@@ -215,7 +226,7 @@ class Wiki(object):
             <section id="prefix-index">
         """
         endmatter = [_ for _ in [
-            self.footnotes.html(),
+            # self.footnotes.html(),
             self.bibliography.html(),
             # self.index.html(),
         ] if _.strip() != ""]
@@ -332,6 +343,7 @@ class Wiki(object):
             {{ content_html|safe }}
         </section>
         """))
+
         inline = Inline()
         content, _ = split_bibliography(text)
         blocks = BlockList(content)
@@ -522,7 +534,7 @@ class Demo(object):
         part_slug = 'index' if 'index' in options else random_slug('demo-')
         lines = pattern.splitlines()
         source = "\n".join(lines[1:-1])
-        output = wiki.process({part_slug: source}, fragment)
+        output = wiki.process(None, None, {part_slug: source}, fragment)
 
         env = Environment(autoescape=True)
         if 'wide' in options:

@@ -109,7 +109,6 @@ $(document).ready(function() {
     });
 
     $('.href-button').click(function() {
-       alert('Click');
        location.href = $(this).attr('href');
     });
 
