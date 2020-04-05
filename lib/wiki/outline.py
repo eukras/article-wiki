@@ -95,6 +95,15 @@ class Outline(object):
                 return title
         return None
 
+    def find_slug(self, match_numbering, default=None):
+        """
+        Return the numbering for a part, by slug.
+        """
+        for (numbering, slug, _, _, _) in self.elements:
+            if numbering == match_numbering:
+                return slug
+        return default
+
     def find_numbering(self, part_slug, default=None):
         """
         Return the numbering for a part, by slug.
@@ -157,7 +166,7 @@ class Outline(object):
 
                             {% if word_count == "0" %}
                             <a href="{{ edit_base_uri }}/{{ slug }}?title={{ title|urlencode }}" class="unmarked">
-                                <i>[+] {{ title }}</i>
+                                <i>{{ title|safe }}</i>
                             </a>
                             {% else %}
                             <a href="#{{ name }}" class="unmarked">
