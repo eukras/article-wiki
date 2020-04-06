@@ -15,6 +15,7 @@ python --version  # <-- should see e.g. 3.5+
 pip --version  # <-- should see (Python e.g. 3.5+)
 pip install -r requirements.txt -r requirements-dev.txt
 pip freeze  # <-- show dependencies
+sudo apt-get install zip  # <-- for downloads
 pytest lib/  # <-- unit tests
 pytest test/  # <-- web tests
 ```
