@@ -19,7 +19,6 @@ def simple_wrap(font: ImageFont, words: list, max_width_px: int) -> list:
         test_string = ' '.join(test_line)
         width = line_width(font, test_line)
         if width > max_width_px:
-            print(width, ': ', test_string)
             if len(line) == 0:
                 lines += [[word]]   # <-- Always at least one word
                 line = []           # <-- Still
