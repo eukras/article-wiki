@@ -49,6 +49,8 @@ And view `http://localhost:8080`.
 
 ## Running in NGINX and UWSGI
 
+* https://uwsgi-docs.readthedocs.io/en/latest/ThingsToKnow.html
+
 The supplied `uwsgi.ini` file will operate nicely with the supplied
 `install/etc/nginx/sites-enabled/default`. This uses a TCP port, and tells
 UWSGI to grab the bottleApp from app.py.
@@ -112,9 +114,9 @@ and won't survive a system restart. For that we'll need to switch to system
 `ENV.vars` file.
 
 ```bash
-cd $root_dir  # <-- Location of this INSTALL.md file.
+cd $root_dir      # <-- Location of this INSTALL.md file.
 cp ENV.dist ENV.vars
-vim ENV.vars  # <-- These values will be used by the article-wiki.service
+vim ENV.vars      # <-- These values will be used by the article-wiki.service
 pip uninstall uwsgi
 sudo apt-get install uwsgi uwsgi-plugin-python3
 which uwsgi  # <-- Make sure this is used in the service definition:
