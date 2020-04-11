@@ -1153,7 +1153,7 @@ def help_button() -> dict:
 
 def subscribe_button() -> dict:
     return {
-        'name': 'Subscribe',
+        'name': 'News',
         'href': config.get('SUBSCRIBE_LINK', ''),
         'icon': 'envelope'
     }
