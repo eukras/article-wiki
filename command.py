@@ -16,10 +16,10 @@ import click
 from faker import Faker
 from typing import List
 
-from lib.cover import make_epub_cover
 from lib.data import Data, load_env_config
 from lib.ebook import write_epub
 from lib.document import Document
+from lib.overlay import make_cover
 from lib.storage import load_dir, save_dir
 
 
@@ -76,18 +76,21 @@ def save_user_document(data: Data, user_slug: str, doc_slug: str):
 def generate_cover(title=None):
     """
     Writes an new random cover to the /tmp dir.
+
+    TODO: Needs updatign to use overlay.make_cover.
     """
-    fake = Faker()
-    app_root = os.path.dirname(__file__)
-    tmp_cover_file = "/tmp/cover.jpg"
-    make_epub_cover(
-        title if title is not None else fake.sentence(),
-        fake.name(),
-        os.path.join(app_root, 'resources/ttf'),
-        os.path.join(app_root, 'resources/cover.png'),
-        tmp_cover_file
-    )
-    print("Generated ebook: {:s}".format(tmp_cover_file))
+    if false:  # <-- disable
+        fake = Faker()
+        app_root = os.path.dirname(__file__)
+        tmp_cover_file = "/tmp/cover.jpg"
+        make_epub_cover(
+            title if title is not None else fake.sentence(),
+            fake.name(),
+            os.path.join(app_root, 'resources/ttf'),
+            os.path.join(app_root, 'resources/cover.png'),
+            tmp_cover_file
+        )
+        print("Generated ebook: {:s}".format(tmp_cover_file))
 
 
 def generate_epub():
