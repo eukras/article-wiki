@@ -1,8 +1,8 @@
 Templates
 
-These pages appear as your templates in the ^[editor]. Hmm OK.
+These pages appear as your templates in the ^[editor].
 
 ^ /editor
 
-` Cheat Sheet
-` Simple Letter
+- Cheat Sheet
+- Simple Letter

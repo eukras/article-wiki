@@ -13,5 +13,5 @@ edit it.
 
 ^ http://chapman.wiki/read/eukras/help
 
-` Author
-` Editor
+- Author
+- Editor

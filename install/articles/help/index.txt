@@ -32,35 +32,35 @@ to word limits.
 
 ~
 
-` Introduction
-` ` Get Started
-` ` Why Use a Wiki?
-` The Index Page
-` Inline Markup
-` ` Typography
-` ` Square Brackets
-` ` Backslashes and Line Breaks
-` ` Icons
-` Four Kinds of Text Blocks
-` ` Paragraphs
-` ` Character Blocks
-` ` ` Subheadings
-` ` ` Quotes and Captions
-` ` ` Lists
-` ` ` Simple Tables
-` ` ` Alignment Blocks
-` ` ` Interlinear Translations
-` ` ` Notes
-` ` ` Hidden Comments
-` ` Function Blocks
-` ` ` Text Alignment
-` ` ` Formatting Tables
-` ` ` Controlling Whitespace
-` ` Spacers and Dividers
-` Adding Information
-` ` Values and Counters
-` ` Links and Footnotes
-` ` Tags and Indexes
-` ` Cross References
-` ` Citations and Bibliography
-` Cheat Sheet (Print Me!)
+- Introduction
+- - Get Started
+- - Why Use a Wiki?
+- The Index Page
+- Inline Markup
+- - Typography
+- - Square Brackets
+- - Backslashes and Line Breaks
+- - Icons
+- Four Kinds of Text Blocks
+- - Paragraphs
+- - Character Blocks
+- - - Subheadings
+- - - Quotes and Captions
+- - - Lists
+- - - Simple Tables
+- - - Alignment Blocks
+- - - Interlinear Translations
+- - - Notes
+- - - Hidden Comments
+- - Function Blocks
+- - - Text Alignment
+- - - Formatting Tables
+- - - Controlling Whitespace
+- - Spacers and Dividers
+- Adding Information
+- - Values and Counters
+- - Links and Footnotes
+- - Tags and Indexes
+- - Cross References
+- - Citations and Bibliography
+- Cheat Sheet (Print Me!)
