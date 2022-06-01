@@ -17,13 +17,9 @@ html {
 }
 
 header {
-    text-align: center;
+    text-align: left;
     margin-top: 3rem;
     margin-bottom: 3rem;
-}
-
-header hgroup h1 {
-    text-align: center;
 }
 
 header hgroup h2 {
@@ -36,8 +32,6 @@ header hgroup h2 {
 }
 
 header address {
-    display: inline-block;
-    margin: .3rem;
     font-style: normal;
 }
 
