@@ -284,8 +284,16 @@ class BlockList(object):
                 )
             else:
                 number = '.'.join([str(_) for _ in numbering])
-                head = '<h1 id="%s"><a href="#%s">%s. &nbsp; %s</a></h1>' % (
-                    nav_id, nav_id, number, renderer.inline.process(title))
+                head = (
+                    '<a href="#%s">'
+                    '<h1 id="%s">'
+                    '<span>%s</span> '  # <-- space!
+                    '<span>%s</span>'
+                    '</h1>'
+                    '</a>'
+                ) % (
+                    nav_id, nav_id, number, renderer.inline.process(title)
+                )
             out += [head]
             if summary != '':
                 out += ['<p class="summary">%s</p>' %
