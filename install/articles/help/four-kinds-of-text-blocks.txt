@@ -1,10 +1,6 @@
 Four Kinds of Text Blocks
 
-Wiki text is organized in four kind of /text blocks/. These are
-paragraphs, character blocks, function blocks and dividers. All text
-blocks are separated from each other by blank lines, although function
-blocks may also contain blank lines; their start and end points are
-indicated by three-character delimiters like `---`:
+Wiki text is organized in four kind of /text blocks/. These are paragraphs, character blocks, function blocks and dividers. All text blocks are separated from each other by blank lines, although function blocks may also contain blank lines; their start and end points are indicated by three-character delimiters like `---`:
 
 DEMO ===
 This is a normal *paragraph*. 
@@ -25,11 +21,9 @@ Here's some
                    function name.
 ---
 
-@
+* * *
 
 (And that's a *divider*.)
 ===
 
-These simple arrangements should cover almost all formatting needs, at
-least when augmented by /options/ and /settings/, which will be
-described below.
+These simple arrangements should cover almost all formatting needs, at least when augmented by /options/ and /settings/, which will be described below.

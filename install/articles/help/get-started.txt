@@ -1,19 +1,13 @@
 Get Started
 
-To write a document, just open the ^[playground] on any Article Wiki
-site, where you can try out wiki formatting and see the results. The
-following three points will cover most of your writing needs, though
-there are many more features available. See the @[cheat-sheet] for a
-handy reference.
+To write a document, just open the ^[playground] on any Article Wiki site, where you can try out wiki formatting and see the results. The following three points will cover most of your writing needs, though there are many more features available. See the @[cheat-sheet] for a handy reference.
 
-=[Firstly], you'll need to know how to lay out text. A single character
-at the start of a line or a paragraph tells you how that block should be
-formatted, like how `>` indicates a quotation in email.
+=[Firstly], you'll need to know how to lay out text. A single character at the start of a line or a paragraph tells you how that block should be formatted, like how `>` indicates a quotation in email.
 
 ^ https://chapman.wiki/playground
 
 DEMO ---
-+ A Simple Example
+@ A Simple Example
 
 Article Wiki is a wiki designed for humanities writing.
 
@@ -31,12 +25,9 @@ Without being awkward or intrusive. Check out the amazing:
 
 ---
 
-From this we can see that `+` and `-` are large and small headings, `>`
-and `=` are quotes and captions, and `*` are bullet points. See @[four-
-kinds-of-text-blocks], for a full list of control characters.
+From this we can see that `+` and `-` are large and small headings, `>` and `=` are quotes and captions, and `*` are bullet points. See @[four- kinds-of-text-blocks], for a full list of control characters.
 
-=[Secondly], you'll want to add a little styling. This will get you
-started, but see @[inline-markup] for the full tour.
+=[Secondly], you'll want to add a little styling. This will get you started, but see @[inline-markup] for the full tour.
 
 DEMO ---
 # *Bold*
@@ -45,10 +36,7 @@ DEMO ---
 # `Monospace`
 ---
 
-=[Thirdly], you might need to know how to add links and footnotes. The
-short answer is that you mark them in the text, then add their content
-as a subsequent paragraph, anywhere in the same section. In both cases
-the magic character is `^`.
+=[Thirdly], you might need to know how to add links and footnotes. The short answer is that you mark them in the text, then add their content as a subsequent paragraph, anywhere in the same section. In both cases the magic character is `^`.
 
 DEMO ---
 Here's a ^[link] and a ^[footnote].
@@ -59,8 +47,4 @@ Article continues...
 ^ This is a footnote. 
 ---
 
-This keeps your text free of interruptions, while also giving your links
-and footnotes as much space as they need. They'll be formatted in a way
-that is equally readable online (with links) and in print. See @[links-
-and-footnotes] below, and then the subsequent sections on indexes and
-bibliographies.
+This keeps your text free of interruptions, while also giving your links and footnotes as much space as they need. They'll be formatted in a way that is equally readable online (with links) and in print. See @[links- and-footnotes] below, and then the subsequent sections on indexes and bibliographies.
