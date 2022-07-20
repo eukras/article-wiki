@@ -2,6 +2,7 @@
 Test the redis interface for user and docs handling.
 """
 
+import pytest
 import os
 
 from lib.data import Data
@@ -18,6 +19,7 @@ config = {
 data = Data(config, strict=True)
 
 
+@pytest.mark.integration
 def test_write_epub():
     """
     Create a hash, find its key, delete it.

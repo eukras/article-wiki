@@ -9,6 +9,7 @@
 # FlushDB #1 and exit.
 
 import logging
+import pytest
 import sys
 
 from webtest import TestApp as AppTester  # so not collected?
@@ -95,6 +96,7 @@ def match_link(uri):
 # 1. NAVIGATION WITHOUT LOGIN
 # ---------------------------
 
+@pytest.mark.integration
 def test_nothing():
     """
     Pytest executes test functions in order. Resetting the DB at the start of
@@ -104,6 +106,7 @@ def test_nothing():
     assert True
 
 
+@pytest.mark.integration
 def test_homepage():
     """Main landing page."""
     do_logout()
@@ -114,6 +117,7 @@ def test_homepage():
         assert _.headers['location'].endswith('/')
 
 
+@pytest.mark.integration
 def test_admin_user_page():
     """List admin user's articles, incl. link to help."""
     do_logout()
@@ -127,6 +131,7 @@ def test_admin_user_page():
         assert _.lxml.xpath(match_link(href))
 
 
+@pytest.mark.integration
 def test_editor_page():
     """Editor page has buttons, textarea and main"""
     do_logout()
@@ -135,6 +140,7 @@ def test_editor_page():
     assert _.lxml.xpath("//main")
 
 
+@pytest.mark.integration
 def test_help_page():
     # Help page (with standard lengthy content)
     do_logout()
@@ -144,6 +150,7 @@ def test_help_page():
     assert _.lxml.xpath("count(//section)") > 30
 
 
+@pytest.mark.integration
 def test_bad_login_fails():
     login_page = test.get(LOGIN_URI)
     form = login_page.form
@@ -163,6 +170,7 @@ def test_bad_login_fails():
 # ------------------------
 
 
+@pytest.mark.integration
 def test_admin_user_page_with_login():
 
     do_login_as_admin()
@@ -181,6 +189,7 @@ def test_admin_user_page_with_login():
         assert _.lxml.xpath(match_link(href))
 
 
+@pytest.mark.integration
 def test_create_index():
     """
     Creating an article should result in accurate metadata.
@@ -243,6 +252,7 @@ def test_create_index():
     assert '31 December 1999' in _
 
 
+@pytest.mark.integration
 def test_rename_article():
 
     do_login_as_admin()
@@ -279,6 +289,7 @@ def test_rename_article():
     assert _.lxml.xpath(match_link(new_uri))
 
 
+@pytest.mark.integration
 def test_create_part():
 
     do_login_as_admin()

@@ -1,3 +1,4 @@
+import pytest
 import tempfile
 import os
 
@@ -14,6 +15,7 @@ from lib.wiki.sample_data import minimal_document
 from lib.wiki.utils import random_slug
 
 
+@pytest.mark.integration
 def test_save_dir_and_load_dir():
     """
     Save parts to a directory; load back; compare.
@@ -34,6 +36,7 @@ def test_save_dir_and_load_dir():
         assert parts == parts2
 
 
+@pytest.mark.integration
 def test_user_archive():
     """
     Generate an archive file; check it exists.
