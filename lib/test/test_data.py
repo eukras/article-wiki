@@ -2,6 +2,7 @@
 Test the redis interface for user and docs handling.
 """
 
+import pytest
 from .context import lib  # noqa: F401
 
 from lib.data import Data
@@ -65,6 +66,7 @@ def test_check_slugs():
         assert True
 
 
+@pytest.mark.integration
 def test_userSet():
     """
     User Set -- A set of user_slugs: Can be used to construct keys
@@ -88,6 +90,7 @@ def test_userSet():
     assert count == data.userSet_count()
 
 
+@pytest.mark.integration
 def test_users():
     """
     Users -- Redis Hashes of user names and whether they're
@@ -112,6 +115,7 @@ def test_users():
     assert data.user_get(user_slug) is None
 
 
+@pytest.mark.integration
 def test_userDocumentSet():
     """
     UserDocumentSet -- a set of doc_slugs for each user.
@@ -136,6 +140,7 @@ def test_userDocumentSet():
     assert data.userDocumentSet_list(user_slug) == []
 
 
+@pytest.mark.integration
 def test_userDocuments():
     """
     UserDocuments -- Redis Hashes of {part_slug: wiki_text}.
@@ -166,6 +171,7 @@ def test_userDocuments():
     # get_dict / archive ?
 
 
+@pytest.mark.integration
 def test_userDocumentMetadata():
     """
     UserDocumentMetadata -- Redis Hashes of {key: val}.
@@ -190,6 +196,7 @@ def test_userDocumentMetadata():
     assert not data.userDocumentMetadata_exists(user_slug, doc_slug)
 
 
+@pytest.mark.integration
 def test_userDocumentLastChanged():
     """
     Note that last_changed is just a list of metadata keys; so must also create
@@ -219,6 +226,7 @@ def test_userDocumentLastChanged():
     assert not data.userDocumentMetadata_exists(user_slug, doc_slug)
 
 
+@pytest.mark.integration
 def test_userDocumentCache():
     user_slug = random_slug('test-user-')
     doc_slug = random_slug('test-document-')
