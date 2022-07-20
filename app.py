@@ -42,7 +42,8 @@ from PIL import Image, ImageDraw
 from bottle_utils import flash
 
 from beaker.middleware import SessionMiddleware
-from jinja2 import Environment as JinjaTemplates, PackageLoader, escape
+from jinja2 import Environment as JinjaTemplates, PackageLoader
+from markupsafe import escape
 from slugify import slugify
 
 from lib.bokeh import make_background

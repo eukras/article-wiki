@@ -5,7 +5,7 @@ Construct footnotes from ^[Links] in document parts.
 import re
 import validators
 
-from jinja2 import Environment, escape
+from jinja2 import Environment
 from sortedcontainers import SortedDict
 
 from lib.wiki.blocks import BlockList
