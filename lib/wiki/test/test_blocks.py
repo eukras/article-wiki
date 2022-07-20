@@ -3,6 +3,8 @@ A BlockList is a parser that turns a text into a list of objects with a common
 Block interface.
 """
 
+from lxml import html
+
 from .context import lib  # noqa: F401
 
 from lib.wiki.blocks import \
@@ -302,15 +304,13 @@ def test_list_block():
         # Test 1
         # Test 2
         """)
-    expect = trim("""
-        <ol>
-        <li>
-        Test 1</li><li>Test 2
-        </li>
-        </ol>
-        """)
     actual = list_block(text, Settings())
-    assert expect == actual
+    print(actual)
+    __ = html.fromstring(str(actual))
+    assert __.xpath("count(//ol)") == 1
+    assert __.xpath("count(//li)") == 2
+    assert __.xpath("//ol/li[contains(., 'Test 1')]")
+    assert __.xpath("//ol/li[contains(., 'Test 2')]")
 
 
 def test_list_block_recursor():
@@ -319,19 +319,13 @@ def test_list_block_recursor():
         # Test 1
         # # Test 2
         """)
-    expect = trim("""
-        <ol>
-        <li>
-        Test 1<ol>
-        <li>
-        Test 2
-        </li>
-        </ol>
-        </li>
-        </ol>
-        """)
     actual = list_block(text, Settings())
-    assert expect == actual
+    print(actual)
+    __ = html.fromstring(str(actual))
+    assert __.xpath("count(//ol)") == 2
+    assert __.xpath("count(//li)") == 2
+    assert __.xpath("//ol/li[contains(., 'Test 1')]")
+    assert __.xpath("//ol/li/ol/li[contains(., 'Test 2')]")
 
 
 def test_table_block():
