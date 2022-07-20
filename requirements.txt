@@ -15,6 +15,7 @@ nltk
 Pillow
 python-dotenv
 python-slugify
+pytest
 pytz
 redis
 roman
