@@ -8,9 +8,13 @@
 # - CRUD for docs and parts, while testing indexing consistency.
 # FlushDB #1 and exit.
 
+
 import logging
 import pytest
 import sys
+
+# Disable this for no; TODO: Tag as integrations.
+pytest.skip(allow_module_level=True)
 
 from webtest import TestApp as AppTester  # so not collected?
 
