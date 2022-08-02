@@ -1001,7 +1001,7 @@ def post_upload_txt(user_slug, doc_slug):
     prefix = 'article-wiki_{:s}_{:s}_'.format(user_slug, doc_slug)
     if not name.startswith(prefix) or not name.endswith('.txt'):
         msg = "A '{:s}*.txt' filename is expected."
-        bottle.abort(msg.format(prefix))
+        bottle.abort(400, msg.format(prefix))
 
     # Load contents
     filepath = '/tmp/' + upload.filename
