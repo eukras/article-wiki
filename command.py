@@ -174,7 +174,7 @@ def console(command, title):
         print("  - generate-epub")
         print("  - initialize")
         print("  - load-fixtures")
-        print("  - refresh_metadata")
+        print("  - refresh-metadata")
         print("  - save-fixtures")
 
 
