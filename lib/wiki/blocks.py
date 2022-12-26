@@ -286,10 +286,14 @@ class BlockList(object):
                 number = '.'.join([str(_) for _ in numbering])
                 head = (
                     '<a href="#%s">'
-                    '<h1 id="%s">'
-                    '<span>%s</span> '  # <-- space!
-                    '<span>%s</span>'
-                    '</h1>'
+                    '<table>'
+                    '<tbody>'
+                    '<tr>'
+                    '<td width="1%%"><h1 id="%s">§%s.&nbsp;</h1></td>'
+                    '<td width="99%%"><h1>%s</h1></td>'
+                    '</tr>'
+                    '</tbody>'
+                    '</table>'
                     '</a>'
                 ) % (
                     nav_id, nav_id, number, renderer.inline.process(title)
