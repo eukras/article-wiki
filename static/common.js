@@ -6,23 +6,6 @@ $(document).ready(function() {
     var offset = 220;
     var duration = 500;
 
-    $(window).scroll(function() {
-        var scaledPixelWidth = $(document).width();
-        var s = $(window).scrollTop(),
-            d = $(document).height(),
-            c = window.innerHeight;
-        var scrollPercent = Math.round((s / (d-c)) * 100);
-        if (scaledPixelWidth > 768) {
-            if (scrollPercent > 99) { 
-                $("#progress-percent").text('END'); 
-            } else if (scrollPercent > 1) { 
-                $("#progress-percent").text(scrollPercent + '%'); 
-            } else { 
-                $("#progress-percent").text('...'); 
-            }
-        }
-    });
-
     //  Scroll by percentage. Still slightly out of sync at the end of
     //  long sections. Works well enough. 
 
@@ -58,11 +41,6 @@ $(document).ready(function() {
         }
     });
 
-    $('#progress').click(function(event) {
-        event.stopPropagation();
-        window.scrollTo(0,0);
-    });
-
     //  On small screens, 'Edit' button switches back from #editor.mode-preview
     //  to #editor.mode-edit. CSS will show and hide page elements accordingly.
 
@@ -92,108 +70,8 @@ $(document).ready(function() {
 
     $('.table-of-contents').clone().appendTo('#popover-table-of-contents');
 
-    /**
-     * On a keystroke, or if menu button is clicked, toggle nav popover 
-     */
-
-    document.addEventListener('keydown', handleKey);
-
-    function handleKey(event) {
-      if (event.key === 'Esc' || event.key === 'Escape') {
-        toggleMenuPopover();
-      }
-    }
-
-    $('#menu-button').click(function() {
-        toggleMenuPopover();
-    });
-
     $('.href-button').click(function() {
        location.href = $(this).attr('href');
-    });
-
-    $('#popover-comment-button').click(function() {
-        $('div#popover-contents-modal').hide();
-        $('div#popover-comment-button').hide();
-        $('div#popover-comment-close').show();
-        $('div#popover-comment-modal').show();
-        $('textarea[name="comment"]').val('').focus();
-    });
-
-    $('#popover-comment-close').click(function() {
-        $('div#popover-contents-modal').hide();
-        $('div#popover-comment-button').hide(); // <-- nothing selected
-        $('div#popover-comment-modal').hide();
-        $('div#popover-comment-close').hide();
-    });
-
-    $('#popover-suggest-edit-open').click(function() {
-        $('#popover-suggest-preview-content').hide();
-        $('#popover-suggest-edit-content').show();
-        $('textarea[name="changes"]').focus();
-    });
-
-    $('#popover-suggest-edit-close').click(function() {
-        $('#popover-suggest-preview-content').show();
-        $('#popover-suggest-edit-content').hide();
-        $('textarea[name="comment"]').focus();
-    });
-
-    $('#popover-comment-submit').click(function(event) {
-        event.stopPropagation();
-        const data = {
-          user_slug: $('input[name="user_slug"]').val(),
-          doc_slug: $('input[name="doc_slug"]').val(),
-          original: $('input[name="original"]').val().trim(),
-          changes: $('textarea[name="changes"]').val().trim(),
-          comment: $('textarea[name="comment"]').val().trim(),
-          contact: $('input[name="contact"]').val().trim(),
-        };
-
-        //  Hide old errors
-        $('#err-changes,#err-comment,#err-contact').hide();
-
-        //  Validate form
-        errors = {changes: "", comment: "", contact: ""};
-        if (data.changes.length == 0 || data.changes.length > 2000) {
-            errors.changes = "Required field, up to 2000 characters (" + 
-                data.changes.length + " found)";
-        }
-        if (data.comment.length == 0 || data.comment.length > 2000) {
-            errors.comment = "Required field, up to 2000 characters (" + 
-                data.comment.length + " found)";
-        }
-        if (data.contact.length == 0 || data.contact.length > 200) {
-            errors.contact = "Required field, up to 200 characters (" +
-                data.contact.length + " found)";
-        } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(data.contact)) {
-            errors.contact = "Required field, must be an email address";
-        }
-        
-        //  Show errors if any...
-        if (errors.changes != "") {
-            $('#err-changes').text(errors.changes).show();
-        }
-        if (errors.comment != "") {
-            $('#err-comment').text(errors.comment).show();
-        }
-        if (errors.contact != "") {
-            $('#err-contact').text(errors.contact).show();
-        }
-        okay = errors.changes + errors.comment + errors.contact == "";
-
-        if (okay) { 
-            axios.post('/api/comments', data)
-              .then(function (response) {
-                toggleMenuPopover();
-              })
-              .catch(function (error) {
-                alert("Could not submit your comment. Please try again in a little while.");
-                console.log(error);
-              });
-        } else {
-            alert("Check error messages!");
-        }
     });
 
     /**
@@ -237,6 +115,7 @@ $(document).ready(function() {
             }
             const text = $(element).text().trim();
             selectElement(element);
+
             $('div#popover-comment-button').show();
             $('input[name="original"]').val(text)
             $('textarea[name="preview"]').val(text)

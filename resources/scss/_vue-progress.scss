@@ -1,0 +1,21 @@
+nav#progress {
+    //  Button
+    font-family: $fontFamilySansSerif;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    text-decoration: none;
+    font-size: $fontSizeMinus1;
+    padding: 1em;
+    opacity: 0.4;
+    z-index: 20;
+    text-align: left;
+    cursor: pointer;
+    user-select: none;
+}
+
+@media print {
+    #progress {
+        display: none;
+    }
+}
