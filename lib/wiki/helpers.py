@@ -9,18 +9,10 @@ def web_buttons(user_slug: str, doc_slug: str) -> str:
         return ""
     env = Environment(autoescape=True)
     tpl = env.from_string(trim("""
-    <div class="web-only text-center no-print">
+    <div class="button-menu web-only text-center no-print">
         <table>
             <tbody>
                 <tr>
-                    <td class="nav-label text-center">
-                        <a
-                            class="button feature"
-                            href="/"
-                        >
-                            <i class="fa fa-home"></i>&nbsp; Home
-                        </a>
-                    </td>
                     <td class="nav-label text-center">
                         <a
                             class="button feature"
@@ -35,11 +27,6 @@ def web_buttons(user_slug: str, doc_slug: str) -> str:
                             href="/epub/{{user_slug}}/{{doc_slug}}"
                         >
                             <i class="fa fa-book"></i>&nbsp; Download (as .EPUB)
-                        </a>
-                    </td>
-                    <td class="nav-label text-center">
-                        <a class="button feature button-themes">
-                            <i class="fa fa-adjust"></i>&nbsp; Theme
                         </a>
                     </td>
                 </tr>
