@@ -470,14 +470,13 @@ def user_page(user_slug):
         edit_button(user_slug, 'fixtures', 'author'),
     ]
 
-    footer_buttons = []
+    footer_buttons = [help_button()]
     if config['ARTICLE_WIKI_CREDIT'] == 'YES':
         footer_buttons += [source_button()]
-    footer_buttons += [help_button()]
     if has_authority_for_user(user_slug):
         footer_buttons += [export_archive_button(user_slug)]
     if not login:
-        footer_buttons += [rss_button(user_slug)
+        footer_buttons += [rss_button(user_slug)]
 
     slugs = data.userDocumentSet_list(user_slug)
     changes_list = data.userDocumentLastChanged_list(user_slug)
@@ -1147,7 +1146,7 @@ def help_button() -> dict:
 
 def rss_button(user_slug) -> dict:
     return {
-        'name': 'RSS',
+        'name': 'Changes (RSS)',
         'href': '/rss/%s.xml' % user_slug,
         'icon': 'rss'
     }
@@ -1227,7 +1226,7 @@ def export_archive_button(user_slug: str) -> dict:
 
 def source_button() -> dict:
     return {
-        'name': 'Source',
+        'name': 'Article Wiki',
         'href': 'https://github.com/eukras/article-wiki',
         'icon': 'github'
     }
