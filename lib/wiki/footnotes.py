@@ -89,12 +89,15 @@ class Footnotes(object):
             if count in self.footnotes[part_slug]:
                 footnote_text = self.footnotes[part_slug][count]
 
-        if validators.url(footnote_text):
-            ref_text = footnote_text
-            # print('URL', ref_text)
+        rel_me = ''
+        if footnote_text.startswith(tuple(['http:', 'https:', 'mailto:'])):
+            if footnote_text.endswith('|rel=me'):
+                ref_text = footnote_text[:-7]
+                rel_me = ' rel="me"'
+            else:
+                ref_text = footnote_text
         else:
             ref_text = self.inline.process(footnote_text)
-            # print('NOT URL', footnote_text, ref_text)
 
         _ = '<a class="%s" id="%s_footnote_%s" href="#%s_link_%s">%s</a>'
         ref_link = _ % ('web-marker', self.id_prefix,
@@ -105,16 +108,16 @@ class Footnotes(object):
 
         self.backlinks[number][count] = (ref_link, ref_text)
 
-        if validators.url(footnote_text):
+        if footnote_text.startswith(tuple(['http:', 'https:', 'mailto:'])):
 
             link = trim("""
-                <a class="web-link" title="%s" href="%s"
+                <a class="web-link" title="%s" href="%s"%s
                    target="_blank">%s</a>%s<a class="web-marker"
                    id="%s_link_%s" href="#%s_footnote_%s"><sup>%s</sup></a>
                 """) % (
-                strip_markup(footnote_text), footnote_text, link_markup,
-                punctuation, self.id_prefix, nav_id, self.id_prefix, nav_id,
-                count
+                strip_markup(ref_text), ref_text, rel_me,
+                link_markup, punctuation, self.id_prefix, nav_id,
+                self.id_prefix, nav_id, count
             )
 
         else:
