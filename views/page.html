@@ -12,6 +12,10 @@
         {{ button.name }}
     </a>
     {% endfor %}
+    <button class="button button-themes">
+        <i class="fa fa-adjust"></i>
+        Theme
+    </button>
 </nav>
 
 {% endif %}
@@ -30,50 +34,9 @@
         {{ button.name }}
     </a>
     {% endfor %}
-    <button class="button button-themes">
-        <i class="fa fa-adjust"></i>
-        Theme
-    </button>
 </nav>
 {% endif %}
 
-</div>
-
-<!-- Nav elements -->
-<div id="menu" class="side-nav menu-nav visible-over-popover-contents-modal no-print">
-    <div title="Show/hide menu [ESC]" id="menu-button" class="clickable">
-        <i class="fa fa-bars"></i>&nbsp; ESC
-    </div>
-</div> 
-
-<div id="progress" class="side-nav bottom-menu progress-nav no-print clickable">
-    <span id="progress-percent">...</span> <i class="fa fa-arrow-up"></i>
-</div> 
-
-<!-- Nav system popovers -->
-
-<div
-    id="popover-contents-modal"
-    style="display: none;"
->
-    <div class="popover-body">
-
-        {% if web_buttons is defined %}
-        {{ web_buttons }}
-        {% endif %}
-
-        <div id="popover-table-of-contents">
-            <div class="text-center">
-                <i>When reading an article, the ESC button<br/>
-                shows you the table of contents.</i>
-            </div>
-        </div>
-
-        {% if web_buttons is defined %}
-        {{ web_buttons }}
-        {% endif %}
-
-    </div>
 </div>
 
 <!-- Comment system popovers -->
