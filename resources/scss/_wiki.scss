@@ -13,25 +13,37 @@ html {
     font-family: $fontFamilySerif;
     font-size: $fontSize;
     line-height: 150%;
-    color: #222;
+    color: $lightFgColor
 }
 
 header {
-    text-align: left;
-    margin-top: 3rem;
-    margin-bottom: 3rem;
+    text-align: center;
+    margin: 3rem;
+}
+
+header hgroup {
+    margin: 3rem 0;
+}
+
+header hgroup h1 {
+    text-align: center;
+    padding: 0;
+    margin: 1rem 0 0 0;
+    font-weight: bold;
+    font-size: $fontSizePlus5;
 }
 
 header hgroup h2 {
+    text-align: center;
     padding: 0;
-    margin: 0 0 1rem 0;
+    margin: 1rem 0 1rem 0;
     font-style: italic;
     font-weight: normal;
     font-size: $fontSizePlus2;
-    margin-bottom: 2rem;
 }
 
 header address {
+    text-align: center;
     font-style: normal;
 }
 
@@ -65,7 +77,7 @@ section.depth-3 {
     margin-top: 1rem;
 }
 
-section.depth-1 h1, header h1 {
+section.depth-1 h1 {
     font-size: $fontSizePlus3;
 }
 
@@ -91,7 +103,7 @@ section.depth-6 h1 {
 }
 
 footer {
-    font-size: $fontSizeMinus1;
+    font-size: $fontSizeMinus2;
 }
 
 
@@ -250,50 +262,3 @@ td {
     widows: 3;
     orphans: 3;
 }
-
-/**
- * -------------------------------------------------------------------------
- * FOR PLUGINS
- * -------------------------------------------------------------------------
- */
-
-/** 
- * CODE
- */
-
-.code .hll { background-color: #ffffcc }
-.code .c   { font-style: italic }           /* Comment */
-.code .err { border: 1px solid #FF0000 }    /* Error */
-.code .k   { font-weight: bold }            /* Keyword */
-.code .cm  { font-style: italic }           /* Comment.Multiline */
-.code .c1  { font-style: italic }           /* Comment.Single */
-.code .cs  { font-style: italic }           /* Comment.Special */
-.code .ge  { font-style: italic }           /* Generic.Emph */
-.code .gh  { font-weight: bold }            /* Generic.Heading */
-.code .gp  { font-weight: bold }            /* Generic.Prompt */
-.code .gs  { font-weight: bold }            /* Generic.Strong */
-.code .gu  { font-weight: bold }            /* Generic.Subheading */
-.code .kc  { font-weight: bold }            /* Keyword.Constant */
-.code .kd  { font-weight: bold }            /* Keyword.Declaration */
-.code .kn  { font-weight: bold }            /* Keyword.Namespace */
-.code .kr  { font-weight: bold }            /* Keyword.Reserved */
-.code .s   { font-style: italic }           /* Literal.String */
-.code .nc  { font-weight: bold }            /* Name.Class */
-.code .ni  { font-weight: bold }            /* Name.Entity */
-.code .ne  { font-weight: bold }            /* Name.Exception */
-.code .nn  { font-weight: bold }            /* Name.Namespace */
-.code .nt  { font-weight: bold }            /* Name.Tag */
-.code .ow  { font-weight: bold }            /* Operator.Word */
-.code .sb { font-style: italic }            /* Literal.String.Backtick */
-.code .sc { font-style: italic }            /* Literal.String.Char */
-.code .sd { }                               /* Literal.String.Doc */
-.code .s2 { font-style: italic }            /* Literal.String.Double */
-.code .se { font-weight: bold;
-            font-style: italic }            /* Literal.String.Escape */
-.code .sh { font-style: italic }            /* Literal.String.Heredoc */
-.code .si { font-weight: bold;
-            font-style: italic }            /* Literal.String.Interpol */
-.code .sx { font-style: italic }            /* Literal.String.Other */
-.code .sr { font-style: italic }            /* Literal.String.Regex */
-.code .s1 { font-style: italic }            /* Literal.String.Single */
-.code .ss { font-style: italic }            /* Literal.String.Symbol */

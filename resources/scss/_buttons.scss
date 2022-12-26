@@ -20,7 +20,7 @@ a.button, input[type="submit"], button {
     font-family: $fontFamilySansSerif;
     font-size: $fontSizeMinus2;
     background-image: linear-gradient(rgba(128, 128, 128, 0.1), rgba(128, 128, 128, 0));
-    color: #4da3a9;
+    color: $lightFgLink;
     border-left: 1px dotted rgba(128, 128, 128, 0.3);
     padding: 0.3rem 1.3rem;
     text-align: center;

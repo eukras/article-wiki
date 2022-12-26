@@ -2,18 +2,43 @@ $fontFamilySerif: 'IBM Plex Serif', 'GFS Didot', serif;
 $fontFamilySansSerif: 'IBM Plex Sans Condensed', Helvetica, sans-serif;
 $fontFamilyMonospace: 'Fira Mono', 'Andale Mono', monospace;
 
-$borderRadius: 7px;
+$borderRadius: 0.5rem;
 
-$stepUp: 1.20;
-$stepDown: 0.90;
+$baseFontSize: 1.10;
+$stepUp: 1.10;
+$stepDown: 0.95;
 
-$fontSizePlus3: #{$stepUp * $stepUp * $stepUp}rem;
-$fontSizePlus2: #{$stepUp * $stepUp}rem;
-$fontSizePlus1: #{$stepUp}rem;
-$fontSize: 1rem;
-$fontSizeMinus1: #{$stepDown}rem;
-$fontSizeMinus2: #{$stepDown * $stepDown}rem;
-$fontSizeMinus3: #{$stepDown * $stepDown * $stepDown}rem;
+$fontSizePlus5: #{$baseFontSize * $stepUp * $stepUp * $stepUp * $stepUp * $stepUp}rem;
+$fontSizePlus4: #{$baseFontSize * $stepUp * $stepUp * $stepUp * $stepUp}rem;
+$fontSizePlus3: #{$baseFontSize * $stepUp * $stepUp * $stepUp}rem;
+$fontSizePlus2: #{$baseFontSize * $stepUp * $stepUp}rem;
+$fontSizePlus1: #{$baseFontSize * $stepUp}rem;
+$fontSize: #{$baseFontSize}rem;
+$fontSizeMinus1: #{$baseFontSize * $stepDown}rem;
+$fontSizeMinus2: #{$baseFontSize * $stepDown * $stepDown}rem;
+$fontSizeMinus3: #{$baseFontSize * $stepDown * $stepDown * $stepDown}rem;
+
+$lightBgPage: #A0b8A0;  // <-- sage green
+$lightBgColor: #f8f8f8;
+$lightBgSelection: #baffba;
+
+$lightFgColor: black; 
+$lightFgHighlight: #baffba;
+$lightFgLink: #20b2aa;  // <-- light sea green
+$lightFgLinkHover: blue;
+$lightFgInsert: black;
+$lightFgDelete: black;
+
+$darkBgPage: #050509;  // <-- sage green
+$darkBgColor: #050509;
+$darkBgSelection: #2d828a;
+
+$darkFgColor: #808089;
+$darkFgHighlight: #67679e;
+$darkFgLink: #a0a0a0;
+$darkFgLinkHover: #d0d0d0;
+$darkFgInsert: lightgreen;
+$darkFgDelete: indianred;
 
 
 //  -------------

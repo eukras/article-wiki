@@ -35,7 +35,7 @@ div#popover-contents-modal {
 
     overflow-y: auto;
 
-    background-color: #f8f8f8;
+    background-color: $lightBgColor;
 }
 
 div#popover-comment-modal div.popover-body,
@@ -59,7 +59,7 @@ div#popover-comment-close {
     max-height: 2.6rem;
     font-size: 1.5rem;
     text-align: center;
-    color: white;
+    color: $lightBgColor;
     background-color: blueviolet;
     cursor: pointer;
     box-shadow: 0 0 0.9rem #ccc;

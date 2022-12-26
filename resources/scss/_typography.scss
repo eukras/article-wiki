@@ -117,7 +117,7 @@ ul, ol, dl {
 .note {
     font-family: $fontFamilySansSerif;
     font-size: $fontSizeMinus2;
-    border: dotted 1px black;
+    border: dotted 1px $lightFgColor;
     border-radius: $borderRadius;
     margin: 1rem 0;
     padding: 1rem;
@@ -139,14 +139,14 @@ aside {
     font-size: $fontSizeMinus2;
     float: right;
     width: 30%;
-    border-left: dotted 1px black;
+    border-left: dotted 1px $lightFgColor;
     padding-left: 1rem;
     margin-left: 1rem;
     margin-bottom: 0.5rem;
 }
 
 .box-dotted {
-    border: dotted 1pt black;
+    border: dotted 1pt $lightFgColor;
     border-radius: $borderRadius;
     padding: 0 1rem;
     margin: 1rem 0;
@@ -263,8 +263,6 @@ h6 {
     margin-bottom: 0;
     padding-bottom: 0.3rem;
     margin-top: 1rem;
-    /* Allow for numbered indents */
-    display: flex;
     gap: 1rem;
 }
 
@@ -303,7 +301,6 @@ h1 {
 
 h2 {
     font-size: $fontSizePlus1;
-    text-align: center;
     margin: 2rem 0 1rem 0;
     padding: 0;
 }
@@ -372,6 +369,10 @@ p.subhead {
     padding: 0.8rem 0 0 0;
 }
 
+p + p.subhead {
+    margin-top: 1rem;
+}
+
 p.summary {
     font-size: $fontSizePlus1;
     margin: 0 0 0.5rem 0;
@@ -414,9 +415,9 @@ blockquote + p.caption {
 }
 
 .column-rule {
-    -webkit-column-rule: dotted 1px black;
-    -moz-column-rule: dotted 1px black;
-    column-rule: dotted 1px black;
+    -webkit-column-rule: dotted 1px $lightFgColor;
+    -moz-column-rule: dotted 1px $lightFgColor;
+    column-rule: dotted 1px $lightFgColor;
 }
 
 .columns-min-width {
@@ -427,20 +428,20 @@ blockquote + p.caption {
 
 hr {
     border: 0;
-    border-bottom: 4pt solid black;
+    border-bottom: 4pt solid $lightFgColor;
     margin: 1rem 0;
 }
 
 hr.div-dotted { 
-    border-bottom: dotted 0.8pt black;
+    border-bottom: dotted 0.8pt $lightFgColor;
 }
 
 hr.div-solid { 
-    border-bottom: solid 0.8pt black;
+    border-bottom: solid 0.8pt $lightFgColor;
 }
 
 hr.div-thick { 
-    border-bottom: solid 3pt black;
+    border-bottom: solid 3pt $lightFgColor;
 }
 
 hr.div-center { 
@@ -499,7 +500,7 @@ var {
     font-size: $fontSizeMinus1;
     font-style: inherit;
     font-weight: bold;
-    border: solid 1pt black;
+    border: solid 1pt $lightFgColor;
     border-radius: 3pt;
     padding: 0 4pt;
     white-space: nowrap;
@@ -537,17 +538,17 @@ dl dd {
 
 ins {
     text-decoration: none;
-    border-bottom: 1px dotted black;
+    border-bottom: 1px dotted $lightFgColor;
 }
 
 del {
     text-decoration: line-through;
-    border-bottom: 1px dotted black;
+    border-bottom: 1px dotted $lightFgColor;
 }
 
 
 .table-wrapper {
-    border: dotted 1pt black;
+    border: dotted 1pt $lightFgColor;
     border-radius: $borderRadius;
     padding: 0 1rem;
     margin: 1rem 0;
@@ -582,9 +583,9 @@ tbody td {
 .highlight {
     padding-left: .6rem;
     padding-right: .6rem;
-    color: #fff;
+    color: $lightBgColor;
     font-weight: bold;
-    background-color: #000;
+    background-color: $lightFgColor;
     border-radius: 3pt;
 }
 

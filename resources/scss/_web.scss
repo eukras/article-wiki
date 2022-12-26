@@ -1,6 +1,10 @@
 html {
-    background-color: #A0b8A0;
+    background-color: $lightBgPage;
 }
 
-::-moz-selection { background: #baffba; }
-::selection { background: #baffba; }
+header {
+    margin-top: 5rem;
+}
+
+::-moz-selection { background: $lightBgSelection; }
+::selection { background: $lightBgSelection; }

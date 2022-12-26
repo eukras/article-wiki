@@ -15,5 +15,9 @@
 @import "_typography.scss";
 @import "_responsive.scss";
 
+/* Vue tools */
+@import "_vue-escape.scss";
+@import "_vue-progress.scss";
+
 /* main.css and epub.css are two separate builds.*/
 @import "_web.scss";

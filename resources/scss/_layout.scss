@@ -8,7 +8,7 @@
  */
 
 #page, #editor  {
-    background-color: #f8f8f8;
+    background-color: $lightBgColor;
 }
 
 div#background {
@@ -39,6 +39,7 @@ form {
 @media screen {
 
     body { 
+        font-size: #{$fontSize};
         padding: 0;
         margin: 0;
     }
@@ -117,7 +118,7 @@ form {
     }
 
     body {
-        margin: 3em;
+        margin: 0 3rem;
         padding: 0;
     }
 
@@ -144,7 +145,7 @@ form {
     }
 
     #page {
-        background-color: white;
+        background-color: $lightBgColor;
         width: auto;
         margin: 0;
         padding: 0;
@@ -157,8 +158,8 @@ form {
     }
 
     var {
-        border: 2px solid black;
-        color: black;
+        border: 2px solid $lightFgColor;
+        color: $lightFgColor;
     }
 }
 
@@ -184,38 +185,6 @@ form {
     }
 }
 
-/*
- * SIDE BAR
- *
- */
-
-#menu,
-#progress {
-    font-family: $fontFamilySansSerif;
-}
-
-.side-nav { 
-    position: fixed;
-    text-decoration: none;
-    font-size: $fontSizeMinus1;
-    padding: 1em;
-    opacity: 0.4;
-}
-
-.menu-nav {
-    top: 0;
-    left: 0;
-}
-
-.progress-nav {
-    bottom: 0;
-    right: 0;
-}
-
-#menu-button {
-    z-index: 20;
-}
-
 
 /* CSS Modal notice: only deactivated if grid is supported. */
 
@@ -228,7 +197,7 @@ form {
         position: fixed;
         top: 0;
         left: 0;
-        background-color: #000;
+        background-color: $lightFgColor;
         width: 100vw;
         height: 100vh;
         opacity: 0.5;
@@ -242,7 +211,7 @@ form {
         border-radius: $borderRadius;
         box-shadow: 1rem 1rem 2rem #444;
         text-align: center;
-        background-color: #fff;
+        background-color: $lightBgColor;
         width: 18em;
         max-width: 90%;
         padding: 2rem;

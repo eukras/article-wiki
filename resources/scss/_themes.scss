@@ -2,25 +2,29 @@
 
     html.theme-dark {
 
-        $fg: #889;
-        $bg: #050509;
-        $hl: #67679e;
+        $darkFgColor: #889;
+        $darkBgColor: #050509;
+        $darkFgHighlight: #67679e;
 
         ::selection {
-            background-color: #2d828a;
+            background-color: $darkBgSelection;
         }
 
-        color: $fg;
-        background-color: $bg;
+        color: $darkFgColor;
+        background-color: $darkBgColor;
 
         div#background {
-            background-color: $bg;
+            background-color: $darkBgColor;
             background-blend-mode: hard-light;
             opacity: 0.25;
         }
 
+        #escape-modal {
+            background-color: $darkBgColor;
+        }
+
         div#popover-contents-modal {
-            background-color: $bg;
+            background-color: $darkBgColor;
         }
 
         a.button, input[type="submit"], button {
@@ -47,31 +51,31 @@
 
         div#popover-comment-button,
         div#popover-comment-close {
-            background-color: $bg;
-            color: $fg;
-            border: 3px $hl solid;
-            box-shadow: 0 0 0.9rem $hl;
+            background-color: $darkBgColor;
+            color: $darkFgColor;
+            border: 3px $darkFgHighlight solid;
+            box-shadow: 0 0 0.9rem $darkFgHighlight;
         }
 
         div#popover-comment-button i,
         div#popover-comment-close i {
-            color: $fg;
+            color: $darkFgColor;
         }
 
         button.popover-button {
-            background-color: $bg;
-            color: $fg;
-            box-shadow: 0 0 0.9rem $hl;
-            border: 3px $hl solid;
+            background-color: $darkBgColor;
+            color: $darkFgColor;
+            box-shadow: 0 0 0.9rem $darkFgHighlight;
+            border: 3px $darkFgHighlight solid;
         }
 
         #page, #editor {
-            color: $fg;
-            background-color: $bg;
+            color: $darkFgColor;
+            background-color: $darkBgColor;
         }
 
         #editor textarea {
-            color: $fg;
+            color: $darkFgColor;
         }
 
         #editor textarea::-webkit-scrollbar, 
@@ -81,12 +85,12 @@
 
         #editor textarea::-webkit-scrollbar-track, 
         #editor main::-webkit-scrollbar-track {
-            background.color: black;
+            background.color: $darkBgColor;
         }
 
         #editor textarea::-webkit-scrollbar-thumb, 
         #editor main::-webkit-scrollbar-thumb {
-            background-color: #334;
+            background-color: $darkFgHighlight;
         }
 
         #editor textarea::-webkit-resizer,
@@ -100,25 +104,25 @@
         }
 
         h1, h2, h3, h4, h5, h6, .fa {
-            color: $hl;
+            color: $darkFgHighlight;
         }
 
         hr.div-solid {
-            border-bottom: 1pt solid $fg;
+            border-bottom: 1pt solid $darkFgColor;
         }
 
         hr.div-dotted {
-            border-bottom: 1pt dotted $hl;
+            border-bottom: 1pt dotted $darkFgHighlight;
         }
 
         ins {
             text-decoration: none;
-            border-bottom: 1pt dotted $fg;
-            color: lightgreen;
+            border-bottom: 1pt dotted $darkFgColor;
+            color: $darkFgInsert;
         }
         del {
-            color: indianred;
-            border-bottom: 1px dotted $fg;
+            color: $darkFgDelete;
+            border-bottom: 1px dotted $darkFgColor;
         }
 
         tt, textarea {
@@ -131,18 +135,18 @@
         }
 
         var { 
-            border: 1pt solid $hl;
-            color: $hl;
+            border: 1pt solid $darkFgHighlight;
+            color: $darkFgHighlight;
         }
         kbd {
-            border: 1pt dotted $fg;
+            border: 1pt dotted $darkFgColor;
             color: inherit;
         }
 
         .gloss {
             .source {
                 b {
-                    color: $hl;
+                    color: $darkFgHighlight;
                 }
             }
         }
@@ -161,16 +165,16 @@
 
         .wiki-demo-wide {
             .wiki-demo-output {
-                border-left: 0.1rem dotted $hl;
+                border-left: 0.1rem dotted $darkFgHighlight;
             }
         }
 
         aside {
-            border-left: 0.1rem dotted $fg;
+            border-left: 0.1rem dotted $darkFgColor;
         }
 
         .note, .box-dotted {
-            border: 0.1rem dotted $fg;
+            border: 0.1rem dotted $darkFgColor;
         }
 
         .license {
@@ -181,11 +185,11 @@
     
         div#popover-nav-modal,
         div#popover-comment-modal {
-            background-color: $bg;
+            background-color: $darkBgColor;
         }
     
         div.popover-body {
-            background-color: $bg;
+            background-color: $darkBgColor;
         }
     }
 

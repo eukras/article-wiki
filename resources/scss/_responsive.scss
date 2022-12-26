@@ -98,14 +98,13 @@
         .wiki-demo-source {
             border-right: 0.1rem dotted black;
             border-right: 0;
-            padding-left: 2rem;
+            padding-left: 1rem;
             padding-right: 0;
         }
         .wiki-demo-output {
-            border-left: 0.1rem dotted black;
             border-right: 0;
-            padding-left: 2rem;
-            padding-right: 0;
+            padding-left: 0;
+            padding-right: 1rem;
         }
     }
 
