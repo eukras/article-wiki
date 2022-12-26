@@ -470,18 +470,14 @@ def user_page(user_slug):
         edit_button(user_slug, 'fixtures', 'author'),
     ]
 
-    if not login:
-        header_buttons += [
-            subscribe_button(),
-            rss_button(user_slug)
-        ]
-
     footer_buttons = []
     if config['ARTICLE_WIKI_CREDIT'] == 'YES':
         footer_buttons += [source_button()]
     footer_buttons += [help_button()]
     if has_authority_for_user(user_slug):
         footer_buttons += [export_archive_button(user_slug)]
+    if not login:
+        footer_buttons += [rss_button(user_slug)
 
     slugs = data.userDocumentSet_list(user_slug)
     changes_list = data.userDocumentLastChanged_list(user_slug)
@@ -557,17 +553,14 @@ def read_document(user_slug, doc_slug):
     ]
 
     login = get_login()
-    if not login:
-        header_buttons += [
-            subscribe_button(),
-            rss_button(user_slug)
-        ]
 
     footer_buttons = [biblio_button(user_slug, doc_slug)]
     if has_authority_for_user(user_slug):
         footer_buttons += [
             upload_button(user_slug, doc_slug)
         ]
+    if not login:
+        footer_buttons += [rss_button(user_slug)]
     footer_buttons += [download_button(user_slug, doc_slug)]
 
     settings = Settings({
@@ -1149,14 +1142,6 @@ def help_button() -> dict:
         'name': 'Help',
         'href': '/read/{:s}/help'.format(data.admin_user),
         'icon': 'question-circle'
-    }
-
-
-def subscribe_button() -> dict:
-    return {
-        'name': 'News',
-        'href': config.get('SUBSCRIBE_LINK', ''),
-        'icon': 'envelope'
     }
 
 
