@@ -200,7 +200,14 @@ class Wiki(object):
                                ], 'replace', footnote_parts)
 
         html = '<article>\n'
-        html += html_parts['index'] if 'index' in html_parts else ''
+        if 'index' in html_parts:
+            html += html_parts['index']
+            footnote_html = footnote_parts.get(slug)
+            if footnote_html:
+                html += "<footer>"
+                html += "<hr class=\"div-left div-solid\" />"
+                html += footnote_html
+                html += "</footer>"
 
         for (numbering, slug, _, _, _) in self.outline:
             if slug in parts and slug not in ['index', 'biblio']:
@@ -269,8 +276,6 @@ class Wiki(object):
 
         data['author'] = self.settings.get('AUTHOR', '')
         data['email'] = self.settings.get('EMAIL', '')
-        data['facebook'] = self.settings.get('FACEBOOK', '')
-        data['twitter'] = self.settings.get('TWITTER', '')
 
         default = date.today().strftime("%d %b %Y")
         data['date'] = self.settings.get('DATE', default)
@@ -313,21 +318,6 @@ class Wiki(object):
             </div>
             {% endif %}
 
-            {% if facebook != "" or twitter != "" %}
-            <p class="space space-between">
-                {% if facebook != "" %}
-                <a href="https://facebook.com/{{ facebook }}" target="_blank">
-                    FB: {{ facebook }}
-                </a>
-                {% endif %}
-                {% if twitter != "" %}
-                <a href="https://twitter.com/{{ twitter }}" target="_blank">
-                    TW: {{ twitter }}
-                </a>
-                {% endif %}
-            </p>
-            {% endif %}
-
             {% if date %}
             <p class="space" rel="date">
                 {% if parsed_date != None %}
@@ -364,8 +354,6 @@ class Wiki(object):
             summary_html=inline.process(summary),
             author=self.settings.get('AUTHOR', ''),
             email=self.settings.get('EMAIL', ''),
-            facebook=self.settings.get('FACEBOOK', ''),
-            twitter=self.settings.get('TWITTER', ''),
             date=date_string,
             parsed_date=date_yyyymmdd,
             edit_link=self.settings.get_base_uri('edit') + '/index',
