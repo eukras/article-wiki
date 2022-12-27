@@ -202,7 +202,7 @@ class Wiki(object):
         html = '<article>\n'
         if 'index' in html_parts:
             html += html_parts['index']
-            footnote_html = footnote_parts.get(slug)
+            footnote_html = footnote_parts.get('index')
             if footnote_html:
                 html += "<footer>"
                 html += "<hr class=\"div-left div-solid\" />"
@@ -283,7 +283,7 @@ class Wiki(object):
         data['published_time'] = format_date(utc, tz_name, DATE_FORMAT_ISO8601)
 
         data['todo'] = self.settings.get('TODO', '')
-        data['word_count'] = self.outline.total_word_count()
+        data['word_count'] = self.outline.total_word_count() if self.outline else 0;
 
         return data
 
