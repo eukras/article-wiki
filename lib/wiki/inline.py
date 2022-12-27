@@ -26,7 +26,7 @@ class Inline(object):
         '-': 'Deletion',
         '`': 'Teletype',
         '!': 'Marker',
-        ';': 'Sans-Serif Font',
+        ':': 'Sans-Serif Font',
         "'": 'Superscript',
         ',': 'Subscript',
     }
@@ -235,7 +235,7 @@ class Inline(object):
         if '`' in char:
             open_tags.append('<kbd>')
             close_tags.insert(0, '</kbd>')
-        if ';' in char:
+        if ':' in char:
             open_tags.append('<span class="opposite">')
             close_tags.insert(0, '</span>')
         if '!' in char:
