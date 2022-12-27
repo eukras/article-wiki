@@ -8,6 +8,7 @@ nav.button-list {
     display: flex;
     flex-direction: row-reverse;
     flex-wrap: wrap;
+    font-size: $fontSizeMinus1;
 }
 
 @media print {
@@ -22,7 +23,7 @@ a.button, input[type="submit"], button {
     background-image: linear-gradient(rgba(128, 128, 128, 0.1), rgba(128, 128, 128, 0));
     color: $lightFgLink;
     border-left: 1px dotted rgba(128, 128, 128, 0.3);
-    padding: 0.3rem 1.3rem;
+    padding: 0.3rem 1rem;
     text-align: center;
     user-select: none;
     user-drag: none;
