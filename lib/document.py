@@ -318,10 +318,10 @@ class Document(object):
 
         def make_txt_name(user_slug: str, doc_slug: str) -> str:
             """Formats a timestamped file_name for a combined download file."""
-            name = "article-wiki_{:s}_{:s}_{:d}-{:d}-{:d}.txt"
+            name = "article-wiki_{:s}_{:s}_{:04d}{:02d}{:02d}_{:02d}{:02d}.txt"
             now = datetime.datetime.now()
-            return name.format(user_slug, doc_slug,
-                               now.year, now.month, now.day)
+            return name.format(user_slug, doc_slug, now.year, now.month,
+                               now.day, now.hour, now.minute)
 
         def make_txt_divider(number: str, part_slug: str) -> str:
             """Formats a numbered text divider for document exports."""

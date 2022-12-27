@@ -14,7 +14,6 @@ version control operations.
 import codecs
 import datetime
 import glob
-import logging
 import os
 import subprocess
 
@@ -65,10 +64,13 @@ def load_dir(dir_path: str) -> dict:
     document = {}
     if not os.path.isdir(dir_path):
         raise ValueError("No directory at {:s}".format(dir_path))
-    for path in glob.glob(dir_path + '/*.txt'):
+    file_pattern = os.path.join(dir_path, '*.txt')
+    file_paths = glob.glob(file_pattern)
+    for path in file_paths:
         name = path.replace(dir_path + '/', '').replace('.txt', '')
         slug = slugify(name)
         document[slug] = codecs.open(path, 'r', 'utf-8').read()
+        print("READ: {:s} ({:d})".format(slug, len(document[slug])))
     return document
 
 
@@ -77,10 +79,33 @@ def load_dir(dir_path: str) -> dict:
 # -----------------
 
 def make_zip_name(user_slug: str) -> str:
-    "Formats a timestamped archive name for this user_slug."
-    name = "article-wiki_{:s}_{:d}-{:d}-{:d}.zip"
+    """
+    Formats a timestamped archive name for this user_slug.
+    """
+    name = "article-wiki_{:s}_{:02d}{:02d}{:02d}_{:02}{:02d}.zip"
     now = datetime.datetime.now()
-    return name.format(user_slug, now.year, now.month, now.day)
+    return name.format(user_slug, now.year, now.month, now.day, now.hour,
+                       now.minute)
+
+
+def read_archive_dir(dir_path: str) -> Dict[str, Dict[str, str]]:
+    """
+    Writes user documents into a hierarchy of text files.
+
+    For each {doc_slug: {part_slug: part_text}}, create
+    """
+    documentHash = {}
+    if not os.path.isdir(dir_path):
+        raise ValueError("No directory at {:s}".format(dir_path))
+    file_pattern = os.path.join(dir_path, '*')
+    for path in glob.glob(file_pattern):
+        print('PATH', path)
+        if os.path.isdir(path):
+            name = os.path.basename(path).replace('.txt', '')
+            slug = slugify(name)
+            documentHash[slug] = load_dir(path)
+            print('len %d' % len(documentHash[slug]))
+    return documentHash
 
 
 def write_archive_dir(dir_path: str, archive_data: Dict[str, Dict[str, str]]):
@@ -119,9 +144,20 @@ def compress_archive_dir(dir_path: str, zip_name: str) -> str:
     cwd = os.getcwd()
     os.chdir(dir_path)
     command = "zip -R {:s} {:s}".format(zip_name, "*/*")
-    print(command)
     process = subprocess.Popen(command, shell=True)
     process.communicate()  # <-- Wait for completion!
     os.chdir(cwd)
     zip_path = os.path.join(dir_path, zip_name)
     return zip_path
+
+
+def uncompress_archive_dir(dir_path: str, zip_name: str):
+    """
+    For a directory
+    """
+    cwd = os.getcwd()
+    os.chdir(dir_path)
+    command = "unzip {:s}".format(zip_name)
+    process = subprocess.Popen(command, shell=True)
+    process.communicate()  # <-- Wait for completion!
+    os.chdir(cwd)

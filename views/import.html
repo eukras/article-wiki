@@ -1,0 +1,44 @@
+{% extends "page.html" %}
+
+{% block page %}
+
+<div class="wiki">
+<article>
+
+<header>
+    <h1>Upload an Archive File</h1>
+</header>
+
+<main>
+
+<ul>
+    <li>Note that this will replace the contents of this site.</li>
+    <li>Your export file will have be called: <tt>article-wiki_{{ user_slug }}_########-####.zip</tt>, where the # characters represent date and time stamps.</li>
+</ul>
+
+<form
+{% if doc_slug %}
+    action="/upload/{{ user_slug }}/{{ doc_slug }}"
+{% endif %}
+    method="post"
+    enctype="multipart/form-data"
+>
+
+<div class="text-center">
+    <input type="file" name="import" />
+    <p class="space">
+        <button type="submit" class="feature">
+            <i class="fa fa-upload"></i> Import
+        </button>
+    </p>
+</div>
+
+</form>
+
+</main>
+
+</article>
+</div>
+
+
+{% endblock %}

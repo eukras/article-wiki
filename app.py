@@ -54,6 +54,8 @@ from lib.overlay import make_cover, make_card, make_quote
 from lib.storage import \
     compress_archive_dir, \
     make_zip_name, \
+    read_archive_dir, \
+    uncompress_archive_dir, \
     write_archive_dir
 from lib.wiki.blocks import BlockList, get_title_data
 from lib.wiki.helpers import web_buttons
@@ -474,6 +476,7 @@ def user_page(user_slug):
     if config['ARTICLE_WIKI_CREDIT'] == 'YES':
         footer_buttons += [source_button()]
     if has_authority_for_user(user_slug):
+        footer_buttons += [import_archive_button(user_slug)]
         footer_buttons += [export_archive_button(user_slug)]
     if not login:
         footer_buttons += [rss_button(user_slug)]
@@ -917,9 +920,7 @@ def delete_comment(user_slug, doc_slug, time_created_ts):
 @bottle.get('/export-archive/<user_slug>')
 def export_archive(user_slug):
     """
-    Creates an archive tarfile for download.
-
-    @todo: Import archive!
+    Processes an export_archive file based on upload settings.
     """
     config['DEBUG'] = 'YES'
     require_user(user_slug)  # else 404
@@ -932,14 +933,83 @@ def export_archive(user_slug):
         zip_path = os.path.join(dir_path, zip_name)
         compress_archive_dir(dir_path, zip_name)
         if os.path.exists(zip_path):
-            return bottle.static_file(
-                zip_name,
-                root=dir_path,
-                download=zip_name
-            )
+            return bottle.static_file(zip_name, root=dir_path,
+                                      download=zip_name)
         else:
             logging.error("Download failed: " + zip_name)
             bottle.abort(HTTP_BAD_REQUEST, "Download failed.")
+
+
+@bottle.get('/import-archive/<user_slug>')
+def import_archive_form(user_slug):
+    """
+    Show import form for importing an archive zipfile.
+    """
+    require_authority_for_user(user_slug)  # else 401s
+    header_buttons = [{
+        'name': 'Back',
+        'href': '/user/{:s}'.format(user_slug),
+        'icon': 'arrow-left'
+    }]
+    return views.get_template('import.html').render(
+        config=config,
+        user_slug=user_slug,
+        header_buttons=header_buttons
+    )
+
+
+@bottle.post('/import-archive/<user_slug>')
+def post_import_archive(user_slug):
+    """
+    Zaps the current site contents and replaces with an exported zipfile.
+
+    Check permissions
+    Get uploaded file
+    Uncompress file
+    Try to read into an archive_data file.
+    If all OK:
+        (Zap existing site data?)
+        Install archive file
+        Refresh metadata
+        Regenerate the home page.
+        Redirect to home
+    Else:
+        Show error
+    """
+    config['DEBUG'] = 'YES'
+    require_user(user_slug)  # else 404
+
+    upload = bottle.request.files.get('import')
+    name, ext = os.path.splitext(upload.filename)
+    if ext not in ('.zip'):
+        logging.error("Bad uploaded file extension: " + ext)
+        bottle.abort(HTTP_BAD_REQUEST, "The upload must be a .zip file.")
+
+    with tempfile.TemporaryDirectory() as dir_path:
+        upload.save(dir_path)
+        uncompress_archive_dir(dir_path, upload.filename)
+        archive_data = read_archive_dir(dir_path)
+        if 'DEBUG' in config:
+            print(['FILE NAMES: ' + user_slug, archive_data.keys()])
+
+        for doc_slug, doc_parts in archive_data.items():
+            if len(doc_parts):
+                settings = Settings({
+                    'config:host': domain_name(bottle.request),
+                    'config:user': user_slug,
+                    'config:document': doc_slug,
+                })
+                wiki = Wiki(settings)
+                html = wiki.process(user_slug, doc_slug, doc_parts)
+                metadata = wiki.compile_metadata(config['TIME_ZONE'],
+                                                 user_slug, doc_slug)
+                data.userDocument_set(user_slug, doc_slug, doc_parts, metadata)
+                data.userDocumentCache_set(user_slug, doc_slug, html)
+                metadata['url'] = '/read/{:s}/{:s}'.format(user_slug, doc_slug)
+                data.userDocumentMetadata_set(user_slug, doc_slug, metadata)
+
+    uri = '/user/{:s}'.format(user_slug)
+    bottle.redirect(uri)
 
 
 @bottle.get('/download/<user_slug>/<doc_slug>')
@@ -1204,7 +1274,7 @@ def download_button(user_slug: str, doc_slug: str) -> dict:
     return {
         'name': 'Download',
         'href': '/download/{:s}/{:s}'.format(user_slug, doc_slug),
-        'icon': 'download'
+        'icon': 'arrow-down'
     }
 
 
@@ -1212,15 +1282,22 @@ def upload_button(user_slug: str, doc_slug: str) -> dict:
     return {
         'name': 'Upload',
         'href': '/upload/{:s}/{:s}'.format(user_slug, doc_slug),
-        'icon': 'upload'
+        'icon': 'arrow-up'
     }
 
 
 def export_archive_button(user_slug: str) -> dict:
     return {
-        'name': 'Archive',
+        'name': 'Export',
         'href': '/export-archive/{:s}'.format(user_slug),
-        'icon': 'download',
+        'icon': 'arrow-down',
+    }
+
+def import_archive_button(user_slug: str) -> dict:
+    return {
+        'name': 'Import',
+        'href': '/import-archive/{:s}'.format(user_slug),
+        'icon': 'arrow-up',
     }
 
 

@@ -394,15 +394,16 @@ class Data(object):
     def userDocument_hash(self, user_slug: str) -> Dict[str, hash]:
         """
         Like userDocument_list, but returns a hash of
-        {doc_slugs: userDocument}
+        {doc_slug: userDocument}, as might from an export.
 
-        @todo: Restrict downloads to visible documents.
+        @todo: Restrict downloads to visible documents?
         """
         self.require_not_in_context_manager()
         return {
             doc_slug: self.userDocument_get(user_slug, doc_slug)
             for doc_slug in self.userDocumentSet_list(user_slug)
         }
+
 
     # -----------------
     # DOCUMENT METADATA
