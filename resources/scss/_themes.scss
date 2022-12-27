@@ -125,12 +125,12 @@
             border-bottom: 1px dotted $darkFgColor;
         }
 
-        tt, textarea {
+        textarea {
             color: black;
-            background-color: beige;
         }
 
         tt, td tt {
+            color: white;
             padding: 0 0.3rem;
         }
 
