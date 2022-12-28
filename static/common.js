@@ -306,7 +306,7 @@ function makeBokehSvg()
 //  ----------------------------------------
 
 function getThemes() {
-    return ['default', 'dark']; //  [, 'readable', 'compact'];
+    return ['default', 'dark'];
 }
 
 function getThemeClasses() {
