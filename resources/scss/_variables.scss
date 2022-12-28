@@ -4,8 +4,8 @@ $fontFamilyMonospace: 'Fira Mono', 'Andale Mono', monospace;
 
 $borderRadius: 0.5rem;
 
-$baseFontSize: 1.10;
-$stepUp: 1.10;
+$baseFontSize: 1.05;
+$stepUp: 1.15;
 $stepDown: 0.90;
 
 $fontSizePlus5: #{$baseFontSize * $stepUp * $stepUp * $stepUp * $stepUp * $stepUp}rem;
