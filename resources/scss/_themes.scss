@@ -193,30 +193,4 @@
         }
     }
 
-    html.theme-readable {
-        font-size: 30pt;
-        line-height: 40pt;
-    }
-
-    html.theme-compact {
-        font-size: 9pt;
-        line-height: 13pt;
-        font-family: $fontFamilySansSerif;
-    }
-
-}
-
-@media print {
-
-    html.theme-readable {
-        font-size: 14pt;
-        line-height: 20pt;
-    }
-
-    html.theme-compact {
-        font-size: 9pt;
-        line-height: 13pt;
-        font-family: $fontFamilySansSerif;
-    }
-
 }
