@@ -290,7 +290,7 @@ class BlockList(object):
                     '<tbody>'
                     '<tr>'
                     '<td width="1%%"><h1 id="%s">§%s.&nbsp;</h1></td>'
-                    '<td width="99%%"><h1>%s</h1></td>'
+                    '<td width="99%%"><h1 class="balance-text">%s</h1></td>'
                     '</tr>'
                     '</tbody>'
                     '</table>'
