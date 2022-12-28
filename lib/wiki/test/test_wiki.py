@@ -69,7 +69,7 @@ def test_process_simple():
     _ = wiki.process('user-slug', 'doc-slug', document)
     __ = html.fromstring(str(_))
     assert __.xpath("//article/section")
-    assert __.xpath("//a/h1[contains(., 'Title')]")
+    assert __.xpath("//h1[contains(., 'Title')]")
     assert __.xpath("//blockquote[contains(., 'Quote')]")
     assert __.xpath("//p[@class='caption'] and contains(., 'Calvin')")
     assert __.xpath("//p[@class='caption']/em[contains(., 'Institutes')]")
