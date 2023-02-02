@@ -1,26 +1,14 @@
 //  Show a 'TOP' button that contains the current percentage position
-//  in the page. Designed for showing location in long documents.
+//  in the page. Designed for showing reading progress in long documents.
+//  
+//  Part of Article Wiki ().
 
-//  Suggested SCSS:
-//  #progress {
-//      font-family: $fontFamilySansSerif;
-//      bottom: 0;
-//      right: 0;
-//      position: fixed;
-//      text-decoration: none;
-//      font-size: $fontSizeMinus1;
-//      padding: 1em;
-//      opacity: 0.4;
-//      z-index: 20;
-//      cursor: pointer;
-//      user-select: none;
-//  }
 
 export default {
     template: `
         <nav
-            id="progress"
             @click="scrollToTop()"
+            :style="style()"
         >
             {{ scrollText }} <i class="fa fa-arrow-up"></i>
         </nav>
@@ -55,6 +43,21 @@ export default {
         },
         scrollToTop() {
             window.scrollTo(0,0);
+        },
+        style() {
+            return {
+                'fontFamily': 'sans-serif',
+                'bottom': 0,
+                'right': 0,
+                'position': 'fixed',
+                'textDecoration': 'none',
+                'fontSize': '0.9rem',
+                'padding': '1rem',
+                'opacity': 0.4,
+                'zIndex': 20,
+                'cursor': 'pointer',
+                'userSelect': 'none',
+            };
         },
     },
     mounted() {

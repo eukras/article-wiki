@@ -1,11 +1,6 @@
 //  Displays an 'ESC' button. When ESC is pressed, toggle a full-screen overlay
 //  that shows selected elements of the page. Helps access menu and navigation
 //  items on long pages.
-//
-//  Styles: 
-//  nav#escape: the button, suggest top-right
-//  div#escape-modal: the full-screen overlay container, fixed position
-//  div#escape-menu: the menu within the overlay
 
 export default {
     props: {
@@ -13,18 +8,18 @@ export default {
     },
     template: `
         <nav
-            id="escape"
             @click="toggleEscape()"
+            style="styleButton()"
         >
             <i class="fa fa-bars"></i> ESC
         </nav>
         <div
             v-if="showMenu"
-            id="escape-modal"
+            style="styleModal()"
         >
             <div
-                id="escape-menu"
                 @click="toggleEscape()"
+                style="styleMenu()"
             >
                 <div class="text-center">
                     <i>When reading an article, the ESC button<br/>
@@ -39,7 +34,7 @@ export default {
         </div>
     `,
     data() {
-        return {
+       return {
             showMenu: false,
             elements: [],
         };
@@ -61,6 +56,43 @@ export default {
         toggleEscape() {
             this.showMenu = !this.showMenu;
         },
+        styleButton() {
+            return {
+                'fontFamily': 'sans-serif',
+                'position': 'fixed',
+                'top': 0,
+                'left': 0,
+                'textDecoration': 'none',
+                'fontSize': '0.9rem',
+                'padding': '0.9rem',
+                'opacity': 0.4,
+                'zIndex': 20,
+                'textAlign': 'left',
+                'cursor': 'pointer',
+                'userSelect': 'none',
+            };
+        },
+        styleModal() {
+            return {
+                'display': 'flex',
+                'justifyContent': 'center',
+                'alignItems': 'start',
+                'position': 'fixed',
+                'top': 0,
+                'left': 0,
+                'width': '100vw',
+                'height': '100vh',
+                'overflowY': 'auto',
+                'backgroundColor': 'white';
+            };
+        },
+        styleMenu() {
+            return {
+                'width': '44rem';
+                'padding': '2rem 1rem';
+            };
+        },
+
     },
     mounted() {
         document.addEventListener('keydown', this.handleKeyDown);
