@@ -132,13 +132,6 @@ class Articles(Function):
                     <div class="article-card-details">
                         {{ a['date'] }} &middot; {{ "{:,d}".format(words) }} words
                     </div>
-                    <div class="article-card-download">
-                        <a 
-                            href="/epub/{{ a['user'] }}/{{ a['slug'] }}"
-                        >
-                            <i class="fa fa-arrow-circle-down" ></i> eBook
-                        </a>
-                    </div>
 
                 </div>
             {% endfor %}
