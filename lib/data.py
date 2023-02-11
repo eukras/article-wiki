@@ -523,68 +523,6 @@ class Data(object):
             self.userDocumentCache_key(user_slug, doc_slug)
         )
 
-    # -----------------------------------------------------
-    # COMMENTS (JSON ZSET scored by time_created timestamp)
-    # -----------------------------------------------------
-
-    def userDocumentCommentZset_key(
-        self,
-        user_slug,
-        doc_slug
-    ):
-        return "udcz:%s:%s" % (user_slug, doc_slug)
-
-    def userDocumentCommentZset_add(
-        self,
-        user_slug,
-        doc_slug,
-        data,
-        created_dt
-    ):
-        key = self.userDocumentCommentZset_key(user_slug, doc_slug)
-        data_dict = {
-            json.dumps(data): created_dt.timestamp()
-        }
-        self.redis.zadd(key, data_dict)
-
-    def userDocumentCommentZset_countBetweenDates(
-        self,
-        user_slug,
-        doc_slug,
-        start_dt,
-        end_dt
-    ):
-        key = self.userDocumentCommentZset_key(user_slug, doc_slug)
-        start = start_dt.timestamp()
-        end = end_dt.timestamp()
-        return self.redis.zcount(key, int(start), int(end))
-
-    def userDocumentCommentZset_findBetweenDates(
-        self,
-        user_slug,
-        doc_slug,
-        start_dt,
-        end_dt
-    ):
-        key = self.userDocumentCommentZset_key(user_slug, doc_slug)
-        start = start_dt.timestamp()
-        end = end_dt.timestamp()
-        json_data = self.redis.zrangebyscore(key, int(start), int(end))
-        data = [json.loads(_) for _ in json_data]
-        return data
-
-    def userDocumentCommentZset_deleteForDate(
-        self,
-        user_slug,
-        doc_slug,
-        start_dt,
-        end_dt
-    ):
-        key = self.userDocumentCommentZset_key(user_slug, doc_slug)
-        start = start_dt.timestamp()
-        end = end_dt.timestamp()
-        return self.redis.zremrangebyscore(key, start, end)
-
     # ----------
     # GENERATION
     # ----------

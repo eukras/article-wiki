@@ -9,17 +9,17 @@ export default {
     template: `
         <nav
             @click="toggleEscape()"
-            style="styleButton()"
+            :style="styleButton()"
         >
             <i class="fa fa-bars"></i> ESC
         </nav>
         <div
             v-if="showMenu"
-            style="styleModal()"
+            :style="styleModal()"
         >
             <div
                 @click="toggleEscape()"
-                style="styleMenu()"
+                :style="styleMenu()"
             >
                 <div class="text-center">
                     <i>When reading an article, the ESC button<br/>
@@ -40,7 +40,6 @@ export default {
         };
     },
     created() {
-        console.log(this.selector);
         var elements = document.querySelectorAll(this.selector);
         elements.forEach((elem) => this.elements.push(elem.outerHTML));
     },
@@ -83,13 +82,13 @@ export default {
                 'width': '100vw',
                 'height': '100vh',
                 'overflowY': 'auto',
-                'backgroundColor': 'white';
+                'backgroundColor': 'white',
             };
         },
         styleMenu() {
             return {
-                'width': '44rem';
-                'padding': '2rem 1rem';
+                'width': '44rem',
+                'padding': '2rem 1rem',
             };
         },
 

@@ -1,8 +1,5 @@
 $(document).ready(function() { 
 
-    //  Sidebar progress meter.
-    //  Only displayed if we're in the large responsive modes (>768px).
-
     var offset = 220;
     var duration = 500;
 
@@ -80,80 +77,6 @@ $(document).ready(function() {
     $('#popover-table-of-contents a').click(function(event) {
         //  allow event to continue
         toggleMenuPopover();
-    });
-
-    /**
-     * 
-     */
-    $('body').click(function(event) {
-
-        const element = event.target;
-
-        if (["A", "BUTTON"].includes(element.tagName)) {
-            return true;  // <-- stop; let event continue
-        }
-
-        let is_commentable = (
-            $(element).filter('header *').length > 0
-        ||  $(element).filter('section.depth-0 *').length > 0
-        ||  $(element).filter('section.depth-1 *').length > 0
-        ||  $(element).filter('section.depth-2 *').length > 0
-        ||  $(element).filter('section.depth-3 *').length > 0
-        );
-
-        if (is_commentable && !selectionRangeExists()) {
-
-            const block_tags = [ 'P', 'DIV', 'BLOCKQUOTE', 'LI', 'TD', 'H1', ];
-            const stop_tags = [ 'HEADER', 'SECTION', 'BODY', ];
-            let element = $(event.target)[0];
-            while (!block_tags.includes(element.tagName)) {
-                if (element.parentElement === null) {
-                    return;
-                } else {
-                    element = element.parentElement;
-                }
-            }
-            const text = $(element).text().trim();
-            selectElement(element);
-
-            $('div#popover-comment-button').show();
-            $('input[name="original"]').val(text)
-            $('textarea[name="preview"]').val(text)
-            $('textarea[name="changes"]').val(text)
-
-        } else {
-
-            $('div#popover-comment-button').hide();
-
-        }
-    });
-
-    $('.comment-delete-toggle').click(function(event) {
-        const button = $(this).next();
-        if ($(button).attr('disabled')) {
-            $(button).removeAttr('disabled');
-        } else {
-            $(button).attr('disabled', true);
-        }
-    });
-
-    $('.comment-delete').click(function(event) {
-        const user_slug = $(this).attr('data-user_slug');
-        const doc_slug = $(this).attr('data-doc_slug');
-        const timestamp = $(this).attr('data-timestamp');
-        const url = ['/api/comment/delete', user_slug, doc_slug, timestamp];
-        const comment = $(this).parents('.comment');
-        $(this).attr('disabled', true);
-        axios.get(url.join('/'))
-          .then(function (response) {
-            $(comment).fadeOut(300, function() {
-                $(this).remove();
-            });
-          })
-          .catch(function (error) {
-            alert("Could not delete your comment. Please try again in a little while.");
-            console.log(error);
-          });
     });
 
 });
@@ -332,31 +255,6 @@ function cycleTheme() {
     setSvgBackground()
 }
 
-//  ----------------------------------------
-//  Block selector for comments
-//  ----------------------------------------
-
-function selectionRangeExists() {
-    selection = window.getSelection();
-    return selection.type == "Range";
-}
-
-function selectElement(element)
-{
-    if (document.body.createTextRange) {
-        const range = document.body.createTextRange();
-        range.moveToElementText(element);
-        range.select();
-    } else if (window.getSelection) {
-        const selection = window.getSelection();
-        const range = document.createRange();
-        range.selectNodeContents(element);
-        selection.removeAllRanges();
-        selection.addRange(range);
-    } else {
-        console.warn("Could not select text in node: Unsupported browser.");
-    }
-}
 
 
 //  ----------------------------------------

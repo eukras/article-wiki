@@ -46,10 +46,10 @@ export default {
         },
         style() {
             return {
-                'fontFamily': 'sans-serif',
+                'position': 'fixed',
                 'bottom': 0,
                 'right': 0,
-                'position': 'fixed',
+                'fontFamily': 'sans-serif',
                 'textDecoration': 'none',
                 'fontSize': '0.9rem',
                 'padding': '1rem',
