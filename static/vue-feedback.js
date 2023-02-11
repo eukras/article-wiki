@@ -51,8 +51,8 @@ export default {
     computed: {
         emailBody() {
             return [
-                "TEXT:",
-                "> " + this.selectedText.trim(),
+                "SELECTED TEXT:",
+                this.selectedText,
                 "COMMENT:",
                 "..."
             ].join("\n\n");
