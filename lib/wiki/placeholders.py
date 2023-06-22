@@ -133,7 +133,7 @@ class Placeholders(object):
         the wiki this means the index first, then others following the order of
         the index's outline.
         """
-        assert isinstance(decorator, collections.Callable)
+        assert isinstance(decorator, collections.abc.Callable)
         assert isinstance(html_parts, dict)
         assert all([isinstance(_, str) for _ in html_parts])
         # if len(self.patterns) != len(html_parts):

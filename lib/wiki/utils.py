@@ -57,7 +57,7 @@ def compose(functions):
     """
     Chain together a list of 1-to-1 functions.
     """
-    assert all([isinstance(_, collections.Callable) for _ in functions])
+    assert all([isinstance(_, collections.abc.Callable) for _ in functions])
 
     def composer(fn_1, fn_2): return lambda _: fn_1(fn_2(_))
 
