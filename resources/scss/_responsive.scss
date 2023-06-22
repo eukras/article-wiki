@@ -1,6 +1,15 @@
 #btn-edit { display: none; }
 
-@media screen and (max-width: 1024px) {
+
+html {
+    font-size: 16pt;
+}
+
+@media screen and (max-width: 1200px) {
+
+    html {
+        font-size: 14pt;
+    }
 
     #editor {
         a.button, button {
@@ -10,7 +19,11 @@
 
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 720px) {
+
+    html {
+        font-size: 12pt;
+    }
 
     #page {
         margin: 0;
