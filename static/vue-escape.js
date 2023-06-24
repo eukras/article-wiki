@@ -10,8 +10,9 @@ export default {
         <nav
             @click="toggleEscape()"
             :style="styleButton()"
+            class="no-print"
         >
-            <i class="fa fa-bars"></i> ESC
+            <i class="fa fa-bars"></i> <span class="no-compact">ESC</span>
         </nav>
         <div
             v-if="showMenu"
@@ -22,7 +23,7 @@ export default {
                 :style="styleMenu()"
             >
                 <div class="text-center">
-                    <i>When reading an article, the ESC button<br/>
+                    <i>When reading an article, the Escape menu<br/>
                     shows you the table of contents.</i>
                 </div>
                 <div

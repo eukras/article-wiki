@@ -20,6 +20,7 @@ export default {
             v-if="emailAddress && selectedText !== ''"
             :title="selectedText"
             :style="styleCircle()"
+            class="no-print"
         >
             <a
                 :href="emailLink"

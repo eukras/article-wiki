@@ -123,6 +123,9 @@ function setSvgBackground()
     var encodedData = window.btoa(svg);
     var url = 'data:image/svg+xml;base64,' + encodedData;
     $("#background").css('background-image', "url(" + url + ")");
+    $("body").click(function(event) { 
+        setSvgBackground();
+    });
 }
 
 function randInt(min, max) {

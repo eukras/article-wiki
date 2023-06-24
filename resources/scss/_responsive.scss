@@ -1,14 +1,39 @@
 #btn-edit { display: none; }
 
-
-html {
-    font-size: 16pt;
-}
-
-@media screen and (max-width: 1200px) {
+@media print {
 
     html {
-        font-size: 14pt;
+        font-size: 12pt;
+        color: black;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .no-compact {
+        
+    }
+
+}
+
+@media screen {
+
+    html {
+        font-size: $baseFontSizeWidest;
+    }
+
+    #page .wiki {
+        padding: 3rem $sideMarginOnLaptop;
+    }
+
+}
+
+
+@media screen and (max-width: $breakpointOnScreen) {
+
+    html {
+        font-size: $baseFontSizeScreen;
     }
 
     #editor {
@@ -17,12 +42,42 @@ html {
         }
     }
 
+    #page .wiki {
+        padding: 3rem $sideMarginOnLaptop;
+    }
+
 }
 
-@media screen and (max-width: 720px) {
+@media screen and (max-width: $breakpointOnLaptop) {
 
     html {
-        font-size: 12pt;
+        font-size: $baseFontSizeLaptop;
+    }
+
+    #editor {
+        a.button, button {
+            i { display: none; }
+        }
+    }
+
+    #page .wiki {
+        padding: 3rem $sideMarginOnLaptop;
+    }
+
+}
+
+@media screen and (max-width: 1600px) {
+
+    .no-compact {
+        display: none !important;
+    }
+
+}
+
+@media screen and (max-width: $breakpointOnTablet) {
+
+    html {
+        font-size: $baseFontSizeTablet;
     }
 
     #page {
@@ -33,7 +88,7 @@ html {
     }
 
     #page .wiki {
-        padding: 2rem;
+        padding: 2rem $sideMarginOnTablet;
     }
 
 
@@ -43,6 +98,10 @@ html {
                 display: none;
             }
         }
+    }
+
+    .button-list-edge {
+        left: 3.85rem;
     }
 
     a.button-edge {
@@ -119,6 +178,18 @@ html {
             padding-left: 0;
             padding-right: 1rem;
         }
+    }
+
+}
+
+@media screen and (max-width: $breakpointOnMobile) {
+
+    html {
+        font-size: $baseFontSizeMobile;
+    }
+
+    #page .wiki {
+        padding: 3rem $sideMarginOnMobile;
     }
 
 }

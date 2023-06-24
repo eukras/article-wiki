@@ -9,8 +9,9 @@ export default {
         <nav
             @click="scrollToTop()"
             :style="style()"
+            class="no-print"
         >
-            {{ scrollText }} <i class="fa fa-arrow-up"></i>
+            <span class="no-compact">{{ scrollText }}</span> <i class="fa fa-arrow-up"></i>
         </nav>
     `,
     data() {

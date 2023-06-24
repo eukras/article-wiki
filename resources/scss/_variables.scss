@@ -2,6 +2,25 @@ $fontFamilySerif: 'IBM Plex Serif', 'GFS Didot', serif;
 $fontFamilySansSerif: 'IBM Plex Sans Condensed', Helvetica, sans-serif;
 $fontFamilyMonospace: 'Fira Mono', 'Andale Mono', monospace;
 
+$baseFontSizeWidest: 20pt;
+$sideMarginOnWidest: 10rem;
+
+$breakpointOnScreen: 3000px;
+$baseFontSizeScreen: 18pt;
+$sideMarginOnScreen: 8rem;
+
+$breakpointOnLaptop: 2000px;
+$baseFontSizeLaptop: 16pt;
+$sideMarginOnLaptop: 6rem;
+
+$breakpointOnTablet: 1100px;
+$baseFontSizeTablet: 14pt;
+$sideMarginOnTablet: 2.5rem;
+
+$breakpointOnMobile: 600px;
+$baseFontSizeMobile: 12pt;
+$sideMarginOnMobile: 2.5rem;
+
 $borderRadius: 0.5rem;
 
 $baseFontSize: 1.05;
@@ -22,8 +41,8 @@ $lightBgPage: #A0b8A0;  // <-- sage green
 $lightBgColor: #f8f8f8;
 $lightBgSelection: #baffba;
 
-$lightFgColor: black; 
-$lightFgHighlight: #baffba;
+$lightFgColor: #303030; 
+$lightFgHighlight: #000000;
 $lightFgLink: #20b2aa;  // <-- light sea green
 $lightFgLinkHover: blue;
 $lightFgInsert: black;
