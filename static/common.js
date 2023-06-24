@@ -117,15 +117,22 @@ function cleanupText(s) {
 
 //  https://codepen.io/dudleystorey/pen/GJemEX
 
+$("body").click(function(event) { 
+    setSvgBackground();
+});
+
+let svgIsRendering = false;
+
 function setSvgBackground()
 {
-    svg = makeBokehSvg()
-    var encodedData = window.btoa(svg);
-    var url = 'data:image/svg+xml;base64,' + encodedData;
-    $("#background").css('background-image', "url(" + url + ")");
-    $("body").click(function(event) { 
-        setSvgBackground();
-    });
+    if (!svgIsRendering) {
+        svgIsRendering = true;
+        svg = makeBokehSvg()
+        var encodedData = window.btoa(svg);
+        var url = 'data:image/svg+xml;base64,' + encodedData;
+        $("#background").css('background-image', "url(" + url + ")");
+        svgIsRendering = false;
+    }
 }
 
 function randInt(min, max) {
@@ -172,6 +179,7 @@ function drawOneCircle(x, y, radius, h, s, v, opacity)
 {
     var _ = ''
     if (radius < 3) {
+        //  Add an outline on smaller circles.
         _ += '<circle '
         _ += 'r="' + radius + '%" cx="' + x + '%" cy="' + y + '%" ';
         _ += 'fill="hsla(' + h + ', ' + s + '%, 90%, ' + randFloat(0.3, opacity) + ')" ';
@@ -181,10 +189,11 @@ function drawOneCircle(x, y, radius, h, s, v, opacity)
         _ += 'r="' + radius + '%" cx="' + x + '%" cy="' + y + '%" ';
         _ += 'fill="none" ';
         _ += 'stroke="white" ';
-        _ += 'stroke-opacity="' + randFloat(0.1, (opacity * 0.5))+ '" ';
+        _ += 'stroke-opacity="' + randFloat(0.0, (opacity))+ '" ';
         _ += '>';
         _ += '</circle>';
     } else {
+        //  Add a blur on larger circles.
         _ += '<circle '
         _ += 'r="' + radius + '%" cx="' + x + '%" cy="' + y + '%" ';
         _ += 'fill="hsla(' + h + ', ' + s + '%, 90%, ' + randFloat(0.1, opacity * 0.5) + ')" ';
