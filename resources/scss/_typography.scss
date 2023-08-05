@@ -23,6 +23,10 @@
     text-align: right;
 }
 
+.balance-text {
+    text-wrap: balance;
+}
+
 @media screen {
     a.web-link {
         background-color: hsla(120, 45%, 93%, 1);
