@@ -139,7 +139,7 @@ def get_option(options, index, of_type='all', default=''):
         return value
 
 
-def intify(self, x, default=0):
+def intify(x, default=0):
     """
     Integers from arbitrary input, else default value
     """

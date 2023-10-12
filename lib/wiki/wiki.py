@@ -41,6 +41,7 @@ from lib.wiki.utils import \
     clean_text, \
     DATE_FORMAT_ISO8601, \
     format_date, \
+    intify, \
     parse_date, \
     pipe, \
     random_slug, \
@@ -199,7 +200,8 @@ class Wiki(object):
                                self.entities
                                ], 'replace', footnote_parts)
 
-        html = '<article>\n'
+        margin = intify(self.settings.get('MARGIN', '0em'), default=0)
+        html = '<article style="margin: %dem">\n' % max(0, min(8, margin))
         if 'index' in html_parts:
             html += html_parts['index']
             footnote_html = footnote_parts.get('index')
