@@ -8,6 +8,7 @@ save_user_document: Copy from Redis to install folders.
 load_user_document: Copy from install folders to Redis.
 """
 
+
 import os
 import sys
 
@@ -19,7 +20,7 @@ from typing import List
 from lib.data import Data, load_env_config
 from lib.ebook import write_epub
 from lib.document import Document
-from lib.overlay import make_cover
+# from lib.overlay import make_cover
 from lib.storage import load_dir, save_dir
 
 
@@ -79,7 +80,7 @@ def generate_cover(title=None):
 
     TODO: Needs updatign to use overlay.make_cover.
     """
-    if false:  # <-- disable
+    if False:  # <-- disable
         fake = Faker()
         app_root = os.path.dirname(__file__)
         tmp_cover_file = "/tmp/cover.jpg"
