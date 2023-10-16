@@ -10,16 +10,20 @@ clean:
 cloc:
 	cloc lib *.py static resources test views
 
-css: resources/scss/*.scss
+pyscss: resources/scss/*.scss
 	pyscss -o static/main.css resources/scss/main.scss
 	pyscss -o static/epub.css resources/scss/epub.scss
 
+css:
+	sass resources/scss/main.scss static/main.css
+	sass resources/scss/epub.scss static/epub.css
+
+csswatch:
+	sass --watch resources/scss/main.scss static/main.css
+
+
 lint:
 	flake8
-
-push: clean test
-	# Unnecessary, retainedas example
-	# aws s3 sync static/ s3://static.chapman.wiki/
 
 run: test
 	python app.py
