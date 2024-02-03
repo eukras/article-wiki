@@ -294,7 +294,7 @@ def make_overlay(image, layout):
             for line in lines:
 
                 text = ' '.join(line)
-                line_width, _ = font.getsize(text)
+                line_width = font.getlength(text)
                 x = text_center - int(round(line_width / 2))
                 draw.text(
                     (x + shadow_size_px, y + shadow_size_px),
@@ -316,7 +316,8 @@ def make_byline(image: Image, font: ImageFont, byline: str,
     """
     Site marker in bottom right corner.
     """
-    w, h = font.getsize(byline)
+    left, top, right, bottom = font.getbbox(byline)
+    w, h = right - left, bottom - top
     margin = int(round(h * 1.5))
     x = image.width - w - margin
     y = image.height - h - margin
@@ -326,5 +327,6 @@ def make_byline(image: Image, font: ImageFont, byline: str,
 
 @lru_cache(maxsize=32)
 def font_height(font: ImageFont):
-    _, height = font.getsize('hy')  # <-- from ascender to descender
+    left, top, right, bottom = font.getbbox('hy')
+    height = bottom - top
     return height

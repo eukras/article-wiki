@@ -20,14 +20,13 @@ SPLIT_54 = [['4444', '4444'], ['4444', '4444']]
 
 
 def test_default_font():
-    x, y = FONT.getsize('4444')
+    x = FONT.getlength('4444')
     assert x == 24
-    assert y == 11
-    x, y = FONT.getsize('4444 4444')
+    x = FONT.getlength('4444 4444')
     assert x == 54
-    x, y = FONT.getsize('4444 4444 4444')
+    x = FONT.getlength('4444 4444 4444')
     assert x == 84
-    x, y = FONT.getsize('4444 4444 4444 4444')
+    x = FONT.getlength('4444 4444 4444 4444')
     assert x == 114
 
 

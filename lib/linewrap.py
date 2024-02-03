@@ -11,7 +11,9 @@ from PIL import ImageFont
 
 
 def simple_wrap(font: ImageFont, words: list, max_width_px: int) -> list:
-    "Just start a new line when we get to the end."
+    """
+    Just start a new line when we get to the end
+    """
     lines = []
     line = []
     for word in words:
@@ -75,5 +77,4 @@ def line_width(font: ImageFont, line: list) -> int:
     """
     Get the pixel width of ImageFont's rendering of a list of words.
     """
-    width, _ = font.getsize(" ".join(line))
-    return width
+    return font.getlength(" ".join(line))
