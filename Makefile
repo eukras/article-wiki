@@ -31,6 +31,7 @@ run: test
 redis:
 	docker run \
 		--name aw-redis \
+		--network host \
 		-v /docker/article-wiki-redis:/data \
 		-p 6379:6379 \
 		-d redis \
