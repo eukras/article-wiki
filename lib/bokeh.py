@@ -1,10 +1,6 @@
-# UNUSED; Can't render this SVG to image for overlays.
-#
 # Generate a bokeh background image.
-# Copies the generation function in the static/common.js
+# Copies the generation function in the src/bokeh.js
 # Note: https://codepen.io/dudleystorey/pen/GJemEX
-#
-# Call: makeBokehSvg
 
 from jinja2 import Environment
 from PIL import Image

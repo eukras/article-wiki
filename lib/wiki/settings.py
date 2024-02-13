@@ -9,7 +9,6 @@ e.g. AUTHOR, OUTLINE, NUMBERING.
 """
 
 import re
-# import pprint
 
 from html import escape
 from copy import deepcopy
@@ -129,10 +128,10 @@ class Settings(object):
         website = self.get('config:host', 'https://example.org')
         user_slug = self.get('config:user', 'guest')
         doc_slug = self.get('config:document', 'notebook')
+        url_parts = [website, action, user_slug, doc_slug]
         if part:
-            return '/'.join([website, action, user_slug, doc_slug, part])
-        else:
-            return '/'.join([website, action, user_slug, doc_slug])
+            url_parts += [part]
+        return '/'.join([_.strip('/') for _ in url_parts])
 
     def set_config(self, key, list_):
         """

@@ -148,6 +148,7 @@ def compress_archive_dir(dir_path: str, zip_name: str) -> str:
     process.communicate()  # <-- Wait for completion!
     os.chdir(cwd)
     zip_path = os.path.join(dir_path, zip_name)
+    print('ZIP_PATH', zip_path)
     return zip_path
 
 

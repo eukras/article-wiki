@@ -1,7 +1,8 @@
-Beaker>=1.11.0
+airium
+# Beaker>=1.11.0
 bleach>=5.0.1
-bottle>=0.12.21
-bottle-utils>=2.0.post2
+# bottle>=0.12.21
+# bottle-utils>=2.0.post2
 cachetools>=5.2.0
 click>=8.1.3
 cssselect>=1.1.0

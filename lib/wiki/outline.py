@@ -144,18 +144,19 @@ class Outline(object):
                     <tr>
                         {% if slug == 'index' %}
                         <td></td>
-                        <td class="word-count" colspan="{{ (max_depth * 2) - 1 }}">
-                            Index.
+                        <td class="word-count" colspan="{{ (max_depth * 2) - 2 }}">
+                            <i>Word Count</i>
                         </td>
                         <td class="word-count">{{ word_count }}</td>
+                        <td class="word-count">\\\\&nbsp;<b>{{ total_word_count }}</b></td>
                         {% else %}
 
                             {% for i in range(numbering|length - 1) %}
                         <td></td>
                             {% endfor %}
 
-                        <td class="text-right">
-                            <b>{{ numbering | join('.') }}</b>.
+                        <td class="numbering">
+                            {{ numbering | join('.') }}.
                         </td>
 
                         {% if subtotal == "0" %}
@@ -193,13 +194,6 @@ class Outline(object):
                         {% endif %}
                     </tr>
                     {% endfor %}
-                    <tr>
-                        <td></td>
-                        <td class="word-count" colspan="{{ (max_depth * 2) - 1 }}">
-                            Total words.
-                        </td>
-                        <td class="word-count"><b>{{ total_word_count }}</b></td>
-                    </tr>
                 </tbody>
             </table>
             {% endif %}

@@ -29,8 +29,6 @@ with data as _:
     _.userDocumentCache_delete(user_slug, doc_slug)
 """
 
-# import datetime
-import json
 import os
 import time
 import uuid
@@ -585,7 +583,7 @@ class Data(object):
             self.epubCache_key(user_slug, doc_slug)
         )
 
-    def epubCache_deleteAll(self, user_slug: str, doc_slug: str):
+    def epubCache_deleteAll(self):
         for user_slug in self.userSet_list():
             for doc_slug in self.userDocumentSet_list(user_slug):
                 self.epubCache_delete(user_slug, doc_slug)

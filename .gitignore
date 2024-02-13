@@ -1,9 +1,12 @@
 ENV.vars
 **.pyc
 **.xcf
+**.out
+**.files
 __pycache__
 .cache
 .env
 .venv
 .pytest_cache
+node_modules
 tags

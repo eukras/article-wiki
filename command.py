@@ -135,14 +135,13 @@ def save_fixtures():
 def refresh_metadata():
     """
     Cycle through all documents for all users and regenerate their cache and
-    metadata entries. This needs a
+    metadata entries.
     """
-    raise RuntimeError("Must be able to document.set_host")
     data = get_redis_client()
     for user_slug in data.userSet_list():
         for doc_slug in data.userDocumentSet_list(user_slug):
             document = Document(data)
-            document.set_host()  # <-- TODO
+            document.set_host('localhost:8000')  # <-- TODO
             document.load(user_slug, doc_slug)
             document.save()
 

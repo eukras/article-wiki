@@ -3,7 +3,6 @@ Construct footnotes from ^[Links] in document parts.
 """
 
 import re
-import validators
 
 from jinja2 import Environment
 from sortedcontainers import SortedDict
@@ -19,7 +18,7 @@ from lib.wiki.utils import trim
 
 class Footnotes(object):
     """
-    Manage erm... the footnotes.
+    Manage the footnotes.
     """
 
     def __init__(self, parts, outline, id_prefix):
@@ -123,12 +122,12 @@ class Footnotes(object):
         else:
 
             link = trim("""
-                <a class="web-link" title="%s" id="%s_link_%s"
-                    href="#%s_footnote_%s">%s%s<sup>%s</sup></a>
+                %s%s<a class="web-marker" title="%s" id="%s_link_%s"
+                    href="#%s_footnote_%s"><sup>%s</sup></a>
                 """) % (
+                self.inline.process(link_markup), punctuation,
                 strip_markup(footnote_text), self.id_prefix, nav_id,
-                self.id_prefix, nav_id, self.inline.process(link_markup),
-                punctuation, count
+                self.id_prefix, nav_id, count
             )
 
         return link

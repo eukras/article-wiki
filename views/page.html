@@ -4,38 +4,11 @@
 
 <div id="page">
 
-{% if header_buttons %}
-<nav class="button-list button-list-header no-print no-preview">
-    {% for button in header_buttons %}
-    <a id="button-{{ button.icon }}" class="button" href="{{ button.href }}">
-        <i class="fa fa-{{ button.icon }}"></i>
-        {{ button.name }}
-    </a>
-    {% endfor %}
-    <button class="button button-themes">
-        <i class="fa fa-adjust"></i>
-        Theme
-    </button>
-</nav>
-
-{% endif %}
-
 {% block page %}
 
-<!-- REPLACE MEEEEEEE -->
+<!-- REPLACE ME -->
 
 {% endblock %}
-
-{% if footer_buttons %}
-<nav class="button-list button-list-footer no-print no-preview">
-    {% for button in footer_buttons %}
-    <a id="button-{{ button.icon }}" class="button" href="{{ button.href }}">
-        <i class="fa fa-{{ button.icon }}"></i>
-        {{ button.name }}
-    </a>
-    {% endfor %}
-</nav>
-{% endif %}
 
 </div>
 

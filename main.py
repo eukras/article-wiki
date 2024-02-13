@@ -9,7 +9,7 @@ this can be overridden. These can be files in a directory, a Redis hash, or
 a Python dictionary. They are organised by an `index` part which contains a
 table of contents.
 
-- Account 
+- Account
 
 @app.middleware('http') -- OK: Makes login available as a global.
 @app.get('/login') -- OK: Login form.
@@ -24,7 +24,7 @@ table of contents.
 @app.get('/rss/{user_slug}.xml') -- OK: Generate really simple XML.
 @app.get('/help') -- OK: Shows admin user's 'help' document.
 
-- Editing 
+- Editing
 
 @app.get('/edit/{user_slug}/{doc_slug}/{part_slug}') -- OK: Shows editor
 @app.post('/edit/{user_slug}/{doc_slug}/{part_slug}') -- OK: Saves changes
@@ -71,7 +71,6 @@ from feedgen.feed import FeedGenerator
 
 import urllib.parse
 
-import codecs
 import hmac
 import io
 import json
@@ -85,14 +84,12 @@ from PIL import Image, ImageDraw
 
 # OLD SERVER w. BOTTLE
 
-from views.base import page_html
 from jinja2 import Environment as JinjaTemplates, PackageLoader
 
 from markupsafe import escape
 from slugify import slugify
 
-from airium import Airium
-from fastapi import Cookie, Depends, FastAPI, Form, HTTPException, status, \
+from fastapi import Depends, FastAPI, Form, HTTPException, status, \
     Request, UploadFile
 from fastapi.responses import \
     HTMLResponse, \
@@ -115,7 +112,6 @@ from lib.storage import \
     uncompress_archive_dir, \
     write_archive_dir
 from lib.wiki.blocks import BlockList, get_title_data
-from lib.wiki.helpers import web_buttons
 from lib.wiki.inline import Inline
 from lib.wiki.settings import Settings
 from lib.wiki.wiki import \
@@ -124,7 +120,7 @@ from lib.wiki.wiki import \
     is_index_part, \
     reformat_part, \
     split_published
-from lib.wiki.utils import pluralize, trim
+from lib.wiki.utils import trim
 
 
 login = None
@@ -139,14 +135,11 @@ app = FastAPI()
 # Redis, Jinja
 data = Data(config)
 views = JinjaTemplates(
-    loader=PackageLoader('app', 'views'),
+    loader=PackageLoader('main', 'views'),
     trim_blocks=True,
     lstrip_blocks=True,
     keep_trailing_newline=True
 )
-
-
-    # 'session.encrypt_key': config['COOKIE_SECRET'],
 
 
 # ----------------------------------------------------------
@@ -304,13 +297,10 @@ async def login_form():
     """
     template = views.get_template('login.html')
     header_buttons = [home_button()]
-    message = 'FLASH'  # bottle.request.message  # <-- Flash messages
-    message = json.dumps(login)
     html = template.render(
         title="Login",
         config=config,
-        header_buttons=header_buttons,
-        message=message
+        header_buttons=header_buttons
     )
     return HTMLResponse(content=html)
 
@@ -480,19 +470,6 @@ async def read_document(user_slug, doc_slug, request: Request):
     Compile the complete html document.
     """
 
-    header_buttons = [
-        home_button(),
-        edit_button(user_slug, doc_slug, 'index'),
-    ]
-    footer_buttons = []
-    if has_authority_for_user(user_slug):
-        footer_buttons += [
-            upload_button(user_slug, doc_slug)
-        ]
-    if not login:
-        footer_buttons += [rss_button(user_slug)]
-    footer_buttons += [download_button(user_slug, doc_slug)]
-
     settings = Settings({
         'config:host': str(request.base_url),
         'config:user': user_slug,
@@ -528,7 +505,6 @@ async def read_document(user_slug, doc_slug, request: Request):
         content_html=html
     )
     return HTMLResponse(content=page_html)
-
 
 
 @app.get('/rss/{user_slug}.xml')
@@ -834,7 +810,7 @@ async def download_txt(user_slug, doc_slug, request: Request):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=msg)
     file_name, file_text = document.export_txt_file()
     file_headers = {
-        'Content-Disposition': f'inline; filename="{file_name}"'
+        'Content-Disposition': f'attachment; filename="{file_name}"'
     }
     return Response(content=file_text, media_type='text/plain',
                     headers=file_headers)
@@ -891,7 +867,6 @@ async def post_upload_txt(user_slug,
 
     uri = '/read/{:s}/{:s}'.format(user_slug, doc_slug)
     return RedirectResponse(uri, status_code=status.HTTP_303_SEE_OTHER)
-
 
 
 @app.get('/export-archive/{user_slug}')
@@ -1198,7 +1173,7 @@ async def generate_epub(user_slug, doc_slug):
             title="Generating..."
         )
         return HTMLResponse(content=reload_html, 
-                            status_code=status.HTTP_202_ACCEPTED);
+                            status_code=status.HTTP_202_ACCEPTED)
 
     else:
 
@@ -1365,11 +1340,9 @@ app.mount("/dist", StaticFiles(directory="dist"), name="dist")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-
 # ----------------------------------------------------------
 #                      Administrative
 # ----------------------------------------------------------
-
 
 @app.get('/admin/expire-cache')
 def expire():

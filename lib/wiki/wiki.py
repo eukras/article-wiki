@@ -14,7 +14,7 @@ from datetime import date, datetime
 from dateutil.parser import parse
 from pprint import pformat
 
-from jinja2 import Environment
+from airium import Airium
 from slugify import slugify
 
 from lib.wiki.backslashes import Backslashes
@@ -29,11 +29,12 @@ from lib.wiki.entities import Entities
 from lib.wiki.footnotes import Footnotes
 # from lib.wiki.index import Index
 from lib.wiki.inline import Inline
-from lib.wiki.helpers import web_buttons
 from lib.wiki.links import Links
 from lib.wiki.outline import Outline, default_counters
 from lib.wiki.placeholders import Placeholders
-from lib.wiki.renderer import Html
+from lib.wiki.renderer import \
+    Html, \
+    side_button
 from lib.wiki.settings import Settings
 # from lib.wiki.tags import Tags
 from lib.wiki.utils import \
@@ -41,19 +42,16 @@ from lib.wiki.utils import \
     clean_text, \
     DATE_FORMAT_ISO8601, \
     format_date, \
-    intify, \
     parse_date, \
     pipe, \
     random_slug, \
-    split_options, \
-    trim
+    split_options
 from lib.wiki.verbatim import Verbatim
 
 
 class Wiki(object):
     """
-    The simple block-based Article Wiki parser, designed for academic
-    writing.
+    Block-based parser for Article Wiki.
     """
 
     __version__ = '0.1'
@@ -148,33 +146,16 @@ class Wiki(object):
 
         html_parts = {}
 
-        # if len(parts) == 1 or fragment:
-        # number = 1
-        # for slug in sorted(parts):
-        # section = self.make_section(
-        # [str(number)], slug, parts[slug], fragment, preview
-        # )
-        # number = + 1
-        # html_parts[slug] = section
-        # else:
         if 'index' in parts:
             _, title, _, summary = get_title_data(parts['index'], 'index')
             self.settings.set('TITLE', title)
             self.settings.set('SUMMARY', summary)
-            html_parts['index'] = self.make_index(parts['index'])
-            html_parts['index'] += web_buttons(user_slug, doc_slug)
-            if not self.outline.single_page():
-                edit_base_uri = self.settings.get_base_uri('edit')
-                html_parts['index'] += self.outline.html(edit_base_uri)
-                html_parts['index'] += self.outline.html_spare_parts(
-                    parts, edit_base_uri
-                )
+            html_parts['index'] = self.make_index(parts)
         else:
             self.settings.set('TITLE', '')
 
         for (numbering, slug, _, _, _) in self.outline:
             if slug in parts and slug not in ['index', 'biblio']:
-                # print u"MAKE SECTION"
                 section = self.make_section(
                     numbering, slug, parts[slug], fragment, preview
                 )
@@ -185,7 +166,6 @@ class Wiki(object):
         # -------------------------------------
 
         html_parts = pipe([self.cross_references,
-                           # self.tags,
                            self.links,
                            self.citations], 'replace', html_parts)
 
@@ -194,66 +174,145 @@ class Wiki(object):
                            self.backslashes,
                            self.entities], 'replace', html_parts)
 
+        # Add footnote HTML to each part
         footnote_parts = self.footnotes.html_parts()
-        footnote_parts = pipe([self.verbatim,
-                               self.backslashes,
-                               self.entities
-                               ], 'replace', footnote_parts)
-
-        margin = intify(self.settings.get('MARGIN', '0em'), default=0)
-        html = '<article style="margin: %dem">\n' % max(0, min(8, margin))
-        if 'index' in html_parts:
-            html += html_parts['index']
-            footnote_html = footnote_parts.get('index')
-            if footnote_html:
-                html += "<footer>"
-                html += "<hr class=\"div-left div-solid\" />"
-                html += footnote_html
-                html += "</footer>"
+        pipeline = [self.verbatim, self.backslashes, self.entities]
+        footnote_html = pipe(pipeline, 'replace', footnote_parts)
 
         for (numbering, slug, _, _, _) in self.outline:
-            if slug in parts and slug not in ['index', 'biblio']:
-                html += html_parts[slug]
-                footnote_html = footnote_parts.get(slug)
-                if footnote_html:
-                    html += "<footer>"
-                    html += "<hr class=\"div-left div-solid\" />"
-                    html += footnote_html
-                    html += "</footer>"
+            footnotes = footnote_html.get(slug)
+            if footnotes:
+                __ = Airium()
+                with __.footer():
+                    __.hr(klass='div-left div-solid')
+                    __(footnotes)
+                html_parts[slug] += str(__)
 
-        html += self.make_footer()
+        __ = Airium()
+        with __.article():
+            if not fragment:
+                __(self.make_header(fragment, preview))
+            __(self.make_sections(html_parts, fragment, preview))
+        return str(__)
 
-        html += '</article>'
-
-        return html
-
-    def make_footer(self):
+    def make_header(self, fragment, preview) -> Airium:
         """
-        <footer>
-            <section id="prefix-footnotes">
-            <section id="prefix-bibliography">
-            <section id="prefix-index">
+        Create front matter with margins.
         """
-        endmatter = [_ for _ in [
-            # self.footnotes.html(),
-            self.bibliography.html(),
-            # self.index.html(),
-        ] if _.strip() != ""]
-        env = Environment(autoescape=True)
-        tpl = env.from_string(trim("""
-                <footer>
-                {% if endmatter|length > 0 %}
-                    <hr class="div-left div-solid"/>
-                    {% for html in endmatter %}
-                        {{ html | safe }}
-                    {% endfor %}
-                {% endif %}
-                </footer>
-            """))
-        return tpl.render(
-            endmatter=endmatter,
-            biblio_link=self.settings.get_base_uri('edit') + '/biblio'
-        )
+        __ = Airium()
+        with __.div(klass='section-group'):
+            if not fragment and not preview:
+                with __.div(klass='left-margin'):
+                    with __.div(klass='sticky-buttons nav-buttons'):
+                        __(side_button(name='Home', href='/'))
+            with __.div(klass='section-list'):
+                with __.div(klass='section-item'):
+                    with __.div(klass='section-content'):
+                        __(self.make_title_card())
+                    if not fragment and not preview:
+                        with __.div(klass='right-margin'):
+                            with __.div(klass='sticky-buttons option-buttons'):
+                                __(side_button(name='Dark',
+                                               _klass='theme-button'))
+                                __(side_button(name='Full',
+                                               _klass='fullscreen-button'))
+        return __
+
+    def make_sections(self, html_parts, fragment, preview) -> Airium:
+        """
+        Create main body of document, with sticky navigation.
+        """
+        __ = Airium()
+        with __.div(klass='section-group'):
+            if not fragment and not preview:
+                with __.div(klass='left-margin'):
+                    with __.div(klass='sticky-buttons'):
+                        __(side_button(name='Menu',
+                                       _klass='navigation-button'))
+            with __.div(klass='section-list'):
+                if 'index' in html_parts:
+                    with __.div(klass='section-item'):
+                        with __.div(klass='section-content'):
+                            __(html_parts['index'])
+                        if not fragment and not preview:
+                            with __.div(klass='right-margin'):
+                                with __.div(klass='sticky-buttons'):
+                                    link = self.settings.get_base_uri('edit',
+                                                                      'index')
+                                    __(side_button(name='Edit', href=link))
+                for (numbering, slug, _, _, _) in self.outline:
+                    if slug in html_parts and slug not in ['index', 'biblio']:
+                        with __.div(klass='section-item'):
+                            with __.div(klass='section-content'):
+                                __(html_parts[slug])
+                            if not fragment and not preview:
+                                with __.div(klass='right-margin'):
+                                    with __.div(klass='sticky-buttons'):
+                                        label = '§' + '.<wbr/>'.join(numbering)
+                                        link = self.settings.get_base_uri(
+                                                'edit', slug)
+                                        __(side_button(name=label, icon='edit',
+                                                       href=link))
+
+                biblio_html = self.bibliography.html()
+                if biblio_html != '':
+                    with __.div(klass='section-item'):
+                        with __.div(klass='section-content'):
+                            __(biblio_html)
+                        with __.div(klass='right-margin'):
+                            with __.div(klass='sticky-buttons'):
+                                link = self.settings.get_base_uri('edit',
+                                                                  'biblio')
+                                __(side_button(name='Refs', icon='edit',
+                                               href=link))
+
+        return __
+
+    def make_title_card(self) -> Airium:
+        """
+        Format the document header.
+
+        <header>
+            <hgroup>
+                <h1>
+                <h2>
+            <div class="addresses">
+                <address>
+            <div class="date">
+                <time>
+        """
+        title = self.settings.get('TITLE', '')
+        subtitle = self.settings.get('SUMMARY', '')
+        author = self.settings.get('AUTHOR', '')
+        email = self.settings.get('EMAIL', '')
+        date_str = self.settings.get('DATE', '')
+        try:
+            dt = parse(date_str)
+            date_yyyymmdd = dt.date().isoformat()
+        except ValueError:
+            date_yyyymmdd = None
+
+        __ = Airium()
+        with __.header():
+            inline = Inline()
+            with __.hgroup():
+                if title != '':
+                    __.h1(klass='balance-text', _t=inline.process(title))
+                if subtitle != '':
+                    __.h2(klass='balance-text', _t=inline.process(subtitle))
+            if author != '' or email != '':
+                with __.div(klass="author-list"):
+                    with __.address():
+                        __.div(_t=inline.process(author))
+                        __.div(_t=inline.process(email))
+            if date_str != '':
+                if date_yyyymmdd is not None:
+                    with __.p(klass="space", rel="date"):
+                        __.time(pubdate=None, datetime=date_yyyymmdd,
+                                _t=inline.process(date_str))
+                else:
+                    __(inline.process(date_str))
+        return __
 
     def dump(self):
         """
@@ -289,113 +348,23 @@ class Wiki(object):
 
         return data
 
-    def make_index(self, text):
+    def make_index(self, parts):
         """
-        Front matter preceding index text.
-        Multi-author blocks are disabled for now; v.0.1.0 is SINGLE_USER.
+        Front matter: index text and table of contents (from outline)
         """
-        env = Environment(autoescape=True)
-        tpl = env.from_string(trim("""
-        <header>
-
-            {% if title_html != "" %}
-            <hgroup>
-                <h1 class="balance-text">{{ title_html|safe }}</h1>
-            {% if summary != "" %}
-                <h2 class="balance-text">{{ summary_html|safe }}</h2>
-            {% endif %}
-            </hgroup>
-            {% endif %}
-
-            {% if author != "" or email != "" %}
-            <div class="author-list">
-                <address>
-                {% if author != "" %}
-                    <div>{{ author }}</div>
-                {% endif %}
-                {% if email != "" %}
-                    <div><a href="mailto:{{ email }}">{{ email }}</a></div>
-                {% endif %}
-                </address>
-            </div>
-            {% endif %}
-
-            {% if date %}
-            <p class="space" rel="date">
-                {% if parsed_date != None %}
-                <time pubdate datetime="{{ parsed_date }}">{{ date }}</time>
-                {% else %}
-                {{ date }}
-                {% endif %}
-            </p>
-            {% endif %}
-
-        </header>
-        <section class="depth-0">
-            {{ content_html|safe }}
-        </section>
-        """))
-
-        inline = Inline()
+        text = parts['index']
         content, _ = split_bibliography(text)
         blocks = BlockList(content)
-        title, summary = blocks.pop_titles()
+        title, summary = blocks.pop_titles() 
         content_html = blocks.html(['0'], 'index', self.settings,
                                    fragment=True)
-
-        date_string = inline.process(self.settings.get('DATE', ''))
-        try:
-            dt = parse(date_string)
-            date_yyyymmdd = dt.date().isoformat()
-        except ValueError:
-            date_yyyymmdd = None
-
-        # author = self.split_author()
-        return tpl.render(
-            title_html=inline.process(title),
-            summary_html=inline.process(summary),
-            author=self.settings.get('AUTHOR', ''),
-            email=self.settings.get('EMAIL', ''),
-            date=date_string,
-            parsed_date=date_yyyymmdd,
-            edit_link=self.settings.get_base_uri('edit') + '/index',
-            content_html=content_html,
-        )
-
-    # Move to geometry?
-    def split_author(self, author):
-        """
-        UNUSED FOR NOW. v.0.1.0 is SINGLE_USER.
-
-        Split into authors and lines.
-
-        $ AUTHOR = Author / Affiliation
-                 + Author2 / Affiliation2
-
-        No author should return an empty list.
-        """
-        inline = Inline()
-        if author.strip() == '':
-            return []
-        else:
-            return [
-                [inline.process(line.strip()) for line in block.split(' / ')]
-                for block in author.split(' + ')
-            ]
-
-    # Move to geometry?
-    def author_cols(self, author):
-        """
-        Return twelve-column-grid spans based on numbers.
-
-        @todo: Fix the hackish; better solution would find the numbers for each
-        row, e.g. 5 would give 3 + 2.
-
-        @todo: Should be solved with Flexbox now.
-        """
-        _ = len(author)  # list
-        columns = {1: 12, 2: 6, 3: 4, 4: 6}
-        return columns[_] if _ in columns else 4
+        if not self.outline.single_page():
+            edit_base_uri = self.settings.get_base_uri('edit')
+            content_html += self.outline.html(edit_base_uri)
+            content_html += self.outline.html_spare_parts(
+                parts, edit_base_uri
+            )
+        return content_html
 
     def make_section(self, numbering, slug, text, fragment=False,
                      preview=False):
@@ -404,19 +373,6 @@ class Wiki(object):
         A fragment has no heading. A preview has a heading but no context,so no
         numbering.
         """
-        env = Environment(autoescape=True)
-        tpl = env.from_string(trim("""
-        <section class="body depth-{{ depth }}">
-        {% if not fragment %}
-        <nav class="button-list button-list-edge no-preview no-print">
-            <a class="button" href="{{ edit_link }}">
-                <i class="fa fa-pencil"></i> Edit
-            </a>
-        </nav>
-        {% endif %}
-        {{ content_html|safe }}
-        </section>
-        """))
 
         content, _ = split_bibliography(text)
         blocks = BlockList(content)
@@ -424,12 +380,12 @@ class Wiki(object):
             numbering, slug, self.settings, fragment, preview
         )
 
-        return tpl.render(
-            depth=len(numbering),
-            edit_link=self.settings.get_base_uri('edit') + '/' + slug,
-            content_html=content_html,
-            fragment=fragment
-        )
+        __ = Airium()
+        with __.section(id='.'.join(numbering) + '_' + slug,
+                        klass=f"body depth-{len(numbering)}"):
+            with __.div(klass='section-content'):
+                __(content_html)
+        return str(__)
 
 
 # ------------------------------
@@ -521,54 +477,21 @@ class Demo(object):
         wiki = Wiki(self.settings)
         options = match_demo_options(pattern)
         fragment = ('index' not in options)
+        preview = True
         part_slug = 'index' if 'index' in options else random_slug('demo-')
         lines = pattern.splitlines()
+        class_name = 'wiki-demo-wide' if 'wide' in options else 'wiki-demo'
         source = "\n".join(lines[1:-1])
-        output = wiki.process(None, None, {part_slug: source}, fragment)
+        output = wiki.process(None, None, {part_slug: source}, fragment,
+                              preview)
 
-        env = Environment(autoescape=True)
-        if 'wide' in options:
-            tpl = env.from_string(trim("""
-                <div class="wiki-demo-wide space">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <pre>{{ source|safe }}</pre>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="wiki-demo-output">
-                                    {{ output|safe }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            """))
-        else:
-            tpl = env.from_string(trim("""
-                <div class="wiki-demo space">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td width="50%">
-                                    <pre>{{ source|safe }}</pre>
-                                </td>
-                                <td>&nbsp;</td>
-                                <td width="48%" class="wiki-demo-output">
-                                    {{ output|safe }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            """))
-
-        return tpl.render(
-            source=escape(source),
-            output=output
-        )
+        __ = Airium()
+        with __.div(klass=class_name):
+            with __.div(klass='wiki-demo-input'):
+                __.pre(_t=escape(source))
+            with __.div(klass='wiki-demo-output'):
+                __(output)
+        return str(__)
 
     def replace(self, html_parts, decorator=None):
         "Generate demo blocks."

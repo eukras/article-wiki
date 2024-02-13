@@ -1,9 +1,10 @@
 <html lang="en"
-      class="{% if theme %}{{ theme }}{% else %}theme-default{% endif %}"
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:og="http://ogp.me/ns#"
       xmlns:fb="https://www.facebook.com/2008/fbml">
+
 <head>
+
     <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
     <meta name="generator" content="Article Wiki">
@@ -11,9 +12,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>{{ page_title | default('Untitled') }}</title>
-
     {% block metadata %}
+    <title>Article Wiki</title>
     {% endblock %}
 
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
@@ -27,21 +27,29 @@
 </head>
 <body>
 
+    <script>
+        //  Set html tag classes before rendering anything; prevent flashing.
+        const html = document.querySelector('html');
+        const theme = localStorage.getItem('article-wiki-theme') || 'theme-light';
+        html.classList.add(theme);
+        const navigation = localStorage.getItem('article-wiki-navigation') || 'navigation-buttons';
+        html.classList.add(navigation);
+    </script>
+
     <div id="background"></div>
 
     {% block content %}
     {% endblock %}
 
-    <!-- Modal note for browsres without grad layout. -->
-    <div id="browser-not-supported" class="modal">
+    <!-- Modal note for browsers without flex or grid layout. -->
+    <div id="browser-not-supported">
         <div class="modal-cover">
         </div>
         <div class="modal-message">
-            <h2 class="balance-text">Your browser is not supported.</h2>
-            <p class="balance-text">You'll need a modern browser that supports 'grid' layout.</p>
+            <h2 class="balance-text">We don't support your browser. It lacks some modern features we rely upon.</h2>
             <div class="modal-button">
-                <a class="button feature" target="_blank" href="https://caniuse.com/#search=grid">
-                    <i class="fa fa-info-circle"></i> Like What?
+                <a class="button feature" target="_blank" href="https://www.google.com/intl/en_au/chrome/dr/download">
+                    How about Chrome?
                 </a>
             </div>
         </div>
@@ -49,23 +57,7 @@
 
 </body>
 
-{% if false %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-{% else %}
-<script src="{{ config.PUBLIC_DIR }}/jquery.min.js"></script>
-<script src="{{ config.PUBLIC_DIR }}/jquery.cookie.js"></script>
-<script src="{{ config.PUBLIC_DIR }}/axios.min.js"></script>
-{% endif %}
-
-<script src="{{ config.PUBLIC_DIR }}/common.js"></script>
-
-<script src="https://unpkg.com/vue@3"></script>
-
-<script type="module" src="/static/index.js"></script>
-
-<div id="app"></div>
+<script type="module" src="/dist/bundle.js"></script>
 
 {% if config.GOOGLE_ANALYTICS_TRACKING_ID != "" %}
 

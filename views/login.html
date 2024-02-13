@@ -4,13 +4,11 @@
 
 <div class="wiki">
 
-    <header>
-        <h1>Login</h1>
-    </header>
-
     <form method="post" action="/login">
 
         <div id="login">
+
+            <h1>Login</h1>
 
             {% if message %}
             <div class="wiki-error">
@@ -26,7 +24,7 @@
                 <input type="password" name="password" placeholder="Password" />
             </div>
 
-            <div class="space text-center">
+            <div class="space">
                 <button type="submit" class="feature">
                     <i class="fa fa-user"></i> Login
                 </button>

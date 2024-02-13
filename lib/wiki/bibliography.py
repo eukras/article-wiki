@@ -135,7 +135,7 @@ class Bibliography(object):
 
     def html(self):
         """
-        From a list of bibliography lines.
+        Format a list of bibliography lines.
         """
         assert isinstance(self.entries, dict)
 
@@ -143,6 +143,7 @@ class Bibliography(object):
         tpl = env.from_string("""
             {% if entries|length > 0 %}
             <section id="{{ id_prefix }}-bibliography" class="bibliography">
+            <div class="section-content">
             {% if not single_page %}
                 <h1>
                     <a href="#{{ id_prefix }}-bibliography">Bibliography</a>
@@ -169,10 +170,13 @@ class Bibliography(object):
             <pre>{{ entries | tojson }}</pre>
             <pre>{{ citations | tojson }}</pre>
             #}
+            </div>
             </section>
             {% endif %}
             """)
 
+        if not self.entries:
+            return '';
         return tpl.render(
             single_page=self.outline.single_page(),
             entries=self.entries,

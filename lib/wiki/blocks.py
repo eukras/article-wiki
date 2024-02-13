@@ -50,10 +50,11 @@ from lib.wiki.geometry import \
 from lib.wiki.renderer import \
     alert, \
     generate_table, \
-    Html,\
+    Html, \
     parse_table_data, \
-    rule,\
-    space,\
+    rule, \
+    section_heading, \
+    space, \
     tag
 # from lib.wiki.icons import \
 # expand_shorthand
@@ -273,48 +274,21 @@ class BlockList(object):
         renderer = Html({})
         renderer.settings = copy(settings)
         out = []
-        # Headings (if required)
         if not fragment and slug != 'index':
-            out += ['<hgroup>']
             title, summary = self.pop_titles()
             nav_id = get_section_nav_id(numbering, slug)
-            if preview:
-                head = '<h1 id="%s"><a href="#%s">%s</a></h1>' % (
-                    nav_id, nav_id, renderer.inline.process(title)
-                )
-            else:
-                number = '.'.join([str(_) for _ in numbering])
-                head = (
-                    '<a href="#%s">'
-                    '<table>'
-                    '<tbody>'
-                    '<tr>'
-                    '<td width="1%%"><h1 id="%s">§%s.&nbsp;</h1></td>'
-                    '<td width="99%%"><h1 class="balance-text">%s</h1></td>'
-                    '</tr>'
-                    '</tbody>'
-                    '</table>'
-                    '</a>'
-                ) % (
-                    nav_id, nav_id, number, renderer.inline.process(title)
-                )
-            out += [head]
+            number = '.'.join([str(_) for _ in numbering])
             if summary != '':
-                out += ['<p class="summary">%s</p>' %
-                        renderer.inline.process(summary)]
-            out += ['</hgroup>']
+                subtitle = renderer.inline.process(summary)
+            else:
+                subtitle = None
+            out += [str(section_heading(nav_id, number, title, subtitle))]
         # Assemble
         local_settings = copy(settings)
         for _ in self.blocks:
             block_html, local_settings = _.html(renderer, local_settings)
             out += [block_html]
         return "\n\n".join(out)
-
-    def get_outline(self, blocks):
-        """
-        Produce a compact list of the headings in this section.
-        @idea Maybe later add links or slides.
-        """
 
 
 def get_title_data(text: str, part_slug: str) -> (str, str, str, str):
