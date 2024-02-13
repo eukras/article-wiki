@@ -7,8 +7,25 @@
  *
  */
 
-#page, #editor  {
-    background-color: $lightBgColor;
+:root {
+    font-size: calc(0.5em + 0.75vmax);
+}
+
+::-moz-selection,
+::selection {
+    background-color: var(--page-text-selection);
+}
+
+*,
+::before,
+::after, {
+    box-sizing: border-box;
+}
+
+html.theme-light,
+html.theme-dark {
+    color: var(--desk-text);
+    background-color: var(--desk-background);
 }
 
 div#background {
@@ -19,13 +36,87 @@ div#background {
     width: 100%;
     height: 100vh;
     z-index: -10;
-    background-image: none;  /* see common.js */
+    background-color: var(--desk-background);
+    background-blend-mode: var(--desk-svg-blend-mode);
+    opacity: var(--desk-svg-opacity);
+    background-image: none;  /* filled by bokeh.js */
     background-repeat: no-repeat;
     background-attachment: fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
+}
+
+#page, #editor, table  {
+    color: var(--page-text);
+    background-color: var(--page-background);
+}
+
+#page {
+    border: 1pt solid rgba(128, 128, 128, 0.3);
+    max-width: var(--page-width);
+    margin: 2rem auto;
+    padding: 0;
+    @include box-shadow(0, 0, 2.5rem, rgba(30, 60, 30, 0.25));
+    header {
+        margin: 10em 0 5em 0;
+    }
+}
+
+#site-menu {
+    top: 0;
+    left: 0;
+    height: 100vh;
+    padding: var(--side-padding);
+    width: var(--side-width-left);
+}
+
+#page-outline {
+    top: 0;
+    right: 0;
+    height: 100vh;
+    padding: var(--side-padding);
+    width: var(--side-width-right);
+}
+
+@include isTabletOrSmaller {
+    .show-inline-if-laptop-or-larger {
+        display: none;
+    }
+    .show-inline-if-tablet-or-smaller {
+        display: inline;
+    }
+    .show-block-if-laptop-or-larger {
+        display: none;
+    }
+    .show-block-if-tablet-or-smaller {
+        display: block;
+    }
+    #page {
+        margin: 0;
+    }
+    #site-menu {
+        background-color: var(--side-background-left);
+    }
+    #page-outline {
+        background-color: var(--side-background-right);
+    }
+}
+
+@include isLaptopOrLarger {
+    .show-inline-if-tablet-or-smaller {
+        display: none;
+    }
+    .show-inline-if-laptop-or-larger {
+        display: inline;
+    }
+    .show-block-if-tablet-or-smaller {
+        display: none;
+    }
+    .show-block-if-laptop-or-larger {
+        display: block;
+    }
 }
 
 form {
@@ -37,130 +128,73 @@ form {
 }
 
 @media screen {
-
-    body { 
-        font-size: #{$fontSize};
-        padding: 0;
-        margin: 0;
-    }
-
     .web-only {
         display: block;
         padding: 1rem 0;
         margin: 1rem 0;
     }
-
-    #editor {
-
-        overflow: hidden;
-        height: 100vh;
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-        grid-template-rows: 2rem auto;
-        grid-gap: 0;
-
-        a.button, button {
-            text-wrap: none;
-            vertical-align: middle;
-
-            i { display: inline; }
-            span { display: inline; }
-        }
-
-        textarea {
-            font-family: $fontFamilyMonospace;
-            grid-area: unquote("2 / 1 / 3 / 5");
-            padding: 1rem;
-            border: none;
-            outline: none;
-            resize: none;
-            background: inherit;
-        }
-
-        main {
-            grid-area: unquote("2 / 5 / 3 / 9");
-            padding: 2rem;
-            overflow: auto;
-            article {
-                margin-top: 0;
-            }
-            .no-preview {
-                display: none;
-            }
-            section.depth-1 {
-                margin-top: 0;
-                h1 {
-                    margin-top: 0;
-                }
-            }
-        }
-
-    }
-
-    #page { 
-        width: 56rem;
-        max-width: 90%;
-        margin: 2rem auto;
-        padding: 0;
-        @include box-shadow(0, 0, 2.5rem, rgba(30, 60, 30, 0.25));
-    }
-
 }
 
-.print-only {
-    display: none;
+body { 
+    font-size: $fontSize;
+    padding: 0;
+    margin: 0;
 }
 
-@media print {
+#editor {
 
-    html {
-        font-size: 10pt;
+    overflow: hidden;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 2rem auto;
+    grid-gap: 0;
+
+    a.button, button {
+        text-wrap: none;
+        vertical-align: middle;
+
+        i { display: inline; }
+        span { display: inline; }
     }
 
-    body {
-        margin: 0 3rem;
-        padding: 0;
+    textarea {
+        font-family: $fontFamilyMonospace;
+        font-size: $fontSizeMinus3;
+        grid-area: unquote("2 / 1 / 3 / 5");
+        padding: 1rem;
+        border: none;
+        outline: none;
+        resize: none;
+        background: inherit;
     }
 
-    .print-only {
-        display: block;
-    }
-
-    .no-print {
-        display: none;
-    }
-
-    #editor {
-        display: block;
-
-        button, a.button, textarea {
+    main {
+        grid-area: unquote("2 / 5 / 3 / 9");
+        padding: 2rem;
+        overflow: auto;
+        font-size: $fontSizeMinus1;
+        article,
+        header,
+        section,
+        section > *:first-child {
+            margin-top: 0;
+            padding-top: 0;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .no-preview {
             display: none;
         }
-
-        main {
-            width: auto;
-            margin: 0;
-            padding: 0;
+        section.depth-1 {
+            margin-top: 0;
+            h1 {
+                margin-top: 0;
+            }
         }
+
     }
 
-    #page {
-        background-color: $lightBgColor;
-        width: auto;
-        margin: 0;
-        padding: 0;
-    }
-
-    div.wiki {
-        width: auto;
-        margin: 0;
-        padding: 0;
-    }
-
-    var {
-        border: 2px solid $lightFgColor;
-        color: $lightFgColor;
-    }
 }
 
 /*
@@ -169,125 +203,40 @@ form {
  */
 
 #login {
-    margin: 0 auto;
+    margin: 0 auto 10em;
     width: 15em;
+
+    h1 {
+        margin: 2em 0 1em;
+    }
+
+    .wiki-error {
+        margin: 1em 0;
+    }
 
     input {
         width: 100%;
         font-family: $fontFamilySansSerif;
         font-size: $fontSizePlus1;
         border: 1px solid rgba(128, 128, 128, 0.5);
-        background: none;
-        color: inherit;
         border-radius: $borderRadius;
         padding: 0.3rem 0.6rem;
-        cursor: pointer;
+        margin: 1em 0;
     }
 }
 
 
-/* CSS Modal notice: only deactivated if grid is supported. */
+//  ---------------------------------
+//  Scrollbars
+//  ---------------------------------
 
-.modal {
-
-    display: block;
-
-    .modal-cover {
-        z-index: 10;
-        position: fixed;
-        top: 0;
-        left: 0;
-        background-color: $lightFgColor;
-        width: 100vw;
-        height: 100vh;
-        opacity: 0.5;
-    }
-
-    .modal-message {
-        position: fixed;
-        z-index: 11;
-        top: 2em;
-        left: 2em;
-        border-radius: $borderRadius;
-        box-shadow: 1rem 1rem 2rem #444;
-        text-align: center;
-        background-color: $lightBgColor;
-        width: 18em;
-        max-width: 90%;
-        padding: 2rem;
-
-        h2 {
-            font-weight: bold;
-            margin: 0 0 1rem 0;
-        }
-
-        .modal-button {
-            margin: 2rem 0 1rem 0;
-        }
-    }
-
+body::-webkit-scrollbar {
+  width: 1rem;
 }
-
-@supports (display: flex) {
-    .modal {
-        display: none;
-    }
+body::-webkit-scrollbar-track {
+    background: transparent;
 }
-
-/* Comments */
-
-/**
-<div class="comment">
-    <h4>
-        <span class="comment-created_fmt">{{ _.time_created_fmt }}</span> 
-        <span class="comment-aw_login">~{{ _.aw_login }}</span>
-        <span class="comment-ip_address">{{ _.ip_address }}</span>
-    </h4>
-    <div>
-        <span class="comment-contact">{{ _.contact }}</span>
-        <span class="comment-google_tracker">{{ _.google_tracker }}</span>
-    </div>
-    <div style="comment-comment">{{ _.comment }}</div>
-    {% if _.changes == "" %}
-    <div style="comment-original">{{ _.original }}</div>
-    {% else %}
-    <div style="comment-diff_html">{{ _.diff_html|safe }}</div>
-    {% endif %}
-</div>
-**/ 
-
-.comment {
-    margin-top: 1.5rem;
-    border-top: 1px solid rgba(128, 128, 128, 0.3);
-    padding-top: 0.5rem;
-}
-
-.comment .comment-google_tracker,
-.comment .comment-ip_address {
-    opacity: 0.3;
-    font-family: $fontFamilySansSerif;
-    font-size: $fontSizeMinus2;
-}
-
-.comment .comment-comment {
-    white-space: pre-line;
-    background-color: rgba(128, 128, 128, 0.1);
-    padding: 1rem;
-    margin: 0.5rem 0;
-}
-
-.comment .comment-original {
-    opacity: 0.3;
-    font-family: $fontFamilySansSerif;
-    font-size: $fontSizeMinus1;
-}
-
-span.diff_add {
-    background-color: rgba(98, 236, 141, 0.3);
-}
-span.diff_chg {
-    background-color: rgba(255, 196, 88, 0.3);
-}
-span.diff_sub {
-    background-color: rgba(255, 86, 80, 0.3);
+body::-webkit-scrollbar-thumb {
+  background-color: var(--page-text);
+  box-shadow: 0 -100vh 0 100vh var(--page-icon-background);
 }

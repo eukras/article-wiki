@@ -1,71 +1,170 @@
-$fontFamilySerif: 'IBM Plex Serif', 'GFS Didot', serif; 
-$fontFamilySansSerif: 'IBM Plex Sans Condensed', Helvetica, sans-serif;
-$fontFamilyMonospace: 'Fira Mono', 'Andale Mono', monospace;
+@use 'sass:math';
+@use 'sass:color';
 
-$baseFontSizeWidest: 20pt;
-$sideMarginOnWidest: 10rem;
+//  -----------------------------
+//  Relative font sizing
+//  -----------------------------
 
-$breakpointOnScreen: 3000px;
-$baseFontSizeScreen: 18pt;
-$sideMarginOnScreen: 8rem;
-
-$breakpointOnLaptop: 2000px;
-$baseFontSizeLaptop: 16pt;
-$sideMarginOnLaptop: 6rem;
-
-$breakpointOnTablet: 1100px;
-$baseFontSizeTablet: 14pt;
-$sideMarginOnTablet: 2.5rem;
-
-$breakpointOnMobile: 600px;
-$baseFontSizeMobile: 12pt;
-$sideMarginOnMobile: 2.5rem;
+$fontFamilySerif: ('IBM Plex Serif', 'GFS Didot', serif); 
+$fontFamilySansSerif: ('IBM Plex Sans Condensed', Helvetica, sans-serif);
+$fontFamilyMonospace: ('Fira Mono', 'Andale Mono', monospace);
 
 $borderRadius: 0.5rem;
 
 $baseFontSize: 1.05;
-$stepUp: 1.15;
-$stepDown: 0.90;
+$stepUp: 1.12;
+$stepDown: 0.88;
 
-$fontSizePlus5: #{$baseFontSize * $stepUp * $stepUp * $stepUp * $stepUp * $stepUp}rem;
-$fontSizePlus4: #{$baseFontSize * $stepUp * $stepUp * $stepUp * $stepUp}rem;
-$fontSizePlus3: #{$baseFontSize * $stepUp * $stepUp * $stepUp}rem;
-$fontSizePlus2: #{$baseFontSize * $stepUp * $stepUp}rem;
-$fontSizePlus1: #{$baseFontSize * $stepUp}rem;
-$fontSize: #{$baseFontSize}rem;
-$fontSizeMinus1: #{$baseFontSize * $stepDown}rem;
-$fontSizeMinus2: #{$baseFontSize * $stepDown * $stepDown}rem;
-$fontSizeMinus3: #{$baseFontSize * $stepDown * $stepDown * $stepDown}rem;
-
-$lightBgPage: #A0b8A0;  // <-- sage green
-$lightBgColor: #f8f8f8;
-$lightBgSelection: #baffba;
-
-$lightFgColor: #303030; 
-$lightFgHighlight: #000000;
-$lightFgLink: #20b2aa;  // <-- light sea green
-$lightFgLinkHover: blue;
-$lightFgInsert: black;
-$lightFgDelete: black;
-
-$darkBgPage: #050509;  // <-- sage green
-$darkBgColor: #050509;
-$darkBgSelection: #2d828a;
-
-$darkFgColor: #808089;
-$darkFgHighlight: #67679e;
-$darkFgLink: #a0a0a0;
-$darkFgLinkHover: #d0d0d0;
-$darkFgInsert: lightgreen;
-$darkFgDelete: indianred;
+$fontSizePlus5: math.percentage($baseFontSize * $stepUp * $stepUp * $stepUp * $stepUp * $stepUp);
+$fontSizePlus4: math.percentage($baseFontSize * $stepUp * $stepUp * $stepUp * $stepUp);
+$fontSizePlus3: math.percentage($baseFontSize * $stepUp * $stepUp * $stepUp);
+$fontSizePlus2: math.percentage($baseFontSize * $stepUp * $stepUp);
+$fontSizePlus1: math.percentage($baseFontSize * $stepUp);
+$fontSize: math.percentage($baseFontSize);
+$fontSizeMinus1: math.percentage($baseFontSize * $stepDown);
+$fontSizeMinus2: math.percentage($baseFontSize * $stepDown * $stepDown);
+$fontSizeMinus3: math.percentage($baseFontSize * $stepDown * $stepDown * $stepDown);
 
 
-//  -------------
-//  Simple mixins
-//  -------------
+//  -----------------------------
+//  Colors used.
+//  -----------------------------
 
-@mixin box-shadow($top, $left, $blur, $color) {
-  -webkit-box-shadow: $top $left $blur $color;
-  -moz-box-shadow: $top $left $blur $color;
-  box-shadow: $top $left $blur $color;
+$black:  hsl(0, 0%,   0%);
+$gray97: hsl(0, 0%,  97%);
+$gray90: hsl(0, 0%,  90%);
+$gray75: hsl(0, 0%,  75%);
+$gray50: hsl(0, 0%,  50%);
+$gray25: hsl(0, 0%,  25%);
+$gray10: hsl(0, 0%,  10%);
+$gray03: hsl(0, 0%,  03%);
+$white:  hsl(0, 0%, 100%);
+
+$gray97-translucent: hsla(0, 0%, 97%, 0.90);
+$gray03-translucent: hsla(0, 0%, 3%, 0.90);
+
+//  Light colors
+$kelpGreen: hsl( 57, 25%, 17%);
+$limeGreen: hsl( 83, 84%, 75%);
+$midGreen:  hsl(120, 46%, 29%);
+$seaGreen:  hsl(120, 14%, 67%);
+
+//  Dark colors
+$busterBlue: hsl(218, 21%, 37%);
+$bostonBlue: hsl(210, 67%, 78%);
+$indigoBlue: hsl(240, 22%, 51%);
+$nightBlue:  hsl(248, 90%,  5%);
+
+//  Desk:
+//  +---------------------------------+
+//  | Side:   Page:          Side     |
+//  | +-----+ +------------+ +------+ |
+//  | +     | |            | |      | |
+//  | +-----+ +------------+ +------+ |
+//  +---------------------------------+
+//
+//  Side panels are transparent on large screens.
+
+//  -----------------------------
+//  Color themes:
+//  - Light (reading in sunlight; default)
+//  - Dark (reading at night with no other light sources)
+//  - Print (black and white).
+
+html.theme-light {
+    --desk-background: #{$seaGreen};
+    --desk-svg-blend-mode: hard-light;
+    --desk-svg-opacity: 1;
+    --desk-text: #{$midGreen};
+    --desk-text-active: #{$gray97};
+    --desk-text-secondary: #{$gray03};
+    --side-background-left: #{$gray97-translucent};
+    --side-background-right: #{$seaGreen};
+    --page-background: #{$gray97};
+    --page-text: #{$gray03};
+    --page-text-secondary: #{$gray03};
+    --page-text-link: #{$gray03};
+    --page-text-selection: #{$limeGreen};
+    --page-icon-background: #{$gray90};
+    --page-icon-text: #{$seaGreen};
+    --completion-bar-svg: url("/static/completion-bar-green.svg");
+}
+
+html.theme-dark {
+    --desk-background: #{$nightBlue};
+    --desk-svg-blend-mode: hard-light;
+    --desk-svg-opacity: 0.33;
+    --desk-text: #{$busterBlue};
+    --desk-text-active: #{$bostonBlue};
+    --desk-text-secondary: #{$indigoBlue};
+    --side-background-left: #{$gray03-translucent};
+    --side-background-right: #{$nightBlue};
+    --page-background: #{$gray03};
+    --page-text: #{$gray50};
+    --page-text-secondary: #{$indigoBlue};
+    --page-text-link: #{$gray75};
+    --page-text-selection: #{$bostonBlue};
+    --page-icon-background: #{$gray10};
+    --page-icon-text: #{$gray25};
+    --completion-bar-svg: url("/static/completion-bar-blue.svg");
+}
+
+@media print {
+
+    html {
+        --desk-background: #{$white};
+        --desk-svg-blend-mode: normal;
+        --desk-svg-opacity: 0;
+        --desk-text: #{$black};
+        --desk-text-active: #{$black};
+        --desk-text-secondary: #{$black};
+        --side-background-left: #{$white};
+        --side-background-right: #{$white};
+        --page-background: #{$white};
+        --page-text: #{$black};
+        --page-text-secondary: #{$black};
+        --page-text-link: #{$black};
+        --page-text-selection: none;
+        --page-icon-background: #{$white};
+        --page-icon-text: #{$black};
+        --completion-bar-svg: none;
+    }
+
+}
+
+//  -----------------------------
+//  Geometry
+//  -----------------------------
+
+@include isLaptopOrLarger {
+
+    html {
+        --page-width: 65vw;
+        --side-width-left: 16vw;
+        --side-width-right: 16vw;
+        --side-padding: 1em;
+        --page-margin: 6em;
+    }
+}
+
+@include isTabletOrSmaller {
+    html {
+        --page-width: 100vw;
+        --side-width-left: 39vw;
+        --side-width-right: 60vw;
+    }
+}
+
+@include isTablet {
+    html {
+        --side-padding: 2em;
+        --page-margin: 4em;
+    }
+}
+
+@include isMobile {
+    html {
+        --side-padding: 1em;
+        --page-margin: 3em;
+    }
 }

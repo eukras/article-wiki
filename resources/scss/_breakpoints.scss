@@ -1,0 +1,26 @@
+$breakpointOnTablet: 1100px;
+$breakpointOnMobile: 600px;
+
+@mixin isLaptopOrLarger {
+    @media screen and (min-width: $breakpointOnTablet + 1) {
+        @content;
+    }
+}
+
+@mixin isTabletOrSmaller {
+    @media screen and (max-width: $breakpointOnTablet) {
+        @content;
+    }
+}
+
+@mixin isTablet {
+    @media screen and (min-width: $breakpointOnMobile + 1) and (max-width: $breakpointOnTablet) {
+        @content;
+    }
+}
+
+@mixin isMobile {
+    @media screen and (min-width: 0) and (max-width: $breakpointOnMobile) {
+        @content;
+    }
+}

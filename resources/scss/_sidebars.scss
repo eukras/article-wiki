@@ -1,0 +1,147 @@
+html.navigation-buttons {
+    #site-menu, #page-outline {
+        display: none;
+    }
+}
+
+
+html.navigation-sidebars {
+
+    .nav-buttons, .option-buttons {
+        display: none;
+    }
+
+    #site-menu, #page-outline {
+        user-select: none;
+        display: block;
+        position: fixed;
+        top: 0;
+        max-height: 100vh;
+        overflow: hidden;
+        font-family: $fontFamilySansSerif;
+        color: var(--desk-text);
+        font-size: $fontSizeMinus2;
+        a {
+            color: inherit;
+        }
+        .space {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* No scrollbars */
+        overflow-y: scroll;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none;  /* Internet Explorer 10+ */
+        ::-webkit-scrollbar { /* WebKit */
+            width: 0;
+            height: 0;
+        }
+    }
+    #page-outline {
+        /**
+         * Completion visualisation, colourised by .visible
+         */
+        #completion ol {
+            list-style: none;
+            max-width: 24em;
+            gap: 0.5em;
+            padding: 0;
+            margin: 0;
+            ol, li {
+                display: inline;
+                padding: 0;
+                margin: 0;
+            }
+            .completion-unit {
+                display: inline-block;
+                min-height: 0.55em;
+                margin: 0 0.5em 0.5em 0;
+                padding: 0 0.25em;
+                border: solid 1px var(--desk-text);
+                border-radius: 0.275em;
+                background-repeat: no-repeat;
+                background-size: 32em 1em;
+                background-position-x: 0em;
+            }
+        }
+
+        .completion-unit {
+            background-image: var(--completion-bar-svg);
+        }
+
+        /**
+         * Colourisation:
+         */
+
+        /* Visible elements */
+        div#completion ol li.visible div.completion-unit {
+            background-color: var(--desk-text-active);
+            border: solid 1px var(--desk-text-active);
+            background-image: none;
+        }
+        /* Children of visible elements */
+        #completion li.visible li:not(.visible) .completion-unit {
+            background-color: var(--desk-text-secondary);
+            border: solid 1px var(--desk-text-secondary);
+            background-image: none;
+        }
+        /* Subtree containing visible elements */
+        #completion li:has(ol > li.visible) .completion-unit {
+            background-color: var(--desk-text-secondary);
+            border: solid 1px var(--desk-text-secondary);
+            background-image: none;
+        }
+
+        /**
+         * Document outline; colorised and displayed by .visible
+         */
+        #outline ol {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+        #outline ol {
+            padding-left: 1em;
+        }
+        #outline > ol {
+            padding-left: 0;
+        }
+
+        /*
+         * Visibility: Hide unless top-level or in the context of .visible
+         */
+        #outline li {
+            display: none;
+        }
+        #outline > ol > li {
+            display: block;
+        }
+
+        /* Colorize/display visible elements */
+        #outline li.visible {
+            color: var(--desk-text-active);
+            display: block;
+        }
+
+        /* ... but not their descendants */
+        #outline li.visible li:not(.visible) {
+            color: var(--desk-text-secondary);
+        }
+
+        /* Colorize/display parents of visible elements */
+        #outline li:has(ol > li.visible) {
+            color: var(--desk-text-secondary);
+            display: block;
+        }
+
+        /* Display siblings of visible elements */
+        #outline ol:has(> li.visible) > li {
+            display: block;
+        }
+
+        /* Display immediate children of visible elements */
+        #outline li.visible > ol > li {
+            display: block;
+        }
+    }
+}

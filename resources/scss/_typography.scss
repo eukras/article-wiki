@@ -1,7 +1,14 @@
-//  -----------------
-//  Regular
-//  -----------------
+/**
+ * Fix valign of FontAwesome list icons.
+ */
 
+.fa-li {
+    top: 0.30em;
+}
+
+/*
+ * TOOD: Check if we float anything.
+ */
 .clear {
     clear: both;
 }
@@ -27,19 +34,30 @@
     text-wrap: balance;
 }
 
+.blink {
+  animation: blinker 0.3s ease-in-out infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+/**
+ * TODO: Decide BG color for links.
+ */
 @media screen {
     a.web-link {
-        background-color: hsla(120, 45%, 93%, 1);
         padding: 0 2pt;
     }
     a.web-marker {
-        background-color: hsla(120, 45%, 93%, 1);
         padding: 0 2pt;
     }
 }
 
 a {
-    color: inherit;
+    color: var(--page-text-link);
     text-decoration: none;
 }
 
@@ -51,6 +69,7 @@ a.bibliography {
     font-size: $fontSizeMinus1;
 }
 
+/* CHECK if used */
 a.unmarked {
     font-family: inherit;
     font-style: inherit;
@@ -66,10 +85,6 @@ a.unmarked {
 .side-nav a:hover {
     text-decoration: none;
     border-bottom: none;
-}
-
-.wiki { 
-    padding: 3rem 7rem 7rem 7rem;
 }
 
 p {
@@ -120,7 +135,7 @@ ul, ol, dl {
 .note {
     font-family: $fontFamilySansSerif;
     font-size: $fontSizeMinus2;
-    border: dotted 1px $lightFgColor;
+    border: dotted 1px var(--page-text);
     border-radius: $borderRadius;
     margin: 1rem 0;
     padding: 1rem;
@@ -142,25 +157,20 @@ aside {
     font-size: $fontSizeMinus2;
     float: right;
     width: 30%;
-    border-left: dotted 1px $lightFgColor;
+    border-left: dotted 1px var(--page-text);
     padding-left: 1rem;
     margin-left: 1rem;
     margin-bottom: 0.5rem;
 }
 
 .box-dotted {
-    border: dotted 1pt $lightFgColor;
+    border: dotted 1pt var(--page-text);
     border-radius: $borderRadius;
     padding: 0 1rem;
     margin: 1rem 0;
 }
 
 .vpad { 
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
-}
-
-.hpad { 
     padding-top: 0.5em;
     padding-bottom: 0.5em;
 }
@@ -231,11 +241,6 @@ ul > ul, ol > ol {
     line-height: 1rem;
 }
 
-.space { 
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-}
-
 .text-large {
     font-size: $fontSize;
 }
@@ -250,17 +255,13 @@ ul > ul, ol > ol {
     margin: 0 auto;
 }
 
-hgroup {
-    margin: 2.75rem 0 .75rem 0;
-}
-
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-    color: $lightFgHighlight;
+    color: var(--page-text-secondary);
     margin-top: 0;
     padding-top: 0.7rem;
     margin-bottom: 0;
@@ -276,12 +277,6 @@ hgroup {
             line-height: 1.9rem;
         }
     } 
-}
-
-@media print {
-    h1, h2, h3, h4, h5, h6 {
-        page-break-after: avoid; /** IE only (2019) **/
-    }
 }
 
 h1, h2, h4, h5, h6 {
@@ -303,15 +298,14 @@ h1 {
 }
 
 h2 {
-    font-size: $fontSizePlus1;
+    font-size: $fontSizePlus2;
     margin: 2rem 0 1rem 0;
     padding: 0;
 }
 
 h3 {
     font-size: $fontSizePlus1;
-    font-weight: normal;
-    font-style: italic;
+    font-style: normal;
     margin: 0;
 }
 
@@ -320,11 +314,11 @@ h4 {
 }
 
 h5 { 
-    font-size: $fontSizeMinus1;
+    font-size: $fontSize;
 }
 
 h6 { 
-    font-size: $fontSizeMinus2;
+    font-size: $fontSize;
 }
 
 mark { 
@@ -337,17 +331,15 @@ cite {
 }
 
 sub, sup {
-    font-size: $fontSizeMinus2;
-    vertical-align: baseline;
-    position: relative;
+    font-size: $fontSizeMinus3;
 }
 
 sub {
-    bottom: -0.6em;
+    vertical-align: bottom;
 }
 
 sup {
-    top: -0.6em;
+    vertical-align: top;
 }
 
 img { 
@@ -369,20 +361,33 @@ blockquote + blockquote {
 p.subhead {
     font-weight: bold;
     margin: 0;
-    padding: 0.8rem 0 0 0;
+    padding: 0.8rem 0 0.2rem 0;
 }
 
 p + p.subhead {
     margin-top: 1rem;
 }
 
-p.summary {
+p.summary,
+p.summary a {
+    color: var(--page-text-secondary);
     font-size: $fontSizePlus1;
+    font-style: italic;
     margin: 0 0 0.5rem 0;
 }
 
+/*
+html.theme-dark {
+    p.summary, 
+    p.summary a {
+        color: $darkFgHighlight;
+    }
+}
+*/
+
 p.caption {
-    font-size: $fontSizeMinus1;
+    font-size: $fontSizeMinus2;
+    line-height: inherit;
     padding: 0 2.4rem 0 2.4rem ;
     margin: 1rem 0;
     text-align: center;
@@ -392,7 +397,7 @@ blockquote + p.caption {
     text-align: right;
     padding: 0;
     margin: -1rem 2.4rem 1rem 2.4rem;
-    font-size: $fontSizeMinus1; 
+    font-size: $fontSizeMinus2; 
 }
 
 .wiki-feature {
@@ -417,10 +422,16 @@ blockquote + p.caption {
     column-gap: 1.5rem;
 }
 
+@include isTabletOrSmaller {
+    .columns-x2, .columns-x3 {
+        column-count: 1;
+    }
+}
+
 .column-rule {
-    -webkit-column-rule: dotted 1px $lightFgColor;
-    -moz-column-rule: dotted 1px $lightFgColor;
-    column-rule: dotted 1px $lightFgColor;
+    -webkit-column-rule: dotted 1px var(--page-text);
+    -moz-column-rule: dotted 1px var(--page-text);
+    column-rule: dotted 1px var(--page-text);
 }
 
 .columns-min-width {
@@ -431,20 +442,20 @@ blockquote + p.caption {
 
 hr {
     border: 0;
-    border-bottom: 4pt solid $lightFgColor;
+    border-bottom: 4pt solid var(--page-text);
     margin: 1rem 0;
 }
 
 hr.div-dotted { 
-    border-bottom: dotted 0.8pt $lightFgColor;
+    border-bottom: dotted 0.8pt var(--page-text);
 }
 
 hr.div-solid { 
-    border-bottom: solid 0.8pt $lightFgColor;
+    border-bottom: solid 0.8pt var(--page-text);
 }
 
 hr.div-thick { 
-    border-bottom: solid 3pt $lightFgColor;
+    border-bottom: solid 3pt var(--page-text);
 }
 
 hr.div-center { 
@@ -503,7 +514,7 @@ var {
     font-size: $fontSizeMinus1;
     font-style: inherit;
     font-weight: bold;
-    border: solid 1pt $lightFgColor;
+    border: solid 1pt var(--page-text-secondary);
     border-radius: 3pt;
     padding: 0 4pt;
     white-space: nowrap;
@@ -515,19 +526,6 @@ mark {
 
 kbd { 
     font-family: $fontFamilyMonospace;
-    margin-right: 0.2rem;
-    margin-left: 0.2rem;
-    border-radius: 0.3rem;
-    font-size: $fontSizeMinus2;
-}
-
-td kbd { 
-    border-left: none;
-    border-right: none;
-    padding-right: 0;
-    padding-left: 0;
-    margin-right: 0;
-    margin-left: 0;
     font-size: $fontSizeMinus2;
 }
 
@@ -541,17 +539,17 @@ dl dd {
 
 ins {
     text-decoration: none;
-    border-bottom: 1px dotted $lightFgColor;
+    border-bottom: 1px dotted var(--page-text-secondary);
 }
 
 del {
     text-decoration: line-through;
-    border-bottom: 1px dotted $lightFgColor;
+    border-bottom: 1px dotted var(--page-text-secondary);
 }
 
 
 .table-wrapper {
-    border: dotted 1pt $lightFgColor;
+    border: dotted 1pt var(--page-text-secondary);
     border-radius: $borderRadius;
     padding: 0 1rem;
     margin: 1rem 0;
@@ -581,14 +579,16 @@ thead tr td {
 tbody td {
     vertical-align: top;
     padding: 1px .3rem;
+    word-break: break-word;
+    overflow-y: visible;
 }
 
 .highlight {
     padding-left: .6rem;
     padding-right: .6rem;
-    color: $lightBgColor;
+    color: var(--page-text);
     font-weight: bold;
-    background-color: $lightFgColor;
+    background-color: var(--page-text-selection);
     border-radius: 3pt;
 }
 
@@ -615,30 +615,6 @@ small {
     padding-right: 0.07em;
 }
 
-.header { 
-    font-family: $fontFamilySansSerif;
-    text-align: center;
-    font-size: 2.0rem;
-    margin-bottom: 3rem;
-}
-.header .title,
-.header h1 { 
-    font-size: 3.5rem;
-    font-weight: bold;
-}
-.header .author { 
-    margin-top: 2rem;
-}
-.header .email { 
-    font-family: $fontFamilyMonospace;
-}
-.header .email a { 
-    font-color: inherit;
-    text-decoration: none;
-}
-.header .date { 
-    margin-top: 1rem;
-}
 
 ul, ol {
     padding-left: 2.25rem;

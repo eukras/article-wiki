@@ -1,0 +1,79 @@
+.print-only {
+    display: none;
+}
+
+@media print {
+
+    .print-only {
+        display: block;
+    }
+
+    .no-print {
+        display: none;
+    }
+
+    ::root {
+        font-size: 10pt;
+    }
+
+    * {
+        color: var(--black);
+    }
+
+    div#background {
+        background: none;
+    }
+
+    div#page {
+        background-color: var(--white);
+        width: 96%;
+        min-width: 96%;
+        max-width: 96%;
+        margin: 2%;
+        padding: 0;
+        border: none;
+        box-shadow: none;
+    }
+
+    html.navigation-sidebars {
+        nav#site-menu, nav#page-outline {
+            display: none;
+        }
+    }
+
+    hgroup {
+        page-break-inside: avoid;
+        page-break-after: avoid;
+    }
+
+    p, ol, ul, blockquote, pre {
+        widows: 3;
+        orphans: 3;
+    }
+
+    #editor {
+        display: block;
+
+        button, a.button, textarea {
+            display: none;
+        }
+
+        main {
+            width: auto;
+            margin: 0;
+            padding: 0;
+        }
+    }
+
+    div.wiki {
+        width: auto;
+        margin: 0;
+        padding: 0;
+    }
+
+    var {
+        border: 2px solid var(--black);
+        color: var(--black);
+    }
+
+}

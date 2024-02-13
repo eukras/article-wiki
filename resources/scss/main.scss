@@ -1,19 +1,21 @@
-/* Basics. */
-@import "_variables.scss";
+/* Consistency */
 @import "_reset.scss";
-@import "_fonts.scss";
 
-/* The web application design. */
+/* Basics */
+@import "_breakpoints.scss";
+@import "_mixins.scss";
+@import "_variables.scss";
 
+/* Documents */
 @import "_layout.scss";
-@import "_buttons.scss";
-@import "_popover.scss";
-@import "_themes.scss";
-
-/* Typography: Same for book/print/ebook. */
-@import "_wiki.scss";
 @import "_typography.scss";
-@import "_responsive.scss";
 
-/* main.css and epub.css are two separate builds.*/
-@import "_web.scss";
+/* Application */
+@import "_wiki.scss";
+@import "_sidebars.scss";
+@import "_buttons.scss";
+@import "_editor.scss";
+@import "_unsupported.scss";
+
+/* Printing */
+@import "_print.scss";
