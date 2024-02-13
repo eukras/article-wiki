@@ -1,5 +1,13 @@
 {
+  "name": "ArticleWiki",
   "dependencies": {
+    "js-cookie": "^3.0.5",
     "sass": "^1.69.3"
+  },
+  "scripts": {
+    "build": "sass resources/scss/main.scss static/main.css && rollup -c"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3"
   }
 }
