@@ -97,7 +97,9 @@ from fastapi.responses import \
     PlainTextResponse, \
     RedirectResponse, \
     Response
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
+
 import uvicorn
 
 from lib.bokeh import make_background
@@ -131,6 +133,8 @@ if "pytest" in sys.modules:
     config['REDIS_DATABASE'] = config['REDIS_TEST_DATABASE']
 
 app = FastAPI()
+
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Redis, Jinja
 data = Data(config)
@@ -1357,7 +1361,6 @@ def expire():
 # ----------------------------------------------------------
 #                            Run
 # ----------------------------------------------------------
-
 
 def main():
     uvicorn.run('myapp:app', host='0.0.0.0', port=8000)
