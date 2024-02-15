@@ -1,7 +1,15 @@
+#editor {
+    textarea {
+        color: var(--page-text);
+    }
+}
+
 @include isLaptopOrLarger {
 
     #editor {
-        #btn-edit { display: none; }
+        #btn-edit {
+            display: none;
+        }
     }
 }
 

@@ -60,7 +60,11 @@ div#background {
     padding: 0;
     @include box-shadow(0, 0, 2.5rem, rgba(30, 60, 30, 0.25));
     header {
-        margin: 10em 0 5em 0;
+        text-align: center;
+        margin: 6em 0 5em 0;
+        h1, h2 {
+            text-align: center;
+        }
     }
 }
 
