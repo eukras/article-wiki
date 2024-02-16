@@ -574,6 +574,11 @@ body::-webkit-scrollbar-thumb {
   top: 0.3em;
 }
 
+.space {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
 /*
  * TOOD: Check if we float anything.
  */
@@ -1971,12 +1976,13 @@ button.feature {
   margin-top: 1rem;
 }
 
+#editor textarea {
+  color: var(--page-text);
+}
+
 @media screen and (min-width: 1101px) {
   #editor #btn-edit {
     display: none;
-  }
-  #editor textarea {
-    color: var(--page-text);
   }
 }
 @media screen and (max-width: 1100px) {
