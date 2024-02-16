@@ -68,6 +68,138 @@
         }, false);
     }
 
+    /*! js-cookie v3.0.5 | MIT */
+    /* eslint-disable no-var */
+    function assign (target) {
+      for (var i = 1; i < arguments.length; i++) {
+        var source = arguments[i];
+        for (var key in source) {
+          target[key] = source[key];
+        }
+      }
+      return target
+    }
+    /* eslint-enable no-var */
+
+    /* eslint-disable no-var */
+    var defaultConverter = {
+      read: function (value) {
+        if (value[0] === '"') {
+          value = value.slice(1, -1);
+        }
+        return value.replace(/(%[\dA-F]{2})+/gi, decodeURIComponent)
+      },
+      write: function (value) {
+        return encodeURIComponent(value).replace(
+          /%(2[346BF]|3[AC-F]|40|5[BDE]|60|7[BCD])/g,
+          decodeURIComponent
+        )
+      }
+    };
+    /* eslint-enable no-var */
+
+    /* eslint-disable no-var */
+
+    function init (converter, defaultAttributes) {
+      function set (name, value, attributes) {
+        if (typeof document === 'undefined') {
+          return
+        }
+
+        attributes = assign({}, defaultAttributes, attributes);
+
+        if (typeof attributes.expires === 'number') {
+          attributes.expires = new Date(Date.now() + attributes.expires * 864e5);
+        }
+        if (attributes.expires) {
+          attributes.expires = attributes.expires.toUTCString();
+        }
+
+        name = encodeURIComponent(name)
+          .replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent)
+          .replace(/[()]/g, escape);
+
+        var stringifiedAttributes = '';
+        for (var attributeName in attributes) {
+          if (!attributes[attributeName]) {
+            continue
+          }
+
+          stringifiedAttributes += '; ' + attributeName;
+
+          if (attributes[attributeName] === true) {
+            continue
+          }
+
+          // Considers RFC 6265 section 5.2:
+          // ...
+          // 3.  If the remaining unparsed-attributes contains a %x3B (";")
+          //     character:
+          // Consume the characters of the unparsed-attributes up to,
+          // not including, the first %x3B (";") character.
+          // ...
+          stringifiedAttributes += '=' + attributes[attributeName].split(';')[0];
+        }
+
+        return (document.cookie =
+          name + '=' + converter.write(value, name) + stringifiedAttributes)
+      }
+
+      function get (name) {
+        if (typeof document === 'undefined' || (arguments.length && !name)) {
+          return
+        }
+
+        // To prevent the for loop in the first place assign an empty array
+        // in case there are no cookies at all.
+        var cookies = document.cookie ? document.cookie.split('; ') : [];
+        var jar = {};
+        for (var i = 0; i < cookies.length; i++) {
+          var parts = cookies[i].split('=');
+          var value = parts.slice(1).join('=');
+
+          try {
+            var found = decodeURIComponent(parts[0]);
+            jar[found] = converter.read(value, found);
+
+            if (name === found) {
+              break
+            }
+          } catch (e) {}
+        }
+
+        return name ? jar[name] : jar
+      }
+
+      return Object.create(
+        {
+          set,
+          get,
+          remove: function (name, attributes) {
+            set(
+              name,
+              '',
+              assign({}, attributes, {
+                expires: -1
+              })
+            );
+          },
+          withAttributes: function (attributes) {
+            return init(this.converter, assign({}, this.attributes, attributes))
+          },
+          withConverter: function (converter) {
+            return init(assign({}, this.converter, converter), this.attributes)
+          }
+        },
+        {
+          attributes: { value: Object.freeze(defaultAttributes) },
+          converter: { value: Object.freeze(converter) }
+        }
+      )
+    }
+
+    var api = init(defaultConverter, { path: '/' });
+
     /**
      * Create an array of the H1..H6 tags within a given target selector.
      *
@@ -179,6 +311,8 @@
     const ICON_UNCHECKED = 'fa-square-o';
     const ICON_CHECKED = 'fa-check-square-o';
     const ICON_SCROLL_DOWN = 'fa-arrow-down';
+
+    const LOCAL_STORAGE_LAST_READING = 'last-reading';
 
     const TABLET_BREAKPOINT = 1100;  // Detect small screens
 
@@ -323,6 +457,16 @@
         return `H${number + 1}`;
     }
 
+    function createLastReadingBookmarks() {
+        if (user_slug && doc_slug && outline.length > 0) {
+            return `
+                <a id="last-reading" class="icon-button"><i class="fa fa-fw fa-bookmark"></i> <span>Last Reading</span> <span id="last-reading-readout">&sect;0</span></a>
+            `;
+        } else {
+            return '';
+        }
+    }
+
     function createOutlineListByRecursion(h1, outline) {
         //  Create list items for tags (e.g. H1) and recurse for sections having
         //  lower tags (e.g. > H1).
@@ -411,12 +555,23 @@
             </div>
         `;
         }
-        html += `
-            <div class="space">
-                <div><a class="icon-button" href="/login"><i class="fa fa-fw fa-sign-in"></i> User Login</a></div>
+        const login = api.get('token');
+        if (login) {
+            html += `
+                <div class="space">
+                    <div><a class="icon-button" href="/edit/eukras/_/index"><i class="fa fa-fw fa-plus"></i> New Article</a></div>
+                    <div><a class="icon-button" href="/logout"><i class="fa fa-fw fa-sign-out"></i> User Logout</a></div>
+                </div>
             </div>
-        </div>
-    `;
+        `;
+        } else {
+            html += `
+                <div class="space">
+                    <div><a class="icon-button" href="/login"><i class="fa fa-fw fa-sign-in"></i> User Login</a></div>
+                </div>
+            </div>
+        `;
+        }
         const page = document.querySelector('#page');
         const siteMenu = document.createElement('nav');
         siteMenu.setAttribute('id', 'site-menu');
@@ -430,11 +585,7 @@
             <div class="space">
                 <a class="icon-button" href="#"><i class="fa fa-fw fa-arrow-up"></i> <span>Top of Page</span> <span id="progress-meter">0%</span></a>
         `;
-        if (outline.length > 0) {
-            html += `
-                <a id="last-reading" class="icon-button"><i class="fa fa-fw fa-bookmark"></i> <span>Last Reading</span> <span id="last-reading-readout">&sect;0</span></a>
-            `;
-        }
+        html += createLastReadingBookmarks();
         html += `
             </div>
             <div id="completion" class="space">
@@ -613,8 +764,14 @@
     //  Auto-bookmark
 
     function saveBookMark() {
-        if (lastReadSectionId !== '') {
-            localStorage.setItem('bookmark', lastReadSectionId);
+        const json = localStorage.getItem(LOCAL_STORAGE_LAST_READING);
+        if (json) {
+            let last_reading = JSON.parse(json) || {};
+            if (lastReadSectionId !== '') {
+                const key = `${user_slug}_${doc_slug}`;
+                last_reading[key] = lastReadSectionId;
+                localStorage.setItem(LOCAL_STORAGE_LAST_READING, JSON.stringify(last_reading));
+            }
         }
     }
     function isAtTopOfScreen() {
@@ -622,7 +779,16 @@
     }
 
     function loadBookmark() {
-        lastReadSectionId = localStorage.getItem('bookmark') || '';
+        if (user_slug && doc_slug) {
+            const json = localStorage.getItem(LOCAL_STORAGE_LAST_READING);
+            if (json) {
+                const data = JSON.parse(json) || {};
+                const key = `${user_slug}_${doc_slug}`;
+                if (key in data) {
+                    lastReadSectionId = data[key];
+                }
+            }
+        }
     }
 
     function updateBookmark() {

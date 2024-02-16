@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie';
 import {cycleNavigation} from './navigation.mjs';
 import {getOutline} from './outline.mjs';
 import {initOptionHandler} from './options.mjs';
@@ -58,6 +59,8 @@ const UP = 'UP';
 const ICON_UNCHECKED = 'fa-square-o';
 const ICON_CHECKED = 'fa-check-square-o';
 const ICON_SCROLL_DOWN = 'fa-arrow-down';
+
+const LOCAL_STORAGE_LAST_READING = 'last-reading';
 
 const TABLET_BREAKPOINT = 1100;  // Detect small screens
 
@@ -217,6 +220,16 @@ function incTag(tag) {
     return `H${number + 1}`;
 }
 
+function createLastReadingBookmarks() {
+    if (user_slug && doc_slug && outline.length > 0) {
+        return `
+                <a id="last-reading" class="icon-button"><i class="fa fa-fw fa-bookmark"></i> <span>Last Reading</span> <span id="last-reading-readout">&sect;0</span></a>
+            `;
+    } else {
+        return '';
+    }
+}
+
 function createOutlineListByRecursion(h1, outline) {
     //  Create list items for tags (e.g. H1) and recurse for sections having
     //  lower tags (e.g. > H1).
@@ -305,12 +318,23 @@ function createSiteMenu() {
             </div>
         `;
     }
-    html += `
-            <div class="space">
-                <div><a class="icon-button" href="/login"><i class="fa fa-fw fa-sign-in"></i> User Login</a></div>
+    const login = Cookies.get('token');
+    if (login) {
+        html += `
+                <div class="space">
+                    <div><a class="icon-button" href="/edit/eukras/_/index"><i class="fa fa-fw fa-plus"></i> New Article</a></div>
+                    <div><a class="icon-button" href="/logout"><i class="fa fa-fw fa-sign-out"></i> User Logout</a></div>
+                </div>
             </div>
-        </div>
-    `;
+        `;
+    } else {
+        html += `
+                <div class="space">
+                    <div><a class="icon-button" href="/login"><i class="fa fa-fw fa-sign-in"></i> User Login</a></div>
+                </div>
+            </div>
+        `;
+    }
     const page = document.querySelector('#page');
     const siteMenu = document.createElement('nav');
     siteMenu.setAttribute('id', 'site-menu');
@@ -324,11 +348,7 @@ function createPageOutline() {
             <div class="space">
                 <a class="icon-button" href="#"><i class="fa fa-fw fa-arrow-up"></i> <span>Top of Page</span> <span id="progress-meter">0%</span></a>
         `;
-    if (outline.length > 0) {
-        html += `
-                <a id="last-reading" class="icon-button"><i class="fa fa-fw fa-bookmark"></i> <span>Last Reading</span> <span id="last-reading-readout">&sect;0</span></a>
-            `;
-    }
+    html += createLastReadingBookmarks();
     html += `
             </div>
             <div id="completion" class="space">
@@ -521,8 +541,14 @@ function loadUserDocCompletion() {
 //  Auto-bookmark
 
 function saveBookMark() {
-    if (lastReadSectionId !== '') {
-        localStorage.setItem('bookmark', lastReadSectionId);
+    const json = localStorage.getItem(LOCAL_STORAGE_LAST_READING);
+    if (json) {
+        let last_reading = JSON.parse(json) || {};
+        if (lastReadSectionId !== '') {
+            const key = `${user_slug}_${doc_slug}`;
+            last_reading[key] = lastReadSectionId;
+            localStorage.setItem(LOCAL_STORAGE_LAST_READING, JSON.stringify(last_reading));
+        }
     }
 };
 
@@ -531,7 +557,16 @@ function isAtTopOfScreen() {
 }
 
 function loadBookmark() {
-    lastReadSectionId = localStorage.getItem('bookmark') || '';
+    if (user_slug && doc_slug) {
+        const json = localStorage.getItem(LOCAL_STORAGE_LAST_READING);
+        if (json) {
+            const data = JSON.parse(json) || {};
+            const key = `${user_slug}_${doc_slug}`;
+            if (key in data) {
+                lastReadSectionId = data[key];
+            }
+        }
+    }
 }
 
 function updateBookmark() {
