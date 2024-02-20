@@ -32,6 +32,7 @@ with data as _:
 import os
 import time
 import uuid
+import logging
 
 from slugify import slugify
 from typing import Dict, List, Union
@@ -53,28 +54,28 @@ def load_env_config() -> dict:
     env_required = [
         'ADMIN_USER',
         'ADMIN_USER_PASSWORD',
-        'APP_NAME',
         'APP_HASH',
+        'APP_NAME',
         'ARTICLE_WIKI_CREDIT',  # YES/NO
         'ARTICLE_WIKI_URL',
         'COOKIE_NAME',
         'COOKIE_SECRET',
         'ENVIRONMENT',
-        'FACEBOOK_APP_ID',
         'GOOGLE_ANALYTICS_TRACKING_ID',
         'PUBLIC_DIR',
-        'SINGLE_USER',  # YES/NO
-        'SUBSCRIBE_LINK',
+        'REDIS_DATABASE',
         'REDIS_HOST',
         'REDIS_PORT',
-        'REDIS_DATABASE',
         'REDIS_TEST_DATABASE',
+        'SINGLE_USER',  # YES/NO
+        'SUBSCRIBE_LINK',
         'TIME_ZONE',
+        'UPLOAD_LIMIT_KB',
         'WEB_HOST',
         'WEB_HOST_PORT',
-        'UPLOAD_LIMIT_KB',
     ]
     config = {}
+    logging.info(os.environ.keys())
     for key in env_required:
         config[key] = os.environ.get(key, None)
         if config[key] is None:

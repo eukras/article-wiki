@@ -16,6 +16,7 @@ Each Block must:
 
 import re
 
+from airium import Airium
 from textwrap import shorten
 
 from copy import copy
@@ -449,6 +450,8 @@ class CharacterBlock(Block):
             html = list_block(content, settings)
         elif _ in Config.tables:
             html = table_block(content, settings)
+        elif _ in Config.quizzes:
+            html = quiz_block(content, settings)
         elif _ in Config.glosses:
             html = gloss_block(content, settings)
         else:
@@ -794,6 +797,32 @@ def column_block(text, settings):
         html += tag('p', content, 'float-left %s' % bootstrap_class)
     html += "<div style=\"clear: both\"></div>"
     return html
+
+
+def quiz_block(text, settings):
+    """
+    Build HTML from text.
+    """
+    inline = Inline()
+    q_html, a_html = [], [];
+    for char, line in split_to_array(text, '?=', capture_characters=True):
+        if char == '?':
+            q_html.append(inline.process(line))
+        if char == '=':
+            a_html.append(inline.process(line))
+    __ = Airium()
+    with __.div(klass='quiz'):
+        if q_html:
+            with __.ol(klass='questions'):
+                for line in q_html:
+                    with __.li():
+                        __(line)
+        if a_html:
+            with __.ol(klass='answers'):
+                for line in a_html:
+                    with __.li():
+                        __(line)
+    return str(__)
 
 
 def gloss_block(text, settings):

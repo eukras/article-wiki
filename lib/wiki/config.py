@@ -1,5 +1,5 @@
 """
-Single point of definition for 'grammar'.
+Single point of definition for grammar variables.
 
 Used in blocks and for self-documentation.
 """
@@ -19,11 +19,12 @@ class Config(object):
     lists = '*#_'     # Recursively nested lists, non-recursive icon lists
     tables = '!|'     # Tables, with format block, with format blocks
     glosses = '/'     # Interlinear translations
+    quizzes = '?'     # Attach a question-and-answers block 
     caption = '='     # Attach a caption to the preceding block
 
     all_control_chars = (
         subheads + nulls + setters + quotes + notes + 
-        aligns + lists + tables + caption + glosses
+        aligns + lists + tables + quizzes + glosses + caption
         )
 
     dividers = [
