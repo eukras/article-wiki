@@ -266,12 +266,9 @@ def parse_table_data(divisions, header=False):
 
 def generate_table(data, options=None):
     """
-    Produce tables from 2D array, and 'lcr$' style options.
-
-    @todo: specify $ LOCALE = ... in settings.
+    Produce tables from 2D array, and 'lcr' style options.
     """
     options = options or []
-    locale.setlocale(locale.LC_ALL, 'en_CA.UTF-8')  # For currency.
     header = ''
     out = [
         "<table class=\"table table-condensed\">",
@@ -303,20 +300,13 @@ def generate_table(data, options=None):
 
 def get_cell_formatting(align, cell):
     """
-    For table_block: align is one of lrc$
+    For table_block: align is one of lrc
     """
     inline = Inline()
     if align == 'r':
         return ("class=\"text-right\"", inline.process(cell))
     elif align == 'c':
         return ("class=\"text-center\"", inline.process(cell))
-    elif align == '$':
-        try:
-            # @todo: Allow locale to be set with settings.
-            value = locale.currency(float(cell), grouping=True)
-        except ValueError:
-            value = cell
-        return ("class=\"text-right\"", value)
     else:
         return ("class=\"text-left\"", inline.process(cell))
 
