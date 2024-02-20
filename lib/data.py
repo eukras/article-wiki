@@ -51,37 +51,28 @@ def load_env_config() -> dict:
 
     @todo: Auto-strip an 'ARTICLE_WIKI_' prefix
     """
-    env_required = [
-        'ADMIN_USER',
-        'ADMIN_USER_PASSWORD',
-        'APP_HASH',
-        'APP_NAME',
-        'ARTICLE_WIKI_CREDIT',  # YES/NO
-        'ARTICLE_WIKI_URL',
-        'COOKIE_NAME',
-        'COOKIE_SECRET',
-        'ENVIRONMENT',
-        'GOOGLE_ANALYTICS_TRACKING_ID',
-        'PUBLIC_DIR',
-        'REDIS_DATABASE',
-        'REDIS_HOST',
-        'REDIS_PORT',
-        'REDIS_TEST_DATABASE',
-        'SINGLE_USER',  # YES/NO
-        'SUBSCRIBE_LINK',
-        'TIME_ZONE',
-        'UPLOAD_LIMIT_KB',
-        'WEB_HOST',
-        'WEB_HOST_PORT',
-    ]
+    env_defaults = {
+            'ADMIN_USER': 'admin',
+            'ADMIN_USER_PASSWORD': 'password',
+            'APP_HASH': '1111111111',
+            'APP_NAME': 'Article Wiki',
+            'ARTICLE_WIKI_CREDIT': 'YES',  # YES/NO
+            'ARTICLE_WIKI_URL': 'https://github.com/eukras/article-wiki',
+            'GOOGLE_ANALYTICS_TRACKING_ID': '',
+            'PUBLIC_DIR': '/static',
+            'REDIS_DATABASE': '0',
+            'REDIS_HOST': 'localhost',
+            'REDIS_PORT': '6379',
+            'REDIS_TEST_DATABASE': '1',
+            'SINGLE_USER': 'YES',
+            'TIME_ZONE': 'Australia/Sydney',
+            'UPLOAD_LIMIT_KB': '500',
+            'WEB_HOST': 'localhost',
+            'WEB_HOST_PORT': '8080',
+        }
     config = {}
-    logging.info(os.environ.keys())
-    for key in env_required:
-        config[key] = os.environ.get(key, None)
-        if config[key] is None:
-            cmd = "set -a && source ENV.dist && set +a"
-            msg = "Env var missing ({:s}); try '{:s}'."
-            raise RuntimeError(msg.format(key, cmd))
+    for key, value in env_defaults.items():
+        config[key] = os.environ.get(key, value)
 
     # Extras
     config['SITE'] = "https://" + config['WEB_HOST']
