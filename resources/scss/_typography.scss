@@ -669,6 +669,13 @@ ul.checkboxes li:before
     margin: 0 1rem;    /* any design */
 }
 
+div.quiz {
+    ol.answers {
+        font-size: $fontSizeMinus2;
+        transform: rotate(180deg);
+    }
+}
+
 /**
  * Mixins
  *

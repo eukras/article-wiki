@@ -132,39 +132,3 @@ html.theme-dark {
 
 }
 
-//  -----------------------------
-//  Geometry
-//  -----------------------------
-
-@include isLaptopOrLarger {
-
-    html {
-        --page-width: 65vw;
-        --side-width-left: 16vw;
-        --side-width-right: 16vw;
-        --side-padding: 1em;
-        --page-margin: 6em;
-    }
-}
-
-@include isTabletOrSmaller {
-    html {
-        --page-width: 100vw;
-        --side-width-left: 39vw;
-        --side-width-right: 60vw;
-    }
-}
-
-@include isTablet {
-    html {
-        --side-padding: 2em;
-        --page-margin: 4em;
-    }
-}
-
-@include isMobile {
-    html {
-        --side-padding: 1em;
-        --page-margin: 3em;
-    }
-}

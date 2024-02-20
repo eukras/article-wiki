@@ -11,6 +11,7 @@ Character Blocks are paragraphs formatted by a single control character at the s
 | `( )` | Float: Left, Right
 | `' " %` | Aside and Note (visible), Comment (hidden)
 | `/` | Translation (interlinear glosses)
+| `?` | Quizzes (with '=' for answers)
 | `\`` | Document outlines (in `index.txt`)
 
 = Table $[t++]. = Summary of Control Characters.
