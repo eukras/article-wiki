@@ -1,6 +1,6 @@
-import collections, re
+import collections
+import re
 
-from slugify import slugify
 from pprint import pprint
 
 from lib.wiki.utils import one_line

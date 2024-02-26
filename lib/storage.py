@@ -19,7 +19,7 @@ import subprocess
 
 from typing import Dict
 
-from slugify import slugify
+from lib.slugs import slug
 
 
 # -------------------------
@@ -68,9 +68,9 @@ def load_dir(dir_path: str) -> dict:
     file_paths = glob.glob(file_pattern)
     for path in file_paths:
         name = path.replace(dir_path + '/', '').replace('.txt', '')
-        slug = slugify(name)
-        document[slug] = codecs.open(path, 'r', 'utf-8').read()
-        print("READ: {:s} ({:d})".format(slug, len(document[slug])))
+        part_slug = slug(name)
+        document[part_slug] = codecs.open(path, 'r', 'utf-8').read()
+        print("READ: {:s} ({:d})".format(part_slug, len(document[part_slug])))
     return document
 
 
@@ -102,9 +102,9 @@ def read_archive_dir(dir_path: str) -> Dict[str, Dict[str, str]]:
         print('PATH', path)
         if os.path.isdir(path):
             name = os.path.basename(path).replace('.txt', '')
-            slug = slugify(name)
-            documentHash[slug] = load_dir(path)
-            print('len %d' % len(documentHash[slug]))
+            part_slug = slug(name)
+            documentHash[part_slug] = load_dir(path)
+            print('len %d' % len(documentHash[part_slug]))
     return documentHash
 
 

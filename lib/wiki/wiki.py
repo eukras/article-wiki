@@ -15,8 +15,8 @@ from dateutil.parser import parse
 from pprint import pformat
 
 from airium import Airium
-from slugify import slugify
 
+from lib.slugs import slug
 from lib.wiki.backslashes import Backslashes
 from lib.wiki.bibliography import Bibliography, split_bibliography
 from lib.wiki.blocks import \
@@ -154,12 +154,12 @@ class Wiki(object):
         else:
             self.settings.set('TITLE', '')
 
-        for (numbering, slug, _, _, _) in self.outline:
-            if slug in parts and slug not in ['index', 'biblio']:
+        for (numbering, _slug, _, _, _) in self.outline:
+            if _slug in parts and _slug not in ['index', 'biblio']:
                 section = self.make_section(
-                    numbering, slug, parts[slug], fragment, preview
+                    numbering, _slug, parts[_slug], fragment, preview
                 )
-                html_parts[slug] = section
+                html_parts[_slug] = section
 
         # -------------------------------------
         # Replace placeholder content (as HTML)
@@ -330,7 +330,7 @@ class Wiki(object):
 
         data['user'] = user_slug
         data['title'] = self.settings.get('TITLE', '')
-        data['slug'] = doc_slug if doc_slug else slugify(data['title'])
+        data['slug'] = doc_slug if doc_slug else slug(data['title'])
         data['summary'] = self.settings.get('SUMMARY', '')
         data['license'] = self.settings.get('LICENSE', '')
         data['publish'] = self.settings.get('PUBLISH', 'YES')  # <-- Default
@@ -344,7 +344,7 @@ class Wiki(object):
         data['published_time'] = format_date(utc, tz_name, DATE_FORMAT_ISO8601)
 
         data['todo'] = self.settings.get('TODO', '')
-        data['word_count'] = self.outline.total_word_count() if self.outline else 0;
+        data['word_count'] = self.outline.total_word_count() if self.outline else 0
 
         return data
 
@@ -355,7 +355,7 @@ class Wiki(object):
         text = parts['index']
         content, _ = split_bibliography(text)
         blocks = BlockList(content)
-        title, summary = blocks.pop_titles() 
+        title, summary = blocks.pop_titles()
         content_html = blocks.html(['0'], 'index', self.settings,
                                    fragment=True)
         if not self.outline.single_page():

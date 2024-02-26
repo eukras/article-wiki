@@ -5,7 +5,6 @@ Render has no state beyond its initial configuration, but we don't want to be
 repeating that everywhere, so we'll initialise once as a singleton.
 """
 
-import locale
 import logging
 import re
 

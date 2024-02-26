@@ -32,13 +32,12 @@ with data as _:
 import os
 import time
 import uuid
-import logging
-
-from slugify import slugify
-from typing import Dict, List, Union
 
 import redis
 
+from typing import Dict, List, Union
+
+from lib.slugs import slug
 from lib.wiki.utils import random_slug
 
 
@@ -47,22 +46,25 @@ LAST_CHANGED_MAX = 10
 
 def load_env_config() -> dict:
     """
-    Create a config array from environment variables. Die if any are missing.
+    Create a config array from environment variables with sensible defaults;
+    override with ENV vars in setup.
 
-    @todo: Auto-strip an 'ARTICLE_WIKI_' prefix
+    @todo: Add an 'ARTICLE_WIKI_' prefix?
     """
     env_defaults = {
             'ADMIN_USER': 'admin',
             'ADMIN_USER_PASSWORD': 'password',
             'APP_HASH': '1111111111',
             'APP_NAME': 'Article Wiki',
-            'ARTICLE_WIKI_CREDIT': 'YES',  # YES/NO
+            'ARTICLE_WIKI_CREDIT': 'YES',
             'ARTICLE_WIKI_URL': 'https://github.com/eukras/article-wiki',
             'GOOGLE_ANALYTICS_TRACKING_ID': '',
             'PUBLIC_DIR': '/static',
             'REDIS_DATABASE': '0',
             'REDIS_HOST': 'localhost',
             'REDIS_PORT': '6379',
+            'REDIS_USER': 'default',
+            'REDIS_PASSWORD': 'password',
             'REDIS_TEST_DATABASE': '1',
             'SINGLE_USER': 'YES',
             'TIME_ZONE': 'Australia/Sydney',
@@ -93,12 +95,16 @@ class Data(object):
         self.redis = redis.Redis(
             config['REDIS_HOST'],
             port=config['REDIS_PORT'],
+            username=config['REDIS_USER'],
+            password=config['REDIS_PASSWORD'],
             db=config['REDIS_DATABASE'],
             decode_responses=True
         )
         self.redis_binary = redis.Redis(
             config['REDIS_HOST'],
             port=config['REDIS_PORT'],
+            username=config['REDIS_USER'],
+            password=config['REDIS_PASSWORD'],
             db=config['REDIS_DATABASE']
         )
         self.time_zone = config['TIME_ZONE']
@@ -145,7 +151,7 @@ class Data(object):
             for _ in slugs:
                 if not isinstance(_, str):
                     raise ValueError("Slugs must be strings")
-                if _ != slugify(_):
+                if _ != slug(_):
                     raise ValueError("Invalid slug: " + _)
 
     def get_hashes(self, keys: List[str]) -> List[dict]:
@@ -394,7 +400,6 @@ class Data(object):
             for doc_slug in self.userDocumentSet_list(user_slug)
         }
 
-
     # -----------------
     # DOCUMENT METADATA
     # -----------------
@@ -579,4 +584,3 @@ class Data(object):
         for user_slug in self.userSet_list():
             for doc_slug in self.userDocumentSet_list(user_slug):
                 self.epubCache_delete(user_slug, doc_slug)
-

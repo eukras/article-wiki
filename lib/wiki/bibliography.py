@@ -8,9 +8,9 @@ Manage a simple bibliography list, of full-line records.
 import re
 
 from jinja2 import Environment
-from slugify import slugify
 from sortedcontainers import SortedDict
 
+from lib.slugs import slug
 from lib.wiki.counters import Letters, Symbols
 from lib.wiki.geometry import get_words
 from lib.wiki.inline import Inline, strip_markup
@@ -206,7 +206,7 @@ def get_nav_id(label, numbering, count):
     #ref-nav_id is the bibliography anchor
     """
     number = get_number(numbering)
-    return slugify(label) + '_' + number + '_' + str(count)
+    return slug(label) + '_' + number + '_' + str(count)
 
 
 def nonempty_lines(content):
@@ -236,8 +236,8 @@ def collate_bibliography(parts):
     Collate the bibliography lines into a list; order it.
     """
     lines = []
-    for slug, section in parts.items():
-        if slug == 'biblio':
+    for key, section in parts.items():
+        if key == 'biblio':
             lines += nonempty_lines(section)
         else:
             _, biblio = split_bibliography(section)

@@ -10,6 +10,10 @@ from lib.wiki.settings import Settings
 from lib.wiki.wiki import Wiki
 
 
+PROTECTED_DOC_SLUGS = ['index']
+PROTECTED_PART_SLUGS = ['index', 'biblio']
+
+
 class Document(object):
     """
     Work with full wiki documents.
@@ -57,19 +61,6 @@ class Document(object):
         Simple comparison of properties.
         """
         return self.parts == other.parts
-
-    def protected_doc_slugs(self):
-        """
-        Admin pages are defined by doc_slugs that are never to be renamed by
-        editing; or added to the Latest Changes list.
-        """
-        return ['fixtures', 'templates']
-
-    def protected_part_slugs(self):
-        """
-        Part slugs that are never to be renamed by editing.
-        """
-        return ['index', 'biblio']
 
     def set_host(self, host: str):
         """
@@ -136,7 +127,7 @@ class Document(object):
         if update_doc_slug is None:
             update_doc_slug = all([
                 # fixtures, templates
-                old_doc_slug not in self.protected_doc_slugs(),
+                old_doc_slug not in PROTECTED_DOC_SLUGS
             ])
 
         if update_doc_slug:
@@ -148,7 +139,7 @@ class Document(object):
 
         with self.data as _:
             _.userDocument_set(self.user_slug, new_doc_slug, self.parts)
-            if old_doc_slug not in self.protected_doc_slugs():
+            if old_doc_slug not in PROTECTED_DOC_SLUGS:
                 _.userDocumentLastChanged_set(self.user_slug,
                                               old_doc_slug, new_doc_slug)
             _.userDocumentCache_delete(self.user_slug, old_doc_slug)
@@ -161,7 +152,8 @@ class Document(object):
             wiki = Wiki(Settings({
                 'config:host': self.host,  # <-- ebooks req. FQDN
                 'config:user': self.user_slug,
-                'config:document': self.doc_slug
+                'config:document': self.doc_slug,
+                'ADMIN_USER': self.data.admin_user
             }))
             html = wiki.process(self.user_slug, self.doc_slug, self.parts)
             self.data.userDocumentCache_set(self.user_slug, self.doc_slug,
@@ -230,7 +222,7 @@ class Document(object):
         okay_to_rename = all([
             old_slug != new_slug,
             old_slug == '_' or old_slug in self.parts,
-            old_slug not in self.protected_part_slugs(),
+            old_slug not in PROTECTED_PART_SLUGS,
             new_slug not in self.parts
         ])
         if okay_to_rename:

@@ -85,11 +85,13 @@ class Articles(Function):
     """
     Take lines of the form user_slug/doc_slug.
     Present links to books, using their covers and metadata.
+
+    Allow $[ADMIN_USER] in articles lists.
     """
     examples = [
         trim("""
         ARTICLES ---
-        eukras/article-wiki
+        $[ADMIN_USER]/article-wiki
         ---
         """)
     ]
@@ -99,8 +101,10 @@ class Articles(Function):
         config = load_env_config()
         data = Data(config)
 
+        text = self.text.replace('$[ADMIN_USER]', data.admin_user)
+
         articles = []
-        for line in self.text.splitlines():
+        for line in text.splitlines():
             parts = line.split('/')
             if len(parts) == 2:
                 user_slug, doc_slug = parts

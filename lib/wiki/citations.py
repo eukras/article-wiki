@@ -7,8 +7,7 @@ bibliography element.
 
 import re
 
-from slugify import slugify
-
+from lib.slugs import slug
 from lib.wiki.config import Config
 from lib.wiki.placeholders import Placeholders
 from lib.wiki.bibliography import Bibliography
@@ -49,7 +48,7 @@ class Citations(object):
         """
         numbering = self.bibliography.outline.find_numbering(part_slug)
         citation, note, punctuation = split_pattern(pattern)
-        if self.ibid and slugify(citation) == 'ibid':
+        if self.ibid and slug(citation) == 'ibid':
             index = self.bibliography.get_count(part_slug)
             return self.bibliography.citation(
                 citation, note, punctuation, self.ibid, numbering, index

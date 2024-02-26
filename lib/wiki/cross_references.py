@@ -6,11 +6,10 @@ Cross References placeholders.
 
 from html import escape
 
-from slugify import slugify
-
 from lib.wiki.geometry import get_words
 from lib.wiki.outline import Outline
 from lib.wiki.placeholders import Placeholders
+
 
 class CrossReferences(object):
     """

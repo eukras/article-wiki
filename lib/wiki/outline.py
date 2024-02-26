@@ -9,7 +9,7 @@ from typing import Generator
 
 from html import escape
 from jinja2 import Environment
-from slugify import slugify
+from lib.slugs import slug
 
 from lib.wiki.blocks import BlockList, CharacterBlock, get_title_data
 from lib.wiki.counters import new_counter
@@ -351,7 +351,7 @@ def extract_outline(text: str, counters: list) -> list:
         if isinstance(_, CharacterBlock) and _.control_character == "-":
             hierarchy = split_to_recursive_array(_.content, '- ')
             enumeration = enumerate_list(hierarchy, counters, [])
-            outline = [(numbering, (slugify(_), _, slugify(_), ''))
+            outline = [(numbering, (slug(_), _, slug(_), ''))
                        for numbering, _ in enumeration]
             return outline
     return []

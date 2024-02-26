@@ -21,7 +21,8 @@ from textwrap import shorten
 
 from copy import copy
 from jinja2 import Environment
-from slugify import slugify
+
+from lib.slugs import slug
 
 from lib.wiki.functions.base import \
     Articles, \
@@ -313,11 +314,11 @@ def get_title_data(text: str, part_slug: str) -> (str, str, str, str):
     """
     blocks = BlockList(clean_text(text))
     title, summary = blocks.title_and_summary()
-    title_slug = slugify(title)
+    title_slug = slug(title)
     for _ in blocks.find('CharacterBlock', '$'):
         settings = split_to_dictionary(_.text(), prefix='$', delimiter='=')
         if 'SLUG' in settings:
-            title_slug = slugify(settings['SLUG'])
+            title_slug = slug(settings['SLUG'])
     return part_slug, title, title_slug, summary
 
 
@@ -373,8 +374,6 @@ class Divider(Block):
     def html(self, renderer, settings):
         """
         Map divider patterns to HTML, which doesn't change.
-
-        (Settings are unused.)
         """
         html = {
             # Markers

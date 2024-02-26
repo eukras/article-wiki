@@ -3,7 +3,7 @@ Construct an index from #Tags in document parts.
 """
 
 from jinja2 import Environment
-from slugify import slugify
+from lib.slugs import slug
 
 from lib.wiki.counters import RomanNumerals
 from lib.wiki.outline import Outline
@@ -155,6 +155,6 @@ def get_nav_id(tag, subtag, numbering, count):
     #ref_nav_id is the anchor in the end matter
     """
     number = get_number(numbering)
-    items = [_ for _ in [slugify(tag), slugify(subtag), number, str(count)]
+    items = [_ for _ in [slug(tag), slug(subtag), number, str(count)]
              if _ != '']
     return '_'.join(items)
