@@ -1,14 +1,11 @@
-Nigel Chapman
+Your Homepage
 
-= Web programming and Christian theology.
+= Click the edit button to change this text
 
-$ SLUG = author
-
-| 14 Dec 2018. | Article Wiki source code: https://github.com/eukras/article-wiki
-| 7 Dec 2018. | It's my shiny new web page!
+$ SLUG = index
 
 ~
 
 ARTICLES ---
-eukras/help
+admin/help
 ---
