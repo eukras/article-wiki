@@ -19,7 +19,7 @@ table of contents.
 - Main pages
 
 @app.get('/') -- OK: Redirects to admin user page
-@app.get('/user/{user_slug}') -- OK: Shows user's fixtures/index page.
+@app.get('/read/{user_slug}') -- OK: Shows user's fixtures/index page.
 @app.get('/read/{user_slug}/{doc_slug}') -- OK: Shows user's doc_slug page.
 @app.get('/rss/{user_slug}.xml') -- OK: Generate really simple XML.
 @app.get('/help') -- OK: Shows admin user's 'help' document.
@@ -73,7 +73,6 @@ import urllib.parse
 
 import hmac
 import io
-import json
 import logging
 import os
 import shutil
@@ -82,12 +81,9 @@ import tempfile
 
 from PIL import Image, ImageDraw
 
-# OLD SERVER w. BOTTLE
-
 from jinja2 import Environment as JinjaTemplates, PackageLoader
 
 from markupsafe import escape
-from slugify import slugify
 
 from fastapi import Depends, FastAPI, Form, HTTPException, status, \
     Request, UploadFile
@@ -102,26 +98,28 @@ from fastapi.staticfiles import StaticFiles
 
 import uvicorn
 
+from command import create_admin_user, load_fixtures
+from lib.document import PROTECTED_DOC_SLUGS
+
 from lib.bokeh import make_background
 from lib.data import Data, load_env_config
 from lib.document import Document
 from lib.ebook import write_epub
 from lib.overlay import make_cover, make_card, make_quote
+from lib.slugs import slug
 from lib.storage import \
     compress_archive_dir, \
     make_zip_name, \
     read_archive_dir, \
     uncompress_archive_dir, \
     write_archive_dir
-from lib.wiki.blocks import BlockList, get_title_data
-from lib.wiki.inline import Inline
+from lib.wiki.blocks import get_title_data
 from lib.wiki.settings import Settings
 from lib.wiki.wiki import \
     Wiki, \
     clean_text, \
     is_index_part, \
-    reformat_part, \
-    split_published
+    reformat_part
 from lib.wiki.utils import trim
 
 
@@ -145,10 +143,20 @@ views = JinjaTemplates(
     keep_trailing_newline=True
 )
 
+# ----------------------------------------------------------
+#                       Initialise DB
+# ----------------------------------------------------------
+
+is_setup = data.user_exists(config['ADMIN_USER'])
+if not is_setup:
+    create_admin_user(data)
+    load_fixtures(data)
+
 
 # ----------------------------------------------------------
 #                     Utility functions
 # ----------------------------------------------------------
+
 
 def abs_url(base_url: str, uri: str):
     """
@@ -254,16 +262,19 @@ def show_editor(source: str,
     wiki = Wiki(settings)
     part_slug, title, title_slug, summary = get_title_data(source, part_slug)
     text = reformat_part(part_slug, source)
+
     if part_slug == '':
-        slug = slugify(title)
+        title_slug = slug(title)
     elif part_slug != 'index' and is_index_part(text):
-        slug = 'index'
+        title_slug = 'index'
     elif part_slug == 'biblio':
-        slug = 'biblio'
+        title_slug = 'biblio'
     else:
-        slug = part_slug
-    html = wiki.process(user_slug, doc_slug, {slug: copy(text), },
+        title_slug = part_slug
+
+    html = wiki.process(user_slug, doc_slug, {title_slug: copy(text), },
                         fragment=False, preview=True)
+
     template = views.get_template('editor.html')
     html = template.render(
         page_title="Editing: {:s}".format(title),
@@ -311,13 +322,11 @@ async def login_form():
 
 @app.post('/login')
 async def do_login(username: Annotated[str, Form()] = None,
-             password: Annotated[str, Form()] = None):
+                   password: Annotated[str, Form()] = None):
     """
     Create redis record and cookie for admin user.
-
-    v.0.1.0 -- Sufficient for SINGLE_USER mode.
     """
-    authorized = all([
+    authorized = ([
         username == config['ADMIN_USER'],
         password == config['ADMIN_USER_PASSWORD'],
     ])
@@ -343,12 +352,50 @@ async def do_logout(request: Request):
     """
     response = RedirectResponse('/')
     token = request.cookies.get('token', None)
-    print('LOGOUT: token: ', token)
     if token:
         data.login_delete(token)
         response.delete_cookie(key='token')
-        print('OK');
     return response
+
+
+# ----------------------------------------------------------
+#                        Error Pages
+# ----------------------------------------------------------
+
+
+def error_page(title, message):
+    """
+    Friendly recovery from an unexpected error.
+    """
+    config = load_env_config()
+    template = views.get_template('error.html')
+    page_html = template.render(
+            title=title,
+            message=message,
+            config=config,
+            )
+    return HTMLResponse(content=page_html)
+
+
+@app.exception_handler(403)
+async def error_403(request: Request, exc: HTTPException):
+    return error_page(
+        title='Unauthorised',
+        message='You need administrative priviliges to view this page.')
+
+
+@app.exception_handler(404)
+async def error_404(request: Request, exc: HTTPException):
+    return error_page(
+        title='Not Found',
+        message='This link does not match any page on this website.')
+
+
+@app.exception_handler(500)
+async def error_500(request: Request, exc: HTTPException):
+    return error_page(
+        title='System Error',
+        message='This request could not be served at present.')
 
 
 # ----------------------------------------------------------
@@ -361,7 +408,7 @@ async def home_page():
     """
     SINGLE_USER mode means the admin user's homepage is the site home page.
     """
-    return RedirectResponse(f'/user/{data.admin_user}')
+    return RedirectResponse(f'/read/{data.admin_user}/index')
 
 
 @app.get('/help')
@@ -370,102 +417,6 @@ async def help():
     Show the admin user's 'help' page...
     """
     return RedirectResponse(f'/read/{data.admin_user}/help')
-
-
-@app.get('/user/{user_slug}')
-async def user_page(user_slug, request: Request):
-    """
-    Show /{user_slug}/fixtures/author.
-    """
-    header_buttons = [login_or_logout_button()]
-    if login and login['username'] == user_slug:
-        header_buttons += [
-            new_article_button(user_slug),
-        ]
-
-    header_buttons += [
-        edit_button(user_slug, 'fixtures', 'author'),
-    ]
-
-    footer_buttons = [help_button()]
-    if config['ARTICLE_WIKI_CREDIT'] == 'YES':
-        footer_buttons += [source_button()]
-    if has_authority_for_user(user_slug):
-        footer_buttons += [import_archive_button(user_slug)]
-        footer_buttons += [export_archive_button(user_slug)]
-    if not login:
-        footer_buttons += [rss_button(user_slug)]
-
-    slugs = data.userDocumentSet_list(user_slug)
-    changes_list = data.userDocumentLastChanged_list(user_slug)
-
-    if not has_authority_for_user(user_slug):
-        # Show only those that have been published
-        changes_list, __ = split_published(changes_list)
-
-    article_slugs = [_ for _ in slugs if _ not in ['fixtures', 'templates']]
-    article_keys = [
-        data.userDocumentMetadata_key(user_slug, _)
-        for _ in article_slugs
-    ]
-    article_list = sorted(
-        data.get_hashes(article_keys),
-        key=lambda _: _.get('title', '')
-    )
-
-    published_articles, unpublished_articles = split_published(article_list)
-    if not has_authority_for_user(user_slug):
-        unpublished_articles = []
-
-    settings = Settings({
-        'config:host': str(request.base_url),
-        'config:user': user_slug,
-        'config:document': 'fixtures',
-    })
-    wiki = Wiki(settings)
-
-    document = data.userDocument_get(user_slug, 'fixtures')
-    if not document:
-        raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"User '{user_slug}' not found."
-                )
-    if 'author' in document:
-        text = document['author']
-    else:
-        text = trim("""
-            Author Page
-
-            (Author information to be added here...)
-            """)
-
-    blocks = BlockList(clean_text(text))
-    page_title, page_summary = blocks.title_and_summary()
-    content_html = wiki.process('fixtures', 'author', {'index': blocks.text()},
-                                fragment=False, preview=False)
-
-    metadata = {
-        'title': page_title,
-    }
-
-    inline = Inline()
-    html = views.get_template('user.html').render(
-        config=config,
-        metadata=metadata,
-        content_html=content_html,
-        #   user=user_slug,
-        #   page_title="{:s} - {:s}".format(page_title, page_summary),
-        #   title_html=inline.process(page_title),
-        #   summary_html=inline.process(page_summary),
-        #   header_buttons=header_buttons,
-        #   footer_buttons=footer_buttons,
-        #   changes_list=changes_list,
-        #   published_articles=published_articles,
-        #   unpublished_articles=unpublished_articles,
-        #   content_html=content_html,
-        #   pluralize=pluralize  # <-- hack function injection
-    )
-    return HTMLResponse(content=html)
 
 
 @app.get('/read/{user_slug}/{doc_slug}')
@@ -494,7 +445,7 @@ async def read_document(user_slug, doc_slug, request: Request):
 
     uri = '/read/{:s}/{:s}'.format(user_slug, doc_slug)
     metadata['url'] = abs_url(str(request.base_url), uri)
-    author_uri = '/user/{:s}'.format(user_slug)
+    author_uri = '/read/{:s}'.format(user_slug)
     metadata['author_url'] = abs_url(str(request.base_url), author_uri)
     metadata['home_url'] = abs_url(str(request.base_url), '/')
     image_uri = '/image/card/{:s}/{:s}.jpg'.format(user_slug, doc_slug)
@@ -531,7 +482,7 @@ def cache_rss_latest(user_slug, base_url):
     """
     articles = data.userDocumentLastChanged_list(user_slug)
     fg = FeedGenerator()
-    fg.id(abs_url(base_url, '/user/%s' % user_slug))
+    fg.id(abs_url(base_url, '/read/%s' % user_slug))
     fg.title('Nigel Chapman (%s)' % base_url)
     fg.subtitle('Long reads on Christian thought')  # <-- Set METADATA for this
     # fg.author( {'name':'Nigel Chapman','email':'nigel@chapman.id.au'} )
@@ -559,6 +510,15 @@ def cache_rss_latest(user_slug, base_url):
 #                           Editing
 # ----------------------------------------------------------
 
+@app.get('/new-article')
+async def new_article():
+    if login is not None:
+        uri = f"/edit/{login['username']}/_/index"
+        return RedirectResponse(uri, status_code=status.HTTP_303_SEE_OTHER)
+    else:
+        raise HTTPException(content=status.HTTP_400_BAD_REQUEST,
+                            detail="You must login to create a new article")
+
 
 @app.get('/edit/{user_slug}/{doc_slug}/{part_slug}')
 async def edit_part(
@@ -571,7 +531,8 @@ async def edit_part(
     """
     Open the editor to make changes to a doc_part
     """
-    domain = 'http://localhost:8000'
+    config = load_env_config()
+    domain = config['SITE']
     if not has_authority_for_user(user_slug):
         if not is_published(user_slug, doc_slug):
             msg = f"Document '{user_slug}/{doc_slug}' not found."
@@ -621,9 +582,9 @@ async def edit_part(
                                can_be_saved=has_authority_for_user(user_slug))
             return HTMLResponse(content=html)
         else:
-            part_slug = slugify(title)
-            default = trim("""
-                {:s}
+            part_slug = slug(title)
+            default = trim(f"""
+                {title}
 
                 - Shortcuts!
 
@@ -632,7 +593,7 @@ async def edit_part(
                 CENTER (80%) ---
                 | Ctrl-SPACE | Select the current paragraph
                 ---
-                """.format(title))
+                """)
             can_be_saved = has_authority_for_user(user_slug)
             html = show_editor(default, domain, user_slug, doc_slug, part_slug,
                                is_preview=False, can_be_saved=can_be_saved)
@@ -701,7 +662,9 @@ async def post_edit_part(user_slug: str,
 
     if okay_to_save:
 
-        new_doc_slug = document.save(pregenerate=True)
+        saved_doc_slug = document.save(pregenerate=True)
+        if old_doc_slug not in PROTECTED_DOC_SLUGS:
+            new_doc_slug = saved_doc_slug
 
         old_doc = Document(data)
         if old_doc.load(user_slug, old_doc_slug):
@@ -714,7 +677,7 @@ async def post_edit_part(user_slug: str,
             if part_slug == 'homepage':
                 uri = '/'
             elif part_slug == 'author':
-                uri = '/user/{:s}'.format(user_slug)
+                uri = '/read/{:s}'.format(user_slug)
         return RedirectResponse(uri, status_code=status.HTTP_303_SEE_OTHER)
 
     is_preview = they_selected_preview is not None
@@ -736,15 +699,37 @@ def editor(request: Request, template: str | None = None):
     to save content.
     """
     domain = str(request.base_url)
-    source = ""
-    if template:
-        templates = data.userDocument_get(data.admin_user, 'templates')
-        if isinstance(templates, dict) and template in templates:
-            source = templates[template]
-    else:
-        fixtures = data.userDocument_get(data.admin_user, 'fixtures')
-        if isinstance(fixtures, dict) and 'editor' in fixtures:
-            source = fixtures['editor']
+    source = """Article Wiki
+
+= Welcome to the Playground
+
+$ SLUG = editor
+
+You can use this test page to experiment with wiki formatting. Or make one-off documents and print straight to PDF through your browser. Have a look at the ^[Help Page] to learn everything about the wiki markup.
+
+^ https://chapman.wiki/read/eukras/help
+
+
++ Thought for the day
+
+> It seems that perfection is attained not when there is nothing more to add, but when there is nothing more to remove.
+= ~[de Saint Exupéry, /Terre des Hommes/, p.60]
+
+
+- A little subheading
+
+* Try bullet lists and quotations.
+* Try ^[footnotes], #[index:indexes], and citations (see above).
+* Try floats, alignment, columns, tables.
+
+^ Here's a footnote!
+
+
+_____
+
+de Saint Exupéry, Antoine. 1939. Terre des Hommes. Paris: Éditions Gallimard.
+    """
+
     if is_index_part(source):
         user_slug, doc_slug = '_', '_'
         part_slug = 'index'
@@ -794,7 +779,7 @@ async def delete_part(user_slug, doc_slug, part_slug, request: Request):
         return RedirectResponse('/read/{:s}/{:s}'.format(user_slug, doc_slug))
     else:
         document.delete()
-        return RedirectResponse('/user/{:s}'.format(user_slug))
+        return RedirectResponse('/read/{:s}'.format(user_slug))
 
 
 # -------------------------------------------------------------
@@ -905,7 +890,7 @@ async def import_archive_form(user_slug):
     require_authority_for_user(user_slug)  # else 401s
     header_buttons = [{
         'name': 'Back',
-        'href': '/user/{:s}'.format(user_slug),
+        'href': '/read/{:s}'.format(user_slug),
         'icon': 'arrow-left'
     }]
     html = views.get_template('import.html').render(
@@ -974,7 +959,7 @@ async def post_import_archive(user_slug,
             metadata['url'] = '/read/{:s}/{:s}'.format(user_slug, doc_slug)
             data.userDocumentMetadata_set(user_slug, doc_slug, metadata)
 
-    uri = f'/user/{user_slug}'
+    uri = f'/read/{user_slug}'
     return RedirectResponse(uri, status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -1013,7 +998,7 @@ def back_button() -> dict:
 
 def home_button() -> dict:
     if config['SINGLE_USER'] == 'YES':
-        uri = "/user/{:s}".format(data.admin_user)
+        uri = "/read/{:s}".format(data.admin_user)
     else:
         uri = '/'
     return {
@@ -1050,7 +1035,7 @@ def playground_button() -> dict:
 def user_button(user_slug: str) -> dict:
     return {
         'name': user_slug,
-        'href': '/user/{:s}'.format(user_slug),
+        'href': '/read/{:s}'.format(user_slug),
         'icon': 'user'
     }
 
@@ -1176,7 +1161,7 @@ async def generate_epub(user_slug, doc_slug):
             header_buttons=[back_button, home_button()],
             title="Generating..."
         )
-        return HTMLResponse(content=reload_html, 
+        return HTMLResponse(content=reload_html,
                             status_code=status.HTTP_202_ACCEPTED)
 
     else:
@@ -1254,9 +1239,9 @@ def cache_generate_cover(user_slug: str, doc_slug: str):
             COLOR_TEXT,
             COLOR_SHADOW
         ])
-        return image;
+        return image
     else:
-        raise HTTPException(content=status.HTTP_400_BAD_REQUEST, 
+        raise HTTPException(content=status.HTTP_400_BAD_REQUEST,
                             detail="No metadata")
 
 
@@ -1291,16 +1276,14 @@ def cache_generate_card(user_slug, doc_slug, base_url):
 
 
 @app.get('/image/quote/{checksum}/{encoded}.jpg')
-def generate_quote(checksum, encoded):
-    image = cache_generate_quote(checksum, encoded)
+def generate_quote(checksum, encoded, request: Request):
+    base_url = str(request.base_url)  # <-- URL type
+    image = cache_generate_quote(checksum, encoded, base_url)
     return send_image(image)
 
 
 @ttl_cache(ttl=3600)
-def cache_generate_quote(checksum, encoded, request: Request):
-    """
-    """
-    base_url = str(request.base_url)  # <-- URL type
+def cache_generate_quote(checksum, encoded, base_url):
     decoded = urllib.parse.unquote_plus(encoded)
     key = bytes(config['APP_HASH'], 'utf-8')
     message = bytes(decoded, 'utf-8')
@@ -1347,6 +1330,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # ----------------------------------------------------------
 #                      Administrative
 # ----------------------------------------------------------
+
 
 @app.get('/admin/expire-cache')
 def expire():
