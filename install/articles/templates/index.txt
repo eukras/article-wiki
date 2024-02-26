@@ -1,8 +1,0 @@
-Templates
-
-These pages appear as your templates in the ^[editor].
-
-^ /editor
-
-- Cheat Sheet
-- Simple Letter
