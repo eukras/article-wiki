@@ -39,31 +39,13 @@
     }
 }
 
-/**
- * Bootstrap-like buttons for grayscale
- * All navs are button lists.
- *
- */
-
-nav.button-list {
-    display: flex;
-    flex-direction: row-reverse;
-    flex-wrap: wrap;
-    font-size: $fontSizeMinus1;
-}
-
-@media print {
-    nav.button-list {
-        display: none;
-    }
-}
-
-a.button, input[type="submit"], button {
+input[type="submit"], button {
     font-family: $fontFamilySansSerif;
-    font-size: $fontSizeMinus2;
-    background-image: linear-gradient(rgba(128, 128, 128, 0.1), rgba(128, 128, 128, 0));
+    font-size: $fontSizeMinus1;
+    border-radius: $borderRadius;
+    background-color: var(--page-background);
+    border: 2px solid var(--page-text-link);
     color: var(--page-text-link);
-    border-left: 1px dotted rgba(128, 128, 128, 0.3);
     padding: 0.3rem 1rem;
     text-align: center;
     user-select: none;
@@ -77,20 +59,6 @@ a.button, input[type="submit"], button {
     }
 }
 
-a.button:hover, input[type="submit"]:hover, button:hover {
-    background-image: none;
-}
-
-a.button:active, input[type="submit"]:active, button:active {
-    background-image: linear-gradient(rgba(128, 128, 128, 0.25), rgba(128, 128, 128, 0));
-}
-
-a.button[disabled="DISABLED"], button[disabled="DISABLED"] {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-
 
 input[type="file"] {
     text-align: center;
@@ -100,74 +68,8 @@ input[type="file"] {
     border: dashed 1px rgba(128, 128, 128, 0.5);
 }
 
-/*
- * Slight gradients for edge links in header and footer.
- *
- */
-
-.button-list-footer {
-    a.button, button {
-    /* same */
-    }
-    a.button, button {
-        background-image: linear-gradient(rgba(128, 128, 128, 0), rgba(128, 128, 128, 0.1));
-    }
-
-    a.button:hover, button:hover {
-        background-image: none;
-    }
-
-    a.button:active, button:active {
-        background-image: linear-gradient(rgba(128, 128, 128, 0), rgba(128, 128, 128, 0.25));
-    }
-}
-
-.button-list-edge {
-    -webkit-transform: rotate(90deg);  
-    -moz-transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    -o-transform: rotate(90deg);
-    transform: rotate(90deg);  
-    float: right;
-    position: relative;
-    top: 1rem;
-    left: 7.3rem;
-}
-
-/*
- * Button goes on edge of paper.
- *
- */
-a.button-edge,
-button.button-edge {
-    transform: rotate(90deg);
-    background-image: linear-gradient(rgba(128, 128, 128, 0.1), rgba(128, 128, 128, 0));
-    right: -8.65rem;
-    position: relative;
-    border-right: 1px dotted rgba(128, 128, 128, 0.3);
-    top: 2.6rem;
-}
-
-a.button-edge:hover,
-button.button-edge:hover {
-    background-image: none;
-}
-
-a.button-edge:active,
-button.button-edge:active {
-    background-image: linear-gradient(rgba(128, 128, 128, 0.25), rgba(128, 128, 128, 0));
-}
-
-/*
- * Big center buttons are marked as features
- *
- */
-
 a.button.feature,
 button.feature {
-    font-size: $fontSizeMinus1;
-    border-radius: $borderRadius;
-    border: 2px solid rgba(128, 128, 128, 0.3);
     margin-top: 1rem;
 }
 

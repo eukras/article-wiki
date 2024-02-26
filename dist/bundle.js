@@ -524,10 +524,10 @@
             <div class="space">
                 <div><a class="icon-button" href="/"><i class="fa fa-fw fa-home"></i> Home</a></div>
         `;
-        if (user_slug) {
+        if (user_slug && doc_slug == 'index') {
             html += `
-                <div><a class="icon-button" href="/user/${user_slug}"><i class="fa fa-fw fa-user"></i> Author Page</a></div>
-            `;
+                <div><a class="icon-button" href="/rss/${user_slug}.xml"><i class="fa fa-fw fa-rss"></i> RSS Feed</a></div>
+        `;
         }
         html += `
             </div>
@@ -559,7 +559,7 @@
         if (login) {
             html += `
                 <div class="space">
-                    <div><a class="icon-button" href="/edit/eukras/_/index"><i class="fa fa-fw fa-plus"></i> New Article</a></div>
+                    <div><a class="icon-button" href="/new-article"><i class="fa fa-fw fa-plus"></i> New Article</a></div>
                     <div><a class="icon-button" href="/logout"><i class="fa fa-fw fa-sign-out"></i> User Logout</a></div>
                 </div>
             </div>
@@ -573,10 +573,12 @@
         `;
         }
         const page = document.querySelector('#page');
-        const siteMenu = document.createElement('nav');
-        siteMenu.setAttribute('id', 'site-menu');
-        siteMenu.innerHTML = html;
-        page.before(siteMenu);
+        if (page) {
+            const siteMenu = document.createElement('nav');
+            siteMenu.setAttribute('id', 'site-menu');
+            siteMenu.innerHTML = html;
+            page.before(siteMenu);
+        }
     }
 
     function createPageOutline() {
@@ -601,10 +603,12 @@
         </div>
         `;
         const page = document.querySelector('#page');
-        const pageOutline = document.createElement('nav');
-        pageOutline.setAttribute('id', 'page-outline');
-        pageOutline.innerHTML = html;
-        page.after(pageOutline);
+        if (page) {
+            const pageOutline = document.createElement('nav');
+            pageOutline.setAttribute('id', 'page-outline');
+            pageOutline.innerHTML = html;
+            page.after(pageOutline);
+        }
     }
 
     //  Fade the sidebars
@@ -1014,15 +1018,20 @@
      */
 
     function handleScroll(selector) {
-        const scrolledPixels = window.scrollY,
-              documentPixels = document.body.scrollHeight,
-              viewportPixels = window.innerHeight;
-        const scrollPercent = Math.round(
-            (scrolledPixels / (documentPixels - viewportPixels)) * 100
-        );
         const readout = document.querySelector(selector);
         if (readout !== null) {
-            readout.innerHTML = scrollPercent + '%';
+            const scrolledPixels = window.scrollY,
+                documentPixels = document.body.scrollHeight,
+                viewportPixels = window.innerHeight;
+            if (viewportPixels == documentPixels) { 
+                readout.innerHTML = '';
+            } else {
+                const scrollPercent = Math.min(Math.max(Math.round(
+                    (scrolledPixels / (documentPixels - viewportPixels)) * 100
+                ), 0), 100);
+
+                readout.innerHTML = scrollPercent + '%';
+            }
         }
     }
     function initProgress(selector) 

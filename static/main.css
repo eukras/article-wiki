@@ -485,59 +485,6 @@ body {
   margin: 0;
 }
 
-#editor {
-  overflow: hidden;
-  height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-  grid-template-rows: 2rem auto;
-  grid-gap: 0;
-}
-#editor a.button, #editor button {
-  text-wrap: none;
-  vertical-align: middle;
-}
-#editor a.button i, #editor button i {
-  display: inline;
-}
-#editor a.button span, #editor button span {
-  display: inline;
-}
-#editor textarea {
-  font-family: "Fira Mono", "Andale Mono", monospace;
-  font-size: 71.55456%;
-  grid-area: 2 / 1 / 3 / 5;
-  padding: 1rem;
-  border: none;
-  outline: none;
-  resize: none;
-  background: inherit;
-}
-#editor main {
-  grid-area: 2 / 5 / 3 / 9;
-  padding: 2rem;
-  overflow: auto;
-  font-size: 92.4%;
-}
-#editor main article,
-#editor main header,
-#editor main section,
-#editor main section > *:first-child {
-  margin-top: 0;
-  padding-top: 0;
-  margin-bottom: 0;
-  padding-bottom: 0;
-}
-#editor main .no-preview {
-  display: none;
-}
-#editor main section.depth-1 {
-  margin-top: 0;
-}
-#editor main section.depth-1 h1 {
-  margin-top: 0;
-}
-
 /*
  * LOGIN BOX
  *
@@ -785,6 +732,10 @@ ul > ul, ol > ol {
 
 .float-left {
   float: left;
+}
+
+.space-above {
+  margin-top: 3rem;
 }
 
 .space-left {
@@ -1315,7 +1266,7 @@ article {
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding: calc(1rem + 2vmax) 0 calc(4rem + 4vmax) 0;
+  padding: calc(1rem + 2vmax) 0 calc(6rem + 6vmax) 0;
 }
 
 .section-group {
@@ -1862,29 +1813,13 @@ html.navigation-sidebars #page-outline #outline li.visible > ol > li {
   flex-flow: row;
 }
 
-/**
- * Bootstrap-like buttons for grayscale
- * All navs are button lists.
- *
- */
-nav.button-list {
-  display: flex;
-  flex-direction: row-reverse;
-  flex-wrap: wrap;
-  font-size: 92.4%;
-}
-
-@media print {
-  nav.button-list {
-    display: none;
-  }
-}
-a.button, input[type=submit], button {
+input[type=submit], button {
   font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
-  font-size: 81.312%;
-  background-image: linear-gradient(rgba(128, 128, 128, 0.1), rgba(128, 128, 128, 0));
+  font-size: 92.4%;
+  border-radius: 0.5rem;
+  background-color: var(--page-background);
+  border: 2px solid var(--page-text-link);
   color: var(--page-text-link);
-  border-left: 1px dotted rgba(128, 128, 128, 0.3);
   padding: 0.3rem 1rem;
   text-align: center;
   user-select: none;
@@ -1893,21 +1828,8 @@ a.button, input[type=submit], button {
   cursor: pointer;
   outline: none;
 }
-a.button i.fa, input[type=submit] i.fa, button i.fa {
+input[type=submit] i.fa, button i.fa {
   padding-right: 4px;
-}
-
-a.button:hover, input[type=submit]:hover, button:hover {
-  background-image: none;
-}
-
-a.button:active, input[type=submit]:active, button:active {
-  background-image: linear-gradient(rgba(128, 128, 128, 0.25), rgba(128, 128, 128, 0));
-}
-
-a.button[disabled=DISABLED], button[disabled=DISABLED] {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 input[type=file] {
@@ -1918,71 +1840,84 @@ input[type=file] {
   border: dashed 1px rgba(128, 128, 128, 0.5);
 }
 
-/*
- * Slight gradients for edge links in header and footer.
- *
- */
-.button-list-footer a.button, .button-list-footer button {
-  /* same */
-}
-.button-list-footer a.button, .button-list-footer button {
-  background-image: linear-gradient(rgba(128, 128, 128, 0), rgba(128, 128, 128, 0.1));
-}
-.button-list-footer a.button:hover, .button-list-footer button:hover {
-  background-image: none;
-}
-.button-list-footer a.button:active, .button-list-footer button:active {
-  background-image: linear-gradient(rgba(128, 128, 128, 0), rgba(128, 128, 128, 0.25));
-}
-
-.button-list-edge {
-  -webkit-transform: rotate(90deg);
-  -moz-transform: rotate(90deg);
-  -ms-transform: rotate(90deg);
-  -o-transform: rotate(90deg);
-  transform: rotate(90deg);
-  float: right;
-  position: relative;
-  top: 1rem;
-  left: 7.3rem;
-}
-
-/*
- * Button goes on edge of paper.
- *
- */
-a.button-edge,
-button.button-edge {
-  transform: rotate(90deg);
-  background-image: linear-gradient(rgba(128, 128, 128, 0.1), rgba(128, 128, 128, 0));
-  right: -8.65rem;
-  position: relative;
-  border-right: 1px dotted rgba(128, 128, 128, 0.3);
-  top: 2.6rem;
-}
-
-a.button-edge:hover,
-button.button-edge:hover {
-  background-image: none;
-}
-
-a.button-edge:active,
-button.button-edge:active {
-  background-image: linear-gradient(rgba(128, 128, 128, 0.25), rgba(128, 128, 128, 0));
-}
-
-/*
- * Big center buttons are marked as features
- *
- */
 a.button.feature,
 button.feature {
-  font-size: 92.4%;
-  border-radius: 0.5rem;
-  border: 2px solid rgba(128, 128, 128, 0.3);
   margin-top: 1rem;
 }
 
+#editor {
+  overflow: hidden;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 2rem auto;
+  grid-gap: 0;
+}
+#editor a.button, #editor button {
+  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-size: 81.312%;
+  vertical-align: middle;
+  text-align: center;
+  background-color: var(--page-background);
+  background-image: linear-gradient(rgba(128, 128, 128, 0.25), rgba(128, 128, 128, 0));
+  border: 2px solid var(--page-background);
+  padding: 0.3rem 1rem;
+  color: var(--page-text-link);
+  user-select: none;
+  user-drag: none;
+  -webkit-user-drag: none;
+  cursor: pointer;
+  outline: none;
+}
+#editor a.button:hover, #editor button:hover {
+  background-image: none;
+}
+#editor a.button:active, #editor button:active {
+  background-image: linear-gradient(rgba(128, 128, 128, 0.25), rgba(128, 128, 128, 0));
+}
+#editor a.button[disabled=DISABLED], #editor button[disabled=DISABLED] {
+  opacity: 0.3;
+}
+#editor a.button i, #editor button i {
+  display: inline;
+}
+#editor a.button span, #editor button span {
+  display: inline;
+}
+#editor textarea {
+  font-family: "Fira Mono", "Andale Mono", monospace;
+  font-size: 71.55456%;
+  grid-area: 2 / 1 / 3 / 5;
+  padding: 1rem;
+  border: none;
+  outline: none;
+  resize: none;
+  background: inherit;
+}
+#editor main {
+  grid-area: 2 / 5 / 3 / 9;
+  padding: 2rem;
+  overflow: auto;
+  font-size: 92.4%;
+}
+#editor main article,
+#editor main header,
+#editor main section,
+#editor main section > *:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#editor main .no-preview {
+  display: none;
+}
+#editor main section.depth-1 {
+  margin-top: 0;
+}
+#editor main section.depth-1 h1 {
+  margin-top: 0;
+}
 #editor textarea {
   color: var(--page-text);
 }

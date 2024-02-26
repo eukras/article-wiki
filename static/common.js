@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
     //  Scroll by percentage. Still slightly out of sync at the end of
     //  long sections. Works well enough. 
 
+    $('#editor textarea').focus();
+
     $('#editor textarea').on('scroll', function() {
         var editTop = $(this).scrollTop();
         var editHeight = $(this)[0].scrollHeight - $(this).height() - 20;
@@ -53,24 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-/**
- *
-function toggleMenuPopover() {
-    //  No popovers: show contents
-    //  Popovers: hide them
-    const num_contents = $('div#popover-contents-modal:visible').length;
-    const num_comments = $('div#popover-comment-modal:visible').length;
-    if (num_comments > 0 || num_contents > 0) {
-        $('div#popover-contents-modal').hide();
-    } else {
-        $('div#popover-contents-modal').show();
-    }
-    $('div#popover-comment-modal').hide();
-    //  $('div#popover-comment-button').hide();
-    $('div#popover-comment-close').hide();
-}
-*/
-
 function cleanupText(s) { 
     return s.replace(/…/g, '...')
             .replace(/—/g, '---')
@@ -84,16 +68,6 @@ function cleanupText(s) {
                 return span.innerText;
             })
             ;
-}
-
-//  ----------------------------------------
-//  SVG creation for outliner.
-//  ----------------------------------------
-
-function read_contents(text) {
-    const lines = text.split('\n');
-    const outline = lines.filter(line => line.startsWith('- '));
-    return outline
 }
 
 //  ----------------------------------------

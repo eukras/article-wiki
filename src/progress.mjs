@@ -4,15 +4,20 @@
  */
 
 function handleScroll(selector) {
-    const scrolledPixels = window.scrollY,
-          documentPixels = document.body.scrollHeight,
-          viewportPixels = window.innerHeight;
-    const scrollPercent = Math.round(
-        (scrolledPixels / (documentPixels - viewportPixels)) * 100
-    );
     const readout = document.querySelector(selector);
     if (readout !== null) {
-        readout.innerHTML = scrollPercent + '%';
+        const scrolledPixels = window.scrollY,
+            documentPixels = document.body.scrollHeight,
+            viewportPixels = window.innerHeight;
+        if (viewportPixels == documentPixels) { 
+            readout.innerHTML = '';
+        } else {
+            const scrollPercent = Math.min(Math.max(Math.round(
+                (scrolledPixels / (documentPixels - viewportPixels)) * 100
+            ), 0), 100);
+
+            readout.innerHTML = scrollPercent + '%';
+        }
     }
 };
 
