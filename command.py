@@ -5,7 +5,6 @@ save_user_document: Copy from Redis to install folders.
 load_user_document: Copy from install folders to Redis.
 """
 
-import os
 import sys
 
 import click
@@ -14,7 +13,6 @@ from lib.data import Data, load_env_config
 from lib.ebook import write_epub
 from lib.document import Document
 from lib.fixtures import load_fixtures, save_fixtures
-from lib.storage import load_dir, save_dir
 
 
 def get_redis_client() -> Data:
@@ -27,9 +25,21 @@ def get_redis_client() -> Data:
     return Data(config)
 
 
+data = get_redis_client()
+
 # -------------------------------------------------------------------
 #                               Commands
 # -------------------------------------------------------------------
+
+
+def show_config():
+    """
+    Prints actual ENV vars seen by program
+    """
+    config = load_env_config()
+    for key, val in config.items():
+        print(f'{key:>30}: {val}')
+
 
 def generate_epub():
     """
@@ -54,21 +64,20 @@ def create_admin_user(data):
     print("Created user: {:s}".format(config['ADMIN_USER']))
 
 
-
-def refresh_metadata():
+def refresh_metadata(data):
     """
     Cycle through all documents for all users and regenerate their cache and
     metadata entries.
     """
     config = load_env_config()
-    host = config['WEB_HOST'] + ':' + config['WEB_PORT']
-    data = get_redis_client()
+    host = config['WEB_HOST'] + ':' + config['WEB_HOST_PORT']
     for user_slug in data.userSet_list():
         for doc_slug in data.userDocumentSet_list(user_slug):
             document = Document(data)
             document.set_host(host)
             document.load(user_slug, doc_slug)
             document.save()
+            print(f'DATA: {user_slug}/{doc_slug}')
 
 
 # -------------------------------------------------------------------
@@ -80,22 +89,24 @@ def refresh_metadata():
 @click.option('--title')
 def console(command, title):
     """Processes console commands."""
-    if command == 'generate-epub':
+    if command == 'show-config':
+        show_config()
+    elif command == 'generate-epub':
         generate_epub()
     elif command == 'initialize':
-        data = get_redis_client()
         create_admin_user(data)
         load_fixtures(data)
+        refresh_metadata(data)
     elif command == 'load-fixtures':
-        data = get_redis_client()
         load_fixtures(data)
+        refresh_metadata(data)
     elif command == 'refresh-metadata':
-        refresh_metadata()
+        refresh_metadata(data)
     elif command == 'save-fixtures':
-        data = get_redis_client()
         save_fixtures(data)
     else:
         print("Commands:")
+        print("  - show-config")
         print("  - generate-epub")
         print("  - initialize")
         print("  - load-fixtures")
