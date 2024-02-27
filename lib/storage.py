@@ -143,7 +143,8 @@ def compress_archive_dir(dir_path: str, zip_name: str) -> str:
     """
     cwd = os.getcwd()
     os.chdir(dir_path)
-    command = "zip -R {:s} {:s}".format(zip_name, "*/*")
+    # command = "zip -R {:s} {:s}".format(zip_name, "*/*")
+    command = f"python -m zipfile -c {zip_name} */*"
     process = subprocess.Popen(command, shell=True)
     process.communicate()  # <-- Wait for completion!
     os.chdir(cwd)
@@ -158,7 +159,8 @@ def uncompress_archive_dir(dir_path: str, zip_name: str):
     """
     cwd = os.getcwd()
     os.chdir(dir_path)
-    command = "unzip {:s}".format(zip_name)
+    # command = "unzip {:s}".format(zip_name)
+    command = f"python -m zipfile -e {zip_name} ."
     process = subprocess.Popen(command, shell=True)
     process.communicate()  # <-- Wait for completion!
     os.chdir(cwd)
