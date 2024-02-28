@@ -26,22 +26,28 @@ table of contents.
 
 - Editing
 
+@app.get('/new-article') -- OK: Shows editor with template
 @app.get('/edit/{user_slug}/{doc_slug}/{part_slug}') -- OK: Shows editor
 @app.post('/edit/{user_slug}/{doc_slug}/{part_slug}') -- OK: Saves changes
 @app.get('/playground') -- OK: Shows play editor.
 @app.post('/playground') -- OK: Shows changes.
 @app.get('/delete/{user_slug}/{doc_slug}/{part_slug}') -- OK.
 
+- Admin
+
+@app.get('/admin') -- Administrative options:
+@app.post('/admin/initialize') -- Setup database in initial state
+@app.get('/admin/import-archive/{user_slug}') -- OK: Show upload form
+@app.post('/admin/import-archive/{user_slug}') -- OK: Install a zipfile
+
 - Import/Export
 
 @app.get('/export-archive/{user_slug}') -- OK: Download a zipfile
-@app.get('/import-archive/{user_slug}') -- OK: Show upload form
-@app.post('/import-archive/{user_slug}') -- OK: Install a zipfile
 @app.get('/download/{user_slug}/{doc_slug}') -- OK: Download a text file
 @app.get('/upload/{user_slug}/{doc_slug}') -- OK: Show upload form
 @app.post('/upload/{user_slug}/{doc_slug}') -- OK: Install a text file
 
-- Generated content: ePubs and JPEGs
+- Generated content: ePubs and JPEGs; add SVG?
 
 @app.get('/epub/{user_slug}/{doc_slug}') -- OK: Generates epub.
 @app.get('/image/cover/{user_slug}/{doc_slug}.jpg') -- OK: Generates cover
@@ -98,7 +104,7 @@ from fastapi.staticfiles import StaticFiles
 
 import uvicorn
 
-from command import create_admin_user, load_fixtures
+from command import initialize
 from lib.document import PROTECTED_DOC_SLUGS
 
 from lib.bokeh import make_background
@@ -149,8 +155,7 @@ views = JinjaTemplates(
 
 is_setup = data.user_exists(config['ADMIN_USER'])
 if not is_setup:
-    create_admin_user(data)
-    load_fixtures(data)
+    initialize()
 
 
 # ----------------------------------------------------------
@@ -780,6 +785,31 @@ async def delete_part(user_slug, doc_slug, part_slug, request: Request):
     else:
         document.delete()
         return RedirectResponse('/read/{:s}'.format(user_slug))
+
+
+# -------------------------------------------------------------
+#                       Administration
+# -------------------------------------------------------------
+
+@app.get('/admin')
+async def admin():
+    """
+    Show administrative options. 
+    """
+    require_authority_for_admin()  # else 401s
+    config = load_env_config()
+    html = views.get_template('admin.html').render(
+            config=config)
+    return HTMLResponse(content=html)
+
+@app.post('/admin')
+async def admin_initialize():
+    """
+    Reset site to starting configuration.
+    """
+    require_authority_for_admin()  # else 401s
+    initialize()
+    return RedirectResponse('/', status_code=status.HTTP_303_SEE_OTHER)
 
 
 # -------------------------------------------------------------

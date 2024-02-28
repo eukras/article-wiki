@@ -80,6 +80,16 @@ def refresh_metadata(data):
             print(f'DATA: {user_slug}/{doc_slug}')
 
 
+def initialize():
+    """
+    Reset site to initial state.
+    """
+    data = get_redis_client()
+    create_admin_user(data)
+    load_fixtures(data)
+    refresh_metadata(data)
+
+
 # -------------------------------------------------------------------
 #                               Console
 # -------------------------------------------------------------------
@@ -94,9 +104,7 @@ def console(command, title):
     elif command == 'generate-epub':
         generate_epub()
     elif command == 'initialize':
-        create_admin_user(data)
-        load_fixtures(data)
-        refresh_metadata(data)
+        initialize();
     elif command == 'load-fixtures':
         load_fixtures(data)
         refresh_metadata(data)
