@@ -54,7 +54,8 @@
  */
 @media screen {
     a.web-link {
-        padding: 0 2pt;
+        padding: 0 .25rem;
+        background-color: var(--page-text-link-background);
     }
     a.web-marker {
         padding: 0 2pt;

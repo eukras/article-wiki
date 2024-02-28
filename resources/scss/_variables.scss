@@ -48,6 +48,7 @@ $kelpGreen: hsl( 57, 25%, 17%);
 $limeGreen: hsl( 83, 84%, 75%);
 $midGreen:  hsl(120, 46%, 29%);
 $seaGreen:  hsl(120, 14%, 67%);
+$mintGreen: hsl(120, 44%, 93%);
 
 //  Dark colors
 $busterBlue: hsl(218, 21%, 37%);
@@ -84,6 +85,7 @@ html.theme-light {
     --page-text: #{$gray03};
     --page-text-secondary: #{$gray03};
     --page-text-link: #{$gray03};
+    --page-text-link-background: #{$mintGreen};
     --page-text-selection: #{$limeGreen};
     --page-icon-background: #{$gray90};
     --page-icon-text: #{$seaGreen};
@@ -103,6 +105,7 @@ html.theme-dark {
     --page-text: #{$gray50};
     --page-text-secondary: #{$indigoBlue};
     --page-text-link: #{$gray75};
+    --page-text-link-background: #{$gray03};
     --page-text-selection: #{$bostonBlue};
     --page-icon-background: #{$gray10};
     --page-icon-text: #{$gray25};

@@ -39,7 +39,7 @@
     }
 }
 
-input[type="submit"], button {
+a.button, input[type="submit"], button {
     font-family: $fontFamilySansSerif;
     font-size: $fontSizeMinus1;
     border-radius: $borderRadius;

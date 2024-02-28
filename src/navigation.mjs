@@ -25,14 +25,14 @@ function cycleNavigation() {
 
 function initNavigation(buttonSelector, callback)
 {
-    document.addEventListener('click', function (event) {
-        const button = event.target.closest(buttonSelector);
-        if (button !== null) {
+    const button = document.querySelector(buttonSelector); // one only
+    if (button !== null) {
+        button.addEventListener('click', function (event) {
             cycleNavigation();
             callback();
             event.preventDefault();
-        }
-    }, false);
+        }, false);
+    }
 }
 
 export {cycleNavigation, initNavigation};

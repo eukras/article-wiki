@@ -8,7 +8,7 @@ import {initOptionHandler} from './options.mjs';
  * Starts in NAVIGATE at top of screen.
  *
  * - READ:
- *   ? User is reading and is shown no distractions
+ *   ? User is reading; show no distractions
  *   - No sidebars
  *   - No timers
  *   - Stay in READ if scroll_down.
@@ -322,6 +322,7 @@ function createSiteMenu() {
     if (login) {
         html += `
                 <div class="space">
+                    <div><a class="icon-button" href="/admin"><i class="fa fa-fw fa-wrench"></i> Site Admin</a></div>
                     <div><a class="icon-button" href="/new-article"><i class="fa fa-fw fa-plus"></i> New Article</a></div>
                     <div><a class="icon-button" href="/logout"><i class="fa fa-fw fa-sign-out"></i> User Logout</a></div>
                 </div>
@@ -536,7 +537,7 @@ function saveUserDocCompletion(totalSectionVisibilityTime) {
     localStorage.setItem(key, JSON.stringify(totalSectionVisibilityTime));
 }
 
-function loadUserDocCompletion() {
+function loadSectionVisibilityTime() {
     const key = `completion_${user_slug}_${doc_slug}`;
     const json = localStorage.getItem(key) || '{}';
     return JSON.parse(json) || {};
@@ -772,7 +773,7 @@ function initSidebars()
 {
     outline = getOutline('hgroup.section-heading')
 
-    totalSectionVisibilityTime = loadUserDocCompletion()
+    totalSectionVisibilityTime = loadSectionVisibilityTime()
 
     removeSidebars();
     createSiteMenu();

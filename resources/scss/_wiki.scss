@@ -35,7 +35,7 @@ article {
         }
         .sticky-buttons {
             align-items: flex-start;
-            .button-unit {
+            button.button-unit {
                 display: flex;
                 flex-direction: column;
             }
@@ -58,7 +58,7 @@ article {
                 }
                 .sticky-buttons {
                     align-items: flex-end;
-                    .button-unit {
+                    button.button-unit {
                         display: flex;
                         flex-direction: column;
                     }
@@ -75,42 +75,40 @@ article {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    .button-unit {
-        width: 2.5rem;
+    a.button-unit, button.button-unit {
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        gap: 0.25rem;
+        border: 1px dotted var(--page-icon-text);
+        width: 3rem;
         text-align: center;
-        .button-box {
-            font-size: $fontSizePlus2;
-            padding: 0.4em 0.4em;
-            color: var(--page-icon-text);
-            background-color: var(--page-icon-background);
-            cursor: pointer;
-            svg {
-                fill: var(--page-icon-text);
-                height: 1em;
-                width: 1em;
-            }
-        }
-        .button-label {
-            font-family: $fontFamilySansSerif;
-            font-size: $fontSizeMinus3;
-            text-align: center;
-            color: var(--page-icon-text);
-            padding: 0.25rem;
+        font-family: $fontFamilySansSerif;
+        font-size: $fontSizeMinus3;
+        cursor: pointer;
+        svg {
+            fill: var(--page-icon-text);
+            height: 1.2rem;
+            width: 1.2rem;
         }
     }
 }
 
 .left-margin {
-    .button-box {
-        border-top-right-radius: 0.3em;
-        border-bottom-right-radius: 0.3em;
+    a.button-unit,
+    button.button-unit {
+        padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+        border-left: none;
+        border-radius: 0 1rem 1rem 0;
     }
 }
 
 .right-margin {
-    .button-box {
-        border-top-left-radius: 0.3em;
-        border-bottom-left-radius: 0.3em;
+    a.button-unit,
+    button.button-unit {
+        padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+        border-right: none;
+        border-radius: 1rem 0 0 1rem;
     }
 }
 

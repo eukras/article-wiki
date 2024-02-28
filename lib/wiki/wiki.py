@@ -204,7 +204,7 @@ class Wiki(object):
             if not fragment and not preview:
                 with __.div(klass='left-margin'):
                     with __.div(klass='sticky-buttons nav-buttons'):
-                        __(side_button(name='Home', href='/'))
+                        __(side_button(name='Home', icon='home', href='/'))
             with __.div(klass='section-list'):
                 with __.div(klass='section-item'):
                     with __.div(klass='section-content'):
@@ -212,9 +212,9 @@ class Wiki(object):
                     if not fragment and not preview:
                         with __.div(klass='right-margin'):
                             with __.div(klass='sticky-buttons option-buttons'):
-                                __(side_button(name='Dark',
+                                __(side_button(name='Dark', icon='adjust',
                                                _klass='theme-button'))
-                                __(side_button(name='Full',
+                                __(side_button(name='Full', icon='expand',
                                                _klass='fullscreen-button'))
         return __
 
@@ -227,7 +227,7 @@ class Wiki(object):
             if not fragment and not preview:
                 with __.div(klass='left-margin'):
                     with __.div(klass='sticky-buttons'):
-                        __(side_button(name='Menu',
+                        __(side_button(name='Menu', icon='bars',
                                        _klass='navigation-button'))
             with __.div(klass='section-list'):
                 if 'index' in html_parts:
@@ -237,21 +237,22 @@ class Wiki(object):
                         if not fragment and not preview:
                             with __.div(klass='right-margin'):
                                 with __.div(klass='sticky-buttons'):
-                                    link = self.settings.get_base_uri('edit',
+                                    link = self.settings.get_base_uri('pencil',
                                                                       'index')
-                                    __(side_button(name='Edit', href=link))
-                for (numbering, slug, _, _, _) in self.outline:
-                    if slug in html_parts and slug not in ['index', 'biblio']:
+                                    __(side_button(name='Edit', icon='pencil',
+                                                   href=link))
+                for (numbering, _slug, _, _, _) in self.outline:
+                    if _slug in html_parts and _slug not in ['index', 'biblio']:
                         with __.div(klass='section-item'):
                             with __.div(klass='section-content'):
-                                __(html_parts[slug])
+                                __(html_parts[_slug])
                             if not fragment and not preview:
                                 with __.div(klass='right-margin'):
                                     with __.div(klass='sticky-buttons'):
                                         label = '§' + '.<wbr/>'.join(numbering)
                                         link = self.settings.get_base_uri(
-                                                'edit', slug)
-                                        __(side_button(name=label, icon='edit',
+                                                'edit', _slug)
+                                        __(side_button(name=label, icon='pencil',
                                                        href=link))
 
                 biblio_html = self.bibliography.html()
@@ -263,7 +264,7 @@ class Wiki(object):
                             with __.div(klass='sticky-buttons'):
                                 link = self.settings.get_base_uri('edit',
                                                                   'biblio')
-                                __(side_button(name='Refs', icon='edit',
+                                __(side_button(name='Refs', icon='pencil',
                                                href=link))
 
         return __

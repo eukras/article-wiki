@@ -156,21 +156,6 @@ div#background {
     }
 }
 
-@include isTabletOrSmaller {
-    html.navigation-sidebars {
-        .sticky-buttons {
-            .button-unit {
-                .button-box {
-                    background-color: var(--desk-text-secondary);
-                    svg {
-                        fill: var(--page-background);
-                    }
-                }
-            }
-        }
-    }
-}
-
 form {
     margin-bottom: 0;
 }
