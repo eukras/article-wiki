@@ -1,0 +1,15 @@
+Settings
+
+You will have seen some lines began with `$` in the index page: these are called values or settings. Some like `AUTHOR` and `DATE` are used by the wiki; these are capitalised. In this document `\$[DATE]` is "$[DATE]", for example. You can also make and use your own -- see @[values-counters] below for a full summary. Those set in the index page are especially useful because they are shared with all the other sections.
+
+! Value ! Example ! Explanation
+| `NAME` | Fred Smith | Full name of author
+| `EMAIL` | `fred.smith@example.org` | Contact email for the author
+| `DATE` | 18 December 2019 | A human readable date, preferably unambiguous (so not 1/2/2020)
+| `LICENSE` | `CC-BY-SA` | One of several codes representing a Creative Commons License
+
+For Creative Commons licenses, the following codes will result in appropriate notices appended to the end of the page.
+
+| `CC-BY-SA` | Creative Commons Attribution-ShareAlike 4.0
+| `CC-BY-NC` | Creative Commons Attribution-NonCommercial 4.0
+| `CC-ZERO` | Creative Commons ZERO; like putting the article into the Public Domain

@@ -9,15 +9,6 @@ with it.
 Functions, like /y = f(x)/, will be familiar from maths, spreadsheets,
 or programming; function blocks look like that.
 
-CENTER (80%) ---
-| Alignment | `LEFT`, `CENTER`, `RIGHT`, `FLOAT`
-| Whitespacing | `TEXT`, `VERBATIM`
-| Layout | `BOX`, `COMPACT`, `FEATURE`
-| Tabular Layout | `TABLE`, `GRID`
-
-= Table $[t++]. = List of Function Blocks in Article Wiki
----
-
 
 + Examples of Functions
 

@@ -1,8 +1,8 @@
 Get Started
 
-To write a document, just open the ^[playground] on any Article Wiki site, where you can try out wiki formatting and see the results. The following three points will cover most of your writing needs, though there are many more features available. See the @[cheat-sheet] for a handy reference.
+To try writing with the wiki just open the ^[playground] on any Article Wiki site. The following three points will cover most of your writing needs, though there are many more features available. See the @[cheat-sheet] below for a handy reference.
 
-=[Firstly], you'll need to know how to lay out text. A single character at the start of a line or a paragraph tells you how that block should be formatted, like how `>` indicates a quotation in email.
+=[Firstly], you'll need to know how to lay out text. A single control character at the start of a line or a paragraph tells you how that block should be formatted, like how `>` indicates a quotation in email.
 
 ^ https://chapman.wiki/playground
 
@@ -14,18 +14,13 @@ Article Wiki is a wiki designed for humanities writing.
 > Article Wiki is a triumph!
 = Albert Einstein
 
-
-- Powerful and intuitive!
-
-Without being awkward or intrusive. Check out the amazing:
+Powerful and intuitive, without being awkward or intrusive. Check out the amazing:
 
 * footnotes
 * bibliographies
-* indexes
-
 ---
 
-From this we can see that `+` and `-` are large and small headings, `>` and `=` are quotes and captions, and `*` are bullet points. See @[four- kinds-of-text-blocks], for a full list of control characters.
+From this we can see that `@` is a subheading, `>` and `=` are quotes and captions, and `*` are bullet points. See @[four- kinds-of-text-blocks], for a full list of control characters.
 
 =[Secondly], you'll want to add a little styling. This will get you started, but see @[inline-markup] for the full tour.
 
@@ -43,7 +38,7 @@ Here's a ^[link] and a ^[footnote].
 
 Article continues...
 
-^ http://example.org 
+^ https://example.org 
 ^ This is a footnote. 
 ---
 

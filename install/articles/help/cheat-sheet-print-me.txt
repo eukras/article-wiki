@@ -1,44 +1,38 @@
 Cheat Sheet (Print Me!)
 
-Click the `Edit` button to see how any effect was achieved in an article
-or section. This opens that section in the `/playground`. That also lets
-you print a single section, like this cheat sheet. Remember that a
-leading backslash will neutralise any formatting character.
+Click the `Edit` button to see how any effect was achieved in an article or section. This opens that section in the `/playground`. That also lets you print a single section -- like this cheat sheet!
 
+Character blocks. // Note that captions can be added to tables and headings as well as quotes.
 
-- Character blocks
-
-Note that captions can be added to tables and headings as well as
-quotes.
-
-| `+ -` | Subheadings: Major, Minor
+CENTER (80%) ---
+| `-` | Document outline (used in `index.txt`)
+| `@` | Subheading
 | `> =` | Block quote; Caption
-| `* # _` | Lists: Bullets, Numbers, Checkboxes/Icons
-| `. ; ,` | Alignment: Left, Centre, Right
+| `* # _` | Lists: Bullets, Numbers, Checkboxes
+| `\. ; ,` | Alignment: Left, Centre, Right
 | `: ~` | Block Indents, Hanging Indents
-| `{ }` | Float labels: Left, Right
-| `! |` | Simple Tables: Headers, Cells
-| `/` | Glosses (usually for Interlinear Translations)
-| `' " %` | Aside, Note (visible), Comment (hidden)
-| `\`` | Document outlines (in index.txt)
+| `\! \|` | Simple Tables: Headers, Cells
+| `/` | Glosses (interlinear translations)
+| `\" %` | Note (visible), Comment (hidden)
+---
 
+Inline Square Brackets. // For incidental formatting...
 
-- Inline Square Brackets
+* These are combinable, e.g. `\/\*[bold italic]` for /*[bold italic].
+* Some have shorthand: `*bold*` `/italic/` `_underline_`
+* Some (`*/=`) can be used as inline subheadings.
 
-Not these are combinable, and the the first five have shorthand, e.g.
-`\*bold\*`.
-
-| `\*[bold]`, `\*bold\*` | *[bold], *bold*
-| `/ * _ \` !` | /[Italic], *[Bold], _[Underline], `[Monospace], ![Highlight]
-| `; = { }` | ;[Sans Serif], =[Small Caps], Float left, Float right
+CENTER (80%) ---
+| `/ * _ \`` | /[Italic], *[Bold], _[Underline], `[Monospace]
 | `+ - ' ,` | +[Inserted], -[Deleted], Superscript'[2], Subscript,[2]
-| `\/\*[bold italic]` | /*[bold italic]
+| `; = \|` | ;[Sans Serif], =[Small Caps], ![Highlight]
+---
 
+Inline Information Brackets. // For links and other data operations.
 
-- Inline Information Brackets
-
+CENTER (80%) ---
 | `$` | @[values-counters]
 | `^` | @[links-footnotes]
-| `#` | @[tags-indexes]
 | `@` | @[cross-references]
 | `~` | @[citations-bibliography]
+---

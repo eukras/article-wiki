@@ -1,5 +1,7 @@
 Text Alignment
 
+" Note. ** Right alignment is not dependable for generating eBooks.
+
 The `LEFT`, `CENTER` and `RIGHT` function blocks allow blocks of text to be aligned. To write a well formatted letter, for example:
 
 DEMO +++
@@ -33,3 +35,13 @@ RIGHT ---
 +++
 
 If you wanted to align the right-blocks perfectly, you could write `RIGHT (30%)` to give them both a fixed width. Also, to write a letter in the editor, remember to comment out the title line (use `%`) so it isn't visible.
+
+Quotations can be formatted in the same way, with indents and a smaller font size, which is helpful for poetry:
+
+DEMO +++
+QUOTE ---
+. Quote line 1
+: Quote line 2 (indented)
+, Quote Source
+---
++++

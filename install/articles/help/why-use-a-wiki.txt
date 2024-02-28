@@ -2,7 +2,7 @@ Why Use a Wiki?
 
 " If this is already familiar, skip ahead to @[index-page].
 
-~ It's Easy. // For simple layout, you can go a long way by pretending that you're writing plain-text emails. For the rest, there's a :? Help button in the editor, which brings you back to this page.
+~ It's Easy. // For simple layout, you can go a long way by pretending that you're writing plain-text emails. For the rest, there's a /Help/ button in the editor, which brings you back to this page.
 
 ~ It's Powerful. // Some kinds of text layout are easy to describe in plain text, but difficult to achieve in a word processor. @[interlinear-translations] are one useful example of this.
 

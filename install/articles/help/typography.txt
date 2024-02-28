@@ -1,13 +1,12 @@
 Typography
 
-See @[backslashes] for entering plain quotemarks as `\\\'` and `\\\"`. %[Unicode] characters are always supported.
+See @[backslashes] for entering plain quotemarks as `\\\'` and `\\\"`. Unicode characters are always supported.
 
 DEMO ===
 For common markup, just type naturally:
 
 * 'quote's' "quoting"
 * dashes --- dashes -- 1-2
-* --> <--
 
 Links will be added:
 
@@ -26,22 +25,3 @@ Use round brackets for special characters ...
 | x(EN)x(2EN)x(4EN)x | /en/
 | x(EM)x(2EM)x(4EM)x | /em/
 ===
-
-
-+ HTML Entities
-
-Use ^[HTML Entities] to enter special characters; e.g. write 'd&eacute;tente' as `d\&eacute;tente`. If frequently relying on these characters, it is best to use a keyboard layout for your computer or device that lets you type them directly.
-
-DEMO ---
-| &alpha; | &Gamma; | &aacute;
-    | &aelig; | &ccedil; | &egrave;
-    | &iuml; | &ntilde; | &ocirc;
-| &cent; | &pound; | &euro;
-    | &deg; | &plusmn; | &frac12;
-    | &le; | &ge; | &ne;
-| &copy; | &reg; | &trade;
-    | &sect; | &para; | &dagger;
-    | &laquo; | &raquo; | &middot;
----
-
-^ https://dev.w3.org/html5/html-author/charref

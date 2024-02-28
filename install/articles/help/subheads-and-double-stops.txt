@@ -1,0 +1,46 @@
+Subheads and Double-stops
+
+Subheadings within a section do not appear in the navigation, so it's up to the author to format them however they wish. This can be done with @[alignment-blocks] and @[square-brackets].
+
+DEMO ===
+; =[Here's a Subheading]
+; /[And here's a sub-subheading]
+
+(Regular paragraph continues here, after a gap.)
+===
+
+There is a form of short-cut called a *[double-stop] that makes this easier to type. Several of the common format markers (`/*_=`) can be repeated to either format a whole block of text, or just to mark off some leading text to create a inline subheading.
+
+DEMO ===
+. // Italicised Subheading.
+; ** Bold Subheading.
+, == Small Caps Subheading.
+; __ Underlined subheading.
+
+. Italics. // Body text...
+. Bold face. ** Body text...
+. Small caps. == Body text...
+. Underline. __ Body text...
+===
+
+However, while this allows a great deal of control, it means equal space above and below the subheading unless extra space is manually entered with a @[delimiter]. So headlines are best entered with the `@` control character, which formats it in a customary manner. Double-stops are used to select bold or italic.
+
+DEMO ===
+(Regular paragraph continues here)
+
+@ Subheading
+
+(Regular paragraph continues here)
+===
+
+A range of common layout requirements can be solved with double-stops, of which the following examples are representative.
+
+DEMO ===
+Subheading. // This is an inline subheading at the start of a normal auto-indenting paragraph.
+
+> Abstract. ** A bold inline subheading in a quotation will create a sensibly formatted abstract or summary block. 
+
+~ Definition. // Here's a useful way to format some glossaries, definition lists, and so on.
+
+= Table 1. ** A caption line. 
+===

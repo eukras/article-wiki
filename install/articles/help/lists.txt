@@ -26,15 +26,4 @@ $ NUMBERING = 9
 
 _ Buy milk
 _ Return books to library
-_ Write wiki software
----
-
-See @[icons] for the kind of symbols you can use with check-boxes.
-
-To-do lists default to showing checkboxes as the list markers. However, these can be changed by putting an icon at the start of any line.
-
-DEMO ---
-_ To do
-_ :y Done
-_ :n Won't do
 ---

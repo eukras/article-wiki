@@ -2,31 +2,26 @@ Character Blocks
 
 Character Blocks are paragraphs formatted by a single control character at the start of the first line: It must be the first character and it must be followed by a space.
 
-| `+ -` | Major and Minor Subheadings
+CENTER (80%) ---
+| `@` | Subheadings
 | `> =` | Block quote; Caption/Citation
-| `* # _` | Lists: Bullets, Numbers, Checkboxes/Icons
-| `! |` | Simple Tables: Headers, Cells
-| `. ; ,` | Align: Left, Centre, Right
-| `: ~` | Indents: Block, Hanging
-| `( )` | Float: Left, Right
-| `' " %` | Aside and Note (visible), Comment (hidden)
+| `: ~` | Block indent; Hanging indent
+| `\. ; ,` | Align: Left, Centre, Right
+| `* # _` | Bullet list; Numbered list, To Do list (recurse with `# # #`)
+| `\! |` | Simple Tables: Headers, Cells
+| `\? %` | Note (visible), Comment (hidden))
 | `/` | Translation (interlinear glosses)
-| `?` | Quizzes (with '=' for answers)
-| `\`` | Document outlines (in `index.txt`)
+| `-` | Chapter outlines (in `index.txt`)
+| `& =` | Figures, Captions | TO DO
+---
 
-= Table $[t++]. = Summary of Control Characters.
+~ Recursion. // List characters (`* # + -`), can be repeated to indent them further ( see below).
 
-~ Leaders. ~ Asides and Hanging Indent characters (`' ~`) can be repeated once to delimit an inline title (see below). This line is a hanging indent with a leader.
+~ Captions. // Captions (`=`) will format themselves for the kind of block that they follow, whether tables, quotes, pull-quotes or anything else.
 
-~ Recursion. ~ List characters (`* #`), can be repeated to indent them further ( see below).
+~ Line wrapping. // Paragraphs and Character blocks are turned into a single line in the wiki, so the author needn't manage the line endings. It is assumed that any editing program will wrap lines automatically.
 
-~ Context. ~ Captions (`=`) format differently depending upon the kind of block that they follow, whether tables, quotes or anything similar.
-
-~ Line wrapping. ~ Paragraphs and Character blocks are turned into a single line in the wiki, so the author needn't manage the line endings. It is assumed that any editing program will wrap lines automatically.
-
-DEMO ---
-* This is a continuing
-line
-* This is a continuing
-line also.
+DEMO --- 
+* This is a single line
+* This is a single line too. 
 ---

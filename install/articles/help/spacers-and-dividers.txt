@@ -19,9 +19,7 @@ Otherwise, asterisks, periods, dashes, equals and at symbols can be used to make
 DEMO ===
 * 
 
-* * *
-
--
+- 
 
 - - -
 
@@ -29,9 +27,7 @@ DEMO ===
 
 = = =
 
-@
-
-@ @ @
+* * *
 ===
 
 A full-width divider in a `CENTER` block takes the width of that block, if finer width control is needed. Note the tildes for spacing.

@@ -1,14 +1,5 @@
 Cross References
 
-Article Wiki supports easy cross referencing between the sections of a
-document. Entering `\@[cross-references]` will produce a link to the
-current subheading, @[cross-references], with the section number added
-for the benefit of print readers. Entering `\@[-cross-references]`, with
-a minus at the start, will produce an abbreviated reference, in this
-case @[-cross-references]. You will notice them used throughout this
-document. At present, only section headings can be cross-referenced.
+Article Wiki supports easy cross referencing between the sections of a document. Entering `\@[cross-references]` will produce a link to the current subheading, @[cross-references], with the section number added for the benefit of print readers. Entering `\@[-cross-references]`, with a minus at the start, will produce an abbreviated reference, in this case @[-cross-references]. You will notice them used throughout this document. At present, only section headings can be cross-referenced.
 
-Matching is performed in this way: The wiki will look through the table
-of contents for an exact match, then for the first one that contains
-/all/ of the terms in the cross reference. If there is still no match,
-or if more than one match was found, an error will be displayed.
+Matching is performed in this way. The wiki will look through the table of contents for an exact match, then for the first one that contains /all/ of the terms in the cross reference. If there is still no match, or if more than one match was found, an error will be displayed.

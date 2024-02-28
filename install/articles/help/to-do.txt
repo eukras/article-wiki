@@ -1,80 +1,59 @@
 To Do
 
-LEFT (70%) ---
-| ?[+++]   | Urgent + Important + Easy
-| ?[SPIKE] | Requires pre-work or proof-of-concept
-| ?[HOW?]  | Needs a clearer concept to proceed
+
+@ Next
+
+_ Fully responsive menu with multiple layouts and drop menus.
+_ Allow shorthand FUNCTION Blocks. HEADER/FOOTER as variations of COMPACT.
+
+
+@ Bugs
+
+_ Double-stops don't accommodate trailing punctuation. *Bold.* *Bold*. *Bold.* *Bold*. *Bold.* *Bold*. *Bold.* *Bold*. *Bold.* *Bold*.
+_ Inline markup for links clashes with angled brackets: <http://example.org>. (Extra semi-colon appears.) In `\&gt;` the link is matched until the `;`.
+_ :n Putting icons in the wrong place in lists :q. (Eliminate icons as unused. Add Unicode completion to editor.)
+_ Wrong spacing in e.g. (pp. 16--17) . Handle brackets/numbers separately, or require backslashes always?
+
+
+@ New Features
+
+_ Ability to cycle checkboxes to ticked and sort them by priorities.
+_ `< < <` and `> > >` for COMPACT headers and footers.
+_ Bibliographies should become the last numbered sections and be more easily editable (side link).
+_ Machine-readable CC licenses.
+_ Self-documentation functions. For use in /help especially.
+_ Vue textarea: Ctrl-Up/Dn to move lines or selected lines; Ctrl-Up/Dn to move blocks or selected blocks. Regular shortcuts and autocompletions.
+_ Login without returning to home page.
+_ Plugins. BIBLE, MATH:jax, MUSIC:ly, SLIDES, QUIZ, etc
+
+
+@ Big changes
+
+_ Multiuser through Github logins; retain local admin.
+_ Convert Bottle to FastAPI and run in Lambda; use Saas Redis Store.
+_ Assemble articles into larger books as .epub/PDF; `+` in TOC to recurse; syntax to link between books.
+_ Airium for faster/neater HTML generation.
+_ Fully relative CSS, so that DEMO or QUOTE blocks will have their content stay in proportion. (Only for one layer deep.)
+_ Figures should become the second last numbered section, and allow text-based image formats like SVG or DOT. (Implement figures as an attachement to a book / page / section?)
+_ Behavioural testing.
+_ Containerised for Docker, with a simple import-archive setup.
+_ Show cross-references when editing documents._ Login without returning to home page.
+
+
+@ Ideas
+
+_ Git integration; committing major version changes and suggested changes; with version incrementing in any part of a document, and in the header. 1.2.3 = Major.Minor.Subminor versions.
+_ Outline slides in documents (hidden, `-`); use section heading and counter as title? Possibly Abbreviated block type for slides/quizzes, etc?
+
+VERBATIM ---
+SLIDE 
+* xxx
+* yyy
+* zzz
 ---
 
-
-- Next
-
-* Subtotals in TOC
-* Expand GRID to system of 12s. ?[+++]
-* `$ published = no`
-* `$ editors = x@y.z` -- ?
-* `SET ($context) ---`, displayed immediately after 
-
-
-- Site
-
-* ^[HTTPS]. ?[+++]
-* Identifier string: base64(author,path,file)
-* Link: Edit --> edit/$identifier
-* User identification is by email; authentication is by edit key (or password). ?[+++]
-
-^ https://jaredquinn.info/2016/05/no-excuses-left-for-plaintext-http/
-
-
-- Git
-
-* Decision: Run completely from Git, pulling into local Redis? ?[YES]
-
-
-- Style and Correctness
-
-* Use symbol footnotes in `index.txt` ?[--~]
-* Allow footnotes to appear at the end of each section. `\$ WIKI.footnotes = end-of-section`
-* Add aliases to citations. ?[-++]
-
-
-- Wiki
-
-* Auto-generated list of character blocks. ?[+++]
-* Auto-generated list of built-in function blocks. ?[+++]
-* Fix the word counting. Respect use pf variables?--YES. ?[++!]
-* `library.txt` for directory containing only document folders. Its outlines must be document sub-directories. ?[-+~]
-* `library.json`, `index.json` -- purely for caching ?[--~]
-* Overall refactor into smaller logical units; `wiki.py` and `html.py` are too complex. ?[---] 
-* * Full-document tests; maybe make a canonical render of `/help?` ?[-+-] 
-* * More systematic test suite to accompany breakdowns. ?[---]
-* DEMO blocks can have their footnotes and indexes collide with the parent document. Easily worked around in documentation. ?[--?]
-* Target word counts in TOC with percentage completed. ?[--+]
-* ![FEATURE] Labels?? Maybe just auto-index captions? ?[HOW?]
-* Error summary at the start of the document and section, or after editing. ?[+++]
-* Function block pipes. (Format wrappers have mostly fixed this.) ?[--?]
-* Common styles for function blocks (e.g. 'compact, 2column'). ?[--?]
-* Data blocks and `<<<` pipes. ?[--*]
-* Add 'sum' and percent format options to TABLE? Plus format config for currency, percent? ?[--+]
-* Activate a module on demand... ?[HOW?]
-* Bible references linker (require activate module). ?[--*]
-* Change 'GREEK' to 'UNICODE' module. Post-processors in plugins? Or just diversify Unicode with Gentium, say? ?[--?]
-
-
-- Plugins
-
-* Auto-generated list of plugin examples + options. ?[+++]
-* For complete docs, Every plugin has a doc file that can be loaded in the playground for editing. ?[+++]
-* Add function that lists other functions? Maybe `TABLE () <<< \$[WIKI!function-list]` ?[++-]
-* Fix GRAPH labels; add pie chart; proper demo (or omit). ?[-++]
-
-
-- Typography + Markup
-
-* Auto-generated list of typographic markup. ?[+++]
-* Auto-generated list of brackets markup. ?[+++]
-* Nesting format characters? ?[---]
-* =[LaTeX]-style long arrows for `-\->`? ?[--+]
-* Inline functions. Processed before anything. Can use a backslash? `[\\echo{OK};] ?[HOW?]
-* * Will filters be sufficient? e.g. `\(C)\$[date|year]` or `\(C)\$[year?date]` ?[HOW?]
-
+_ Inherit settings from parent in hierarchy (ChainMap).
+_ Insert standard or customised templates into documents (popover or dropdown)
+_ Allow date (or date-updated) to auto-update.
+_ QUIZ blocks (`?`, with answers collated and rotated 180 degrees?)
+_ Template imsertion and completion in the editor. Tab-through and select patterns?

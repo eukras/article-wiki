@@ -6,15 +6,18 @@ Links and footnotes will both have footnote markers added, since, for the benefi
 
 DEMO ---
 . This is a ^[link].
+. This is a ^[link to myself].
 . This is a ^[footnote].
 
 . Text continues...
 
 ^ http://example.org
+^ http://example.org|rel=me
 ^ Footnote goes here.
 ---
 
 Footnotes will appear at the end of the full document in which they appear. References can be entered after each paragraph, or at any convenient point in the same section, including at the end, so long as they appear in the same order as the links they will be matched with. When there are many links, it may be more convenient to list them after each paragraph, but this is a matter of personal preference.
 
-~ Links in text. ~ URLs and email addresses will be turned into links automatically, without footnoting: http://example.org, hello@example.org. If you ever want to enter a link and have it /not/ be recognized, you can use
-@ [backslashes] in the protocol (`https://`) or on the `@` character to prevent them being matched.
+~ Links in text. // URLs and email addresses will be turned into links automatically, without footnoting, for example https://example.org or hello@example.org. If you ever want to enter a link and have it /not/ be recognised, you can use @[backslashes] in the protocol (`https://`) or on the `@` character to prevent them being matched.
+
+~ Links with `rel=\"me\"` properties. // To identify a link as pointing to yourself on social media, add `|rel=me` to the end of its footnote link. This will turn into a hidden property of the link tag. (There are presently no other hidden properties that can be controlled in this way.)

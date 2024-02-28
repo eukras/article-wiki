@@ -1,0 +1,5 @@
+Summaries
+
+= An introduction or synopsis may be desired as the start of each section.
+
+The caption function block (`=`) is always used to explain the element preceding it. When it follows the initial title paragraph in a section it becomes a summary paragraph. This will be displayed in larger text for easier skimming.

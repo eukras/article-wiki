@@ -1,0 +1,21 @@
+Notes and comments
+
+The `\"` character adds a visible, compact note, with an outline around it.
+
+DEMO ---
+(Regular paragraph continues here...)
+
+" *Block notes* appear as their own paragraphs, but in a much smaller font, and with a box around them.
+
+(Regular paragraph continues here...)
+---
+
+The `%` character indicates a comment that is not displayed to the reader. However, while this text does not appear in HTML (or PDF or ePub, as a result), it is not fully hidden, because a reader can always look at the source in the online editor. A note can also be used in the title paragraph if you don't want the title to be visible, say if writing a letter.
+
+DEMO ---
+* * *
+
+% This text will not be displayed.
+
+* * *
+---

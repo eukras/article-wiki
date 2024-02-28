@@ -9,12 +9,12 @@ CENTER (80%) ---
 | Data goes here | Data goes here
 ---
 
-= Table $[t++]. = A simple table block. 
+= Table $[t++]. ** A simple table block. 
 +++
 
 But this has obvious limitations. We would normally obtain data in CSV format, so why not just use that instead of reformatting?
 
-~ CSV Tables. ~ If I wanted to display some ^[CSV] data in a table, but without fiddly reformatting everytime the data had to be updated, I could use the `TABLE` function to format the data, with formatting instructions ^[given as arguments].
+~ CSV Tables. // If I wanted to display some ^[CSV] data in a table, but without fiddly reformatting everytime the data had to be updated, I could use the `TABLE` function to format the data, with formatting instructions ^[given as arguments].
 
 ^ Comma Separated Value files.
 ^ AsciiDoc has previously used this same approach.
@@ -26,12 +26,12 @@ ID, First Name, Last Name, Salary
 7, Clive, Warner, 45000
 ---
 
-= Table $[t++]. = Tables from CSV data.
+= Table $[t++]. ** Tables from CSV data.
 ===
 
-: ! : $[wiki] does not support more complex table features such as row or column spans. Some more complex formatting can be done with grids.
+" Note. ** Article Wiki does not support more complex table features such as row or column spans. Some more complex formatting can be done with grids.
 
-~ Grids. ~ For really large tables. For clarity it expects `===` as the row divider and `---` as the column divider.
+~ Grids. // For really large tables. For clarity it expects `===` as the row divider and `---` as the column divider.
 
 DEMO :::
 GRID +++
@@ -46,5 +46,5 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 +++
 
-= Table $[t++]. = A `GRID` of square areas.
+= Table $[t++]. ** A `GRID` of square areas.
 :::

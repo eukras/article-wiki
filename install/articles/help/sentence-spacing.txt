@@ -1,0 +1,11 @@
+Sentence Spacing
+
+Sentence-ending punctuation (`.!?`) will always be followed by an extra space for readability. Like. This. It allows for any trailing right-quotes or right-brackets. You can always /escape/ a punctuation character to prevent the extra spacing; see @[backslashes] for more.
+
+DEMO +++
+* J\. R\. R\. Tolkien. C\. S\. Lewis.
+* See Job 11:12, though Heb.\ is unclear.
+* ("A!") ('B?') (C.) "D." E.
++++
+
+Backslashing the period characters in initials, acronyms, and common abreviations is a little inconvenient. There are text processing systems like `LaTeX` that maintain a list of common abbreviations and format them appropriately, but this is complex and it still requires occassional work-arounds. Backslashing is a single, simple principle that gives consistent results in all cases.

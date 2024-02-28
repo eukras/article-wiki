@@ -1,21 +1,23 @@
-How Article Wiki Works
+Article Wiki
 
-= Long-form humanities writing in plain text.
+= Long-form humanities writing in plain text
 
-$ AUTHOR = Nigel Chapman / nigel@chapman.id.au
-$ DATE = 15 December 2018
+$ AUTHOR = Nigel Chapman
+$ EMAIL = nigel@chapman.id.au
+$ DATE = 26 December 2019
 $ SLUG = help
+$ LICENSE = CC-BY-SA
 
 $ site = https://chapman.wiki
 
-Article Wiki is an open-source writing tool for the humanities. It is designed for long, structured arguments in plain text. However, it gives you bibliographies and citations, footnotes and links, and lets you construct indexes, all without making the plain text unreadable. This means you can do your writing anywhere you can edit plain text, including in collaboration or version control systems -- or offline, and just paste it in when back online. You can download the software, run it yourself, and add new features if you have a little programming skill. It is opinionated about layout, but always readable online and in print. Try it out!
+Article Wiki is an open-source writing tool for the humanities. It is designed for long, structured arguments in plain text. It provides bibliographies, citations, and footnotes without making the plain text unreadable. This lets you do your writing anywhere you can edit plain text, including offline, online, or in collaboration or version control systems. It's a web service, but the software is open source, so you can add new features yourself if you have a little programming skill. It is opinionated about layout, but always readable online and in print. Try it out!
 
 CENTER (80%) ---
-| Try it out! | $[site]/playground
-| Source code | https://github.com/eukras/article-wiki
+| Playground | $[site]/playground
+| Source Code | https://github.com/eukras/article-wiki
 ---
 
-This page demonstrates most of Article Wiki's features, starting with @[index-page], which provides a Table of Contents. Since page numbers have no meaning in a web document, the Table of Contents shows word counts instead, on the assumption that long articles are usually written to word limits.
+This page demonstrates most of Article Wiki's features, starting with @[index-page], which provides a Table of Contents. Since page numbers have no meaning in a web document, the Table of Contents shows word counts instead, on the assumption that long articles are usually organised around word limits.
 
 ~
 
@@ -23,22 +25,24 @@ This page demonstrates most of Article Wiki's features, starting with @[index-pa
 - - Get Started
 - - Why Use a Wiki?
 - The Index Page
+- - Settings
 - Inline Markup
 - - Typography
+- - Sentence Spacing
 - - Square Brackets
 - - Backslashes and Line Breaks
-- - Icons
+- - Special Characters
 - Four Kinds of Text Blocks
 - - Paragraphs
 - - Character Blocks
-- - - Subheadings
+- - - Alignment Blocks
+- - - Summaries
+- - - Subheads and Double-stops
 - - - Quotes and Captions
 - - - Lists
 - - - Simple Tables
-- - - Alignment Blocks
 - - - Interlinear Translations
-- - - Notes
-- - - Hidden Comments
+- - - Notes and comments
 - - Function Blocks
 - - - Text Alignment
 - - - Formatting Tables
@@ -47,7 +51,7 @@ This page demonstrates most of Article Wiki's features, starting with @[index-pa
 - Adding Information
 - - Values and Counters
 - - Links and Footnotes
-- - Tags and Indexes
 - - Cross References
 - - Citations and Bibliography
 - Cheat Sheet (Print Me!)
+- To Do

@@ -1,8 +1,3 @@
 Inline Markup
 
-Wiki markup is of two main kinds, #[inline markup: markup, inline] and
-#[block markup:markup, block]. Inline formatting determines how text is
-laid out within each text block, say, a paragraph, a list item or a
-table cell. There are two kinds of inline formatting, general typography
-and square brackets, and markup can always be prevented with
-@[backslashes].
+Wiki markup is of two main kinds, inline and block markup, respectively. Inline formatting determines how text is laid out within each text block, say, a paragraph, a list item or a table cell. There are two kinds of inline formatting, general typography and square brackets. Markup ofny kind can always be prevented with @[backslashes].

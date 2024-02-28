@@ -7,7 +7,7 @@ DEMO ---
 | John | 7326532765
 | Jane | 6397532340 ksjdh kjsh kdsjh sdkjh dskjh dskjh 
 
-= Table $[t++]. = A Table of Numbers
+= Table $[t++]. ** A Table of Numbers
 ---
 
 This is a good way to lay out questions and answers.

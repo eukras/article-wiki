@@ -2,8 +2,8 @@ Paragraphs
 
 Paragraphs are just blocks of text separated by blank lines in the source text.
 
-When a paragraph follow another paragraph, it is marked by a first line indent. Indenting can also be controlled with @[character-blocks].
+When a paragraph follow another paragraph, it is marked by a first line indent, as illustrated here. Indenting can also be controlled with @[character-blocks].
 
-~ The First Paragraph is the Title. ~ There must always be a title, it can be as long as you like, and no other markup is required to indicate it. If writing a letter, say, the title could be hidden by marking it as a #[comment] line, that is, by prefacing it with a `%` symbol and a space.
+~ The First Paragraph is the Title. // There must always be a title, it can be as long as you like, and no other markup is required to indicate it. If writing a letter, say, the title could be hidden by marking it as a comment line, that is, by prefacing it with a `%` symbol and a space.
 
-~ Line Wrapping is Optional. ~ The wiki doesn't care whether paragraphs are wrapped to a certain width, or continue unbroken, only being wrapped in the editor. It will rewrap them automatically where possible so the writer doesn't have to.
+~ Line Wrapping is Optional. // The wiki doesn't care whether paragraphs are wrapped to a certain width, or continue unbroken, only being wrapped in the editor. It will rewrap them automatically where possible so the writer doesn't have to.

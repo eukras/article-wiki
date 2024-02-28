@@ -1,11 +1,70 @@
-Your Homepage
+A Little Christian Problem-Solving
 
-= Click the edit button to change this text
-
+$ AUTHOR = Nigel Chapman
+$ EMAIL = nigel@chapman.id.au
 $ SLUG = index
+
+CENTER (80%) ---
+; NEWS
+
+~ Sept 2022. ** ^[Who to Trust? Christian Belief in Conspiracy Theories] -- An ISCAST Australia publication; project editor and lead author. (Also on Amazon; see link.)
+
+* 25 Jan 2024. ^[Interview: Paranoid Planet, Canada.]
+* 26 Oct 2023. ^[Interview: CPX Work & Faith, Australia.]
+---
+
+^ https://iscast.org/conspiracy
+^ https://www.paranoidplanet.ca/podcast/episode/7ee28f46/bonus-episode-36c-who-would-jesus-scapegoat-feat-australian-author-programmer-and-christian-evangelist-nigel-chapman
+^ https://www.publicchristianity.org/down-the-rabbit-hole/
 
 ~
 
+; ARTICLES
+
 ARTICLES ---
+admin/help-theres-a-conspiracy-theory-in-my-church
+admin/how-should-christians-think-and-speak
+admin/same-sex-marriage-solves-our-evangelical-problems-with-same-sex-orientation
+admin/long-talks
 admin/help
 ---
+
+~
+
+; RANDOM EXTRAS
+
+ARTICLES ---
+admin/clear-gloss-bible-philippians
+---
+
+~
+
+CENTER (80%) ---
+; AUTHOR
+
+Nigel Chapman lives in Melbourne, Australia where he works in design and technology. He has a Masters in Divinity, meaning Christian Theology. Every now and then he writes a long article that that tries to solve a pressing problem of some kind involving Christian thought or practice.
+---
+
+CENTER (60%) ---
+TABLE (rl) ===
+BlueSky: , ^[@chapman.wiki]
+Facebook: , ^[@eukras]
+Twitter/X: , ^[@eukras]
+===
+---
+
+~
+
+CENTER (80%) ---
+; WEBSITE
+
+This website runs on ^[Article Wiki], an open source Python/Redis system for online writing. It turns wiki markup into articles and eBooks.
+---
+
+^ https://twitter.com/eukras
+^ https://bsky.app/profile/chapman.wiki
+^ https://facebook.com/eukras
+^ https://github.com/eukras/article-wiki
+^ https://iscast.org/conspiracy
+
+~ ~ ~ ~
