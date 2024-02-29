@@ -12,8 +12,31 @@
         display: none;
     }
 
+    .left-margin {
+        display: none;
+    }
+
+    .right-margin {
+        display: none;
+    }
+
+    /* Header section must be full-width */
+    .section-group {
+        display: block;
+        width: 100%;
+        .section-list {
+            .section-item {
+                display: block;
+                width: 100%;
+                .section-content {
+                    flex: 1 1 100%;
+                }
+            }
+        }
+    }
+
     ::root {
-        font-size: 10pt;
+        font-size: 9pt;
     }
 
     * {

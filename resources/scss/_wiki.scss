@@ -30,9 +30,6 @@ article {
     .left-margin {
         flex: 1 1 var(--page-margin);
         text-align: left;
-        @media print {
-            display: none;
-        }
         .sticky-buttons {
             align-items: flex-start;
             button.button-unit {
@@ -53,9 +50,6 @@ article {
             .right-margin {
                 flex: 1 1 var(--page-margin);
                 text-align: right;
-                @media isPrint {
-                    display: none;
-                }
                 .sticky-buttons {
                     align-items: flex-end;
                     button.button-unit {
@@ -86,10 +80,11 @@ article {
         font-family: $fontFamilySansSerif;
         font-size: $fontSizeMinus3;
         cursor: pointer;
+        color: var(--page-text-secondary);
         svg {
-            fill: var(--page-icon-text);
             height: 1.2rem;
             width: 1.2rem;
+            fill: var(--page-text-secondary);
         }
     }
 }
@@ -109,6 +104,13 @@ article {
         padding: 0.5rem 0.5rem 0.5rem 0.75rem;
         border-right: none;
         border-radius: 1rem 0 0 1rem;
+    }
+}
+
+@media isPrint {
+    .left-margin, 
+    .right-margin {
+        display: none;
     }
 }
 
