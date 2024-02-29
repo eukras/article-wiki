@@ -84,6 +84,7 @@ html.theme-light {
     --page-background: #{$gray97};
     --page-text: #{$gray03};
     --page-text-secondary: #{$gray03};
+    --page-text-tertiary: #{$gray03};
     --page-text-link: #{$gray03};
     --page-text-link-background: #{$mintGreen};
     --page-text-selection: #{$limeGreen};
@@ -104,6 +105,7 @@ html.theme-dark {
     --page-background: #{$gray03};
     --page-text: #{$gray50};
     --page-text-secondary: #{$indigoBlue};
+    --page-text-tertiary: #{$bostonBlue};
     --page-text-link: #{$gray75};
     --page-text-link-background: #{$gray03};
     --page-text-selection: #{$bostonBlue};

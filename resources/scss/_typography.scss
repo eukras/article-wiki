@@ -271,7 +271,7 @@ h3,
 h4,
 h5,
 h6 {
-    color: var(--page-text-secondary);
+    color: var(--page-text-tertiary);
     margin-top: 0;
     padding-top: 0.7rem;
     margin-bottom: 0;
@@ -369,6 +369,8 @@ blockquote + blockquote {
 }
 
 p.subhead {
+    text-align: center;
+    color: var(--page-text-tertiary);
     font-weight: bold;
     margin: 0;
     padding: 0.8rem 0 0.2rem 0;
