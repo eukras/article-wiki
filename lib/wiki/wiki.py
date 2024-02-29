@@ -237,7 +237,7 @@ class Wiki(object):
                         if not fragment and not preview:
                             with __.div(klass='right-margin'):
                                 with __.div(klass='sticky-buttons'):
-                                    link = self.settings.get_base_uri('pencil',
+                                    link = self.settings.get_base_uri('edit',
                                                                       'index')
                                     __(side_button(name='Edit', icon='pencil',
                                                    href=link))
