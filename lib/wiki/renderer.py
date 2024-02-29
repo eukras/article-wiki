@@ -124,7 +124,7 @@ def side_button(name: str, _id=None, _klass=None, href=None, icon=None,
             __.i(klass='fa fa-fw fa-' + button_icon)
             __(button_label)
     else:
-        with __.button(klass=button_class, id=button_id):
+        with __.button(klass=button_class, type='button'):
             __.i(klass='fa fa-fw fa-' + button_icon)
             __(button_label)
     return __
