@@ -25,13 +25,13 @@ function cycleNavigation() {
 
 function initNavigation(buttonSelector, callback)
 {
-    const button = document.querySelector(buttonSelector); // one only
-    if (button !== null) {
+    const buttons = document.querySelectorAll(buttonSelector);
+    for (const button of buttons) {
         button.addEventListener('click', function (event) {
             cycleNavigation();
             callback();
             event.preventDefault();
-        }, false);
+        }, true);  // <-- Capture
     }
 }
 

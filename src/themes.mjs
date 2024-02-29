@@ -31,13 +31,13 @@ function cycleTheme() {
 
 function initThemes(buttonSelector)
 {
-    document.addEventListener('click', function (event) {
-        const button = event.target.closest(buttonSelector);
-        if (button !== null) {
+    const buttons = document.querySelectorAll(buttonSelector);
+    for (const button of buttons) {
+        button.addEventListener('click', function (event) {
             cycleTheme();
             event.preventDefault();
-        }
-    }, false);
+        }, true);  // <-- Capture
+    }
 }
 
 export {cycleTheme, initThemes};

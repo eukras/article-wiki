@@ -20,12 +20,13 @@ function toggleFullScreen()
 
 function initFullScreen(buttonSelector)
 {
-    document.addEventListener('click', function (event) {
-        const button = event.target.closest(buttonSelector);
-        if (button !== null) {
+    const buttons = document.querySelectorAll(buttonSelector); // one only
+    for (const button of buttons) {
+        button.addEventListener('click', function (event) {
             toggleFullScreen();
-        }
-    });
+            event.preventDefault();
+        }, true);  // <-- Capture
+    }
 }
 
 export {initFullScreen};
