@@ -257,6 +257,7 @@ html.theme-light {
   --page-background: hsl(0, 0%, 97%);
   --page-text: hsl(0, 0%, 3%);
   --page-text-secondary: hsl(0, 0%, 3%);
+  --page-text-tertiary: hsl(0, 0%, 3%);
   --page-text-link: hsl(0, 0%, 3%);
   --page-text-link-background: hsl(120, 44%, 93%);
   --page-text-selection: hsl(83, 84%, 75%);
@@ -277,6 +278,7 @@ html.theme-dark {
   --page-background: hsl(0, 0%, 3%);
   --page-text: hsl(0, 0%, 50%);
   --page-text-secondary: hsl(240, 22%, 51%);
+  --page-text-tertiary: hsl(210, 67%, 78%);
   --page-text-link: hsl(0, 0%, 75%);
   --page-text-link-background: hsl(0, 0%, 3%);
   --page-text-selection: hsl(210, 67%, 78%);
@@ -785,7 +787,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: var(--page-text-secondary);
+  color: var(--page-text-tertiary);
   margin-top: 0;
   padding-top: 0.7rem;
   margin-bottom: 0;
@@ -878,6 +880,8 @@ blockquote + blockquote {
 }
 
 p.subhead {
+  text-align: center;
+  color: var(--page-text-tertiary);
   font-weight: bold;
   margin: 0;
   padding: 0.8rem 0 0.2rem 0;
