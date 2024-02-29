@@ -74,7 +74,7 @@ article {
         flex-direction: column;
         align-items: center; 
         gap: 0.25rem;
-        border: 1px dotted var(--page-icon-text);
+        border: 1px solid var(--page-outline);
         width: 3rem;
         text-align: center;
         font-family: $fontFamilySansSerif;

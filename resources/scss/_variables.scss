@@ -82,6 +82,7 @@ html.theme-light {
     --side-background-left: #{$gray97-translucent};
     --side-background-right: #{$seaGreen};
     --page-background: #{$gray97};
+    --page-outline: #{$gray75};
     --page-text: #{$gray03};
     --page-text-secondary: #{$gray03};
     --page-text-tertiary: #{$gray03};
@@ -103,6 +104,7 @@ html.theme-dark {
     --side-background-left: #{$gray03-translucent};
     --side-background-right: #{$nightBlue};
     --page-background: #{$gray03};
+    --page-outline: #{$gray25};
     --page-text: #{$gray50};
     --page-text-secondary: #{$indigoBlue};
     --page-text-tertiary: #{$bostonBlue};

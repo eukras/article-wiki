@@ -255,6 +255,7 @@ html.theme-light {
   --side-background-left: hsla(0, 0%, 97%, 0.9);
   --side-background-right: hsl(120, 14%, 67%);
   --page-background: hsl(0, 0%, 97%);
+  --page-outline: hsl(0, 0%, 75%);
   --page-text: hsl(0, 0%, 3%);
   --page-text-secondary: hsl(0, 0%, 3%);
   --page-text-tertiary: hsl(0, 0%, 3%);
@@ -276,6 +277,7 @@ html.theme-dark {
   --side-background-left: hsla(0, 0%, 3%, 0.9);
   --side-background-right: hsl(248, 90%, 5%);
   --page-background: hsl(0, 0%, 3%);
+  --page-outline: hsl(0, 0%, 25%);
   --page-text: hsl(0, 0%, 50%);
   --page-text-secondary: hsl(240, 22%, 51%);
   --page-text-tertiary: hsl(210, 67%, 78%);
@@ -363,7 +365,7 @@ div#background {
 }
 
 #page {
-  border: 1pt solid rgba(128, 128, 128, 0.3);
+  border: 1pt solid var(--page-outline);
   max-width: var(--page-width);
   margin: 2rem auto;
   padding: 0;
@@ -1321,7 +1323,7 @@ article {
   flex-direction: column;
   align-items: center;
   gap: 0.25rem;
-  border: 1px dotted var(--page-icon-text);
+  border: 1px solid var(--page-outline);
   width: 3rem;
   text-align: center;
   font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;

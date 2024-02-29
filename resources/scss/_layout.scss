@@ -54,7 +54,7 @@ div#background {
 }
 
 #page {
-    border: 1pt solid rgba(128, 128, 128, 0.3);
+    border: 1pt solid var(--page-outline);
     max-width: var(--page-width);
     margin: 2rem auto;
     padding: 0;
