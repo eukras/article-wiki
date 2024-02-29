@@ -316,11 +316,9 @@ async def login_form():
     Show the login form, if we're using local auth (not OAUTH).
     """
     template = views.get_template('login.html')
-    header_buttons = [home_button()]
     html = template.render(
         title="Login",
         config=config,
-        header_buttons=header_buttons
     )
     return HTMLResponse(content=html)
 
@@ -918,15 +916,9 @@ async def import_archive_form(user_slug):
     Show import form for importing an archive zipfile.
     """
     require_authority_for_user(user_slug)  # else 401s
-    header_buttons = [{
-        'name': 'Back',
-        'href': '/read/{:s}'.format(user_slug),
-        'icon': 'arrow-left'
-    }]
     html = views.get_template('import.html').render(
         config=config,
         user_slug=user_slug,
-        header_buttons=header_buttons
     )
     return HTMLResponse(content=html)
 
@@ -994,155 +986,6 @@ async def post_import_archive(user_slug,
 
 
 # ----------------------------------------------------------
-# Buttons!  Remove these when converted to Airium.
-# ----------------------------------------------------------
-
-
-def login_or_logout_button() -> dict:
-    return logout_button() if login else login_button()
-
-
-def login_button() -> dict:
-    return {
-        'name': 'Login',
-        'href': '/login',
-        'icon': 'user'
-    }
-
-
-def logout_button() -> dict:
-    return {
-        'name': 'Logout',
-        'href': '/logout',
-        'icon': 'user'
-    }
-
-
-def back_button() -> dict:
-    return {
-        'name': 'Go Back',
-        'href': 'javascript:window.history.go(-1);',
-        'icon': 'arrow-left'
-    }
-
-
-def home_button() -> dict:
-    if config['SINGLE_USER'] == 'YES':
-        uri = "/read/{:s}".format(data.admin_user)
-    else:
-        uri = '/'
-    return {
-        'name': 'Home',
-        'href': uri,
-        'icon': 'home'
-    }
-
-
-def help_button() -> dict:
-    return {
-        'name': 'Help',
-        'href': '/read/{:s}/help'.format(data.admin_user),
-        'icon': 'question-circle'
-    }
-
-
-def rss_button(user_slug) -> dict:
-    return {
-        'name': 'Changes (RSS)',
-        'href': '/rss/%s.xml' % user_slug,
-        'icon': 'rss'
-    }
-
-
-def playground_button() -> dict:
-    return {
-        'name': 'Playground',
-        'href': '/playground',
-        'icon': 'pencil'
-    }
-
-
-def user_button(user_slug: str) -> dict:
-    return {
-        'name': user_slug,
-        'href': '/read/{:s}'.format(user_slug),
-        'icon': 'user'
-    }
-
-
-def new_article_button(user_slug: str) -> dict:
-    return {
-        'name': 'New Article',
-        'href': '/edit/{:s}/_/index'.format(user_slug),
-        'icon': 'plus',
-    }
-
-
-# def epub_button(user_slug: str, doc_slug: str) -> dict:
-    # return {
-    # 'name': '.Epub',
-    # 'href': '/epub/{:s}/{:s}'.format(user_slug, doc_slug),
-    # 'icon': 'download',
-    # }
-
-
-def edit_button(user_slug: str, doc_slug: str, part_slug: str) -> dict:
-    return {
-        'name': 'Edit',
-        'href': '/edit/{:s}/{:s}/{:s}'.format(user_slug, doc_slug, part_slug),
-        'icon': 'pencil',
-    }
-
-
-def biblio_button(user_slug: str, doc_slug: str) -> dict:
-    return {
-        'name': 'Biblio',
-        'href': '/edit/{:s}/{:s}/biblio'.format(user_slug, doc_slug),
-        'icon': 'pencil'
-    }
-
-
-def download_button(user_slug: str, doc_slug: str) -> dict:
-    return {
-        'name': 'Download',
-        'href': '/download/{:s}/{:s}'.format(user_slug, doc_slug),
-        'icon': 'arrow-down'
-    }
-
-
-def upload_button(user_slug: str, doc_slug: str) -> dict:
-    return {
-        'name': 'Upload',
-        'href': '/upload/{:s}/{:s}'.format(user_slug, doc_slug),
-        'icon': 'arrow-up'
-    }
-
-
-def export_archive_button(user_slug: str) -> dict:
-    return {
-        'name': 'Export',
-        'href': '/export-archive/{:s}'.format(user_slug),
-        'icon': 'arrow-down',
-    }
-
-
-def import_archive_button(user_slug: str) -> dict:
-    return {
-        'name': 'Import',
-        'href': '/import-archive/{:s}'.format(user_slug),
-        'icon': 'arrow-up',
-    }
-
-
-def source_button() -> dict:
-    return {
-        'name': 'Article Wiki',
-        'href': 'https://github.com/eukras/article-wiki',
-        'icon': 'github'
-    }
-
-
-# ----------------------------------------------------------
 #                      Generated files
 # ----------------------------------------------------------
 
@@ -1188,7 +1031,6 @@ async def generate_epub(user_slug, doc_slug):
             config=config,
             user_slug=user_slug,
             doc_slug=doc_slug,
-            header_buttons=[back_button, home_button()],
             title="Generating..."
         )
         return HTMLResponse(content=reload_html,
