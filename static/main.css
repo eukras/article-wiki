@@ -369,11 +369,12 @@ div#background {
   -moz-box-shadow: 0 0 2.5rem rgba(30, 60, 30, 0.25);
   box-shadow: 0 0 2.5rem rgba(30, 60, 30, 0.25);
 }
-#page header {
+
+header {
   text-align: center;
   margin: 6em 0 5em 0;
 }
-#page header h1, #page header h2 {
+header h1, header h2 {
   text-align: center;
 }
 
@@ -1273,11 +1274,6 @@ article {
   flex: 1 1 var(--page-margin);
   text-align: left;
 }
-@media print {
-  .section-group .left-margin {
-    display: none;
-  }
-}
 .section-group .left-margin .sticky-buttons {
   align-items: flex-start;
 }
@@ -1299,11 +1295,6 @@ article {
 .section-group .section-list .section-item .right-margin {
   flex: 1 1 var(--page-margin);
   text-align: right;
-}
-@media isPrint {
-  .section-group .section-list .section-item .right-margin {
-    display: none;
-  }
 }
 .section-group .section-list .section-item .right-margin .sticky-buttons {
   align-items: flex-end;
@@ -1332,11 +1323,12 @@ article {
   font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
   font-size: 71.55456%;
   cursor: pointer;
+  color: var(--page-text-secondary);
 }
 .sticky-buttons a.button-unit svg, .sticky-buttons button.button-unit svg {
-  fill: var(--page-icon-text);
   height: 1.2rem;
   width: 1.2rem;
+  fill: var(--page-text-secondary);
 }
 
 .left-margin a.button-unit,
@@ -1353,6 +1345,12 @@ article {
   border-radius: 1rem 0 0 1rem;
 }
 
+@media isPrint {
+  .left-margin,
+  .right-margin {
+    display: none;
+  }
+}
 /* Navigation buttons in header */
 .section-group .left-margin,
 .section-group .right-margin {
@@ -2061,8 +2059,26 @@ button.feature {
   .no-print {
     display: none;
   }
+  .left-margin {
+    display: none;
+  }
+  .right-margin {
+    display: none;
+  }
+  /* Header section must be full-width */
+  .section-group {
+    display: block;
+    width: 100%;
+  }
+  .section-group .section-list .section-item {
+    display: block;
+    width: 100%;
+  }
+  .section-group .section-list .section-item .section-content {
+    flex: 1 1 100%;
+  }
   ::root {
-    font-size: 10pt;
+    font-size: 9pt;
   }
   * {
     color: var(--black);

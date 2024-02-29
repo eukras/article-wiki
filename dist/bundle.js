@@ -23,12 +23,13 @@
 
     function initFullScreen(buttonSelector)
     {
-        document.addEventListener('click', function (event) {
-            const button = event.target.closest(buttonSelector);
-            if (button !== null) {
+        const buttons = document.querySelectorAll(buttonSelector); // one only
+        for (const button of buttons) {
+            button.addEventListener('click', function (event) {
                 toggleFullScreen();
-            }
-        });
+                event.preventDefault();
+            }, true);  // <-- Capture
+        }
     }
 
     /**
@@ -58,13 +59,13 @@
 
     function initNavigation(buttonSelector, callback)
     {
-        const button = document.querySelector(buttonSelector); // one only
-        if (button !== null) {
+        const buttons = document.querySelectorAll(buttonSelector);
+        for (const button of buttons) {
             button.addEventListener('click', function (event) {
                 cycleNavigation();
                 callback();
                 event.preventDefault();
-            }, false);
+            }, true);  // <-- Capture
         }
     }
 
@@ -1074,13 +1075,13 @@
 
     function initThemes(buttonSelector)
     {
-        document.addEventListener('click', function (event) {
-            const button = event.target.closest(buttonSelector);
-            if (button !== null) {
+        const buttons = document.querySelectorAll(buttonSelector);
+        for (const button of buttons) {
+            button.addEventListener('click', function (event) {
                 cycleTheme();
                 event.preventDefault();
-            }
-        }, false);
+            }, true);  // <-- Capture
+        }
     }
 
     //  A compressed version of Adobe's jquery.balanceText.js, which operates
