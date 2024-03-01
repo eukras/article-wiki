@@ -3,14 +3,14 @@ import {initNavigation} from './navigation.mjs';
 import {initSidebars, stopScrollDownIndicatorBlinking} from './sidebars.mjs';
 import {initProgress} from './progress.mjs';
 import {initThemes} from './themes.mjs';
-import {polyfillForBalanceText} from './balance-text.mjs';
 import {setSvgBackground} from './bokeh.mjs';
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    polyfillForBalanceText();
-
-    setSvgBackground('#background');
+    //  IOS devices can't generally handle our fullscreen SVG translucency.
+    if (!/Mac OS/.test(window.navigator.userAgent)) {
+        setSvgBackground('#background');
+    }
 
     initSidebars();
     initProgress('#progress-meter');
