@@ -80,11 +80,11 @@ article {
         font-family: $fontFamilySansSerif;
         font-size: $fontSizeMinus3;
         cursor: pointer;
-        color: var(--page-text-secondary);
+        color: var(--desk-text);
         svg {
             height: 1.2rem;
             width: 1.2rem;
-            fill: var(--page-text-secondary);
+            fill: var(--desk-text);
         }
     }
 }
