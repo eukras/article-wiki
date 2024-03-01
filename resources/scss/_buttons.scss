@@ -73,3 +73,8 @@ button.feature {
     margin-top: 1rem;
 }
 
+a[disabled='DISABLED'],
+button[disabled='DISABLED'] {
+    opacity: 30%;
+    cursor: not-allowed;
+}
