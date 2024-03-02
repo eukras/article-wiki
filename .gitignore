@@ -8,5 +8,6 @@ __pycache__
 .env
 .venv
 .pytest_cache
+cscope.*
 node_modules
 tags
