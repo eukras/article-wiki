@@ -69,7 +69,8 @@ def load_dir(dir_path: str) -> dict:
     for path in file_paths:
         name = path.replace(dir_path + '/', '').replace('.txt', '')
         part_slug = slug(name)
-        document[part_slug] = codecs.open(path, 'r', 'utf-8').read()
+        with open(path, 'r') as file:
+            document[part_slug] = file.read()
         print("READ: {:s} ({:d})".format(part_slug, len(document[part_slug])))
     return document
 
