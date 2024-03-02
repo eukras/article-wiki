@@ -90,8 +90,9 @@ def write_epub(user_slug, doc_slug, file_path):
     chapter_file_name = doc_slug + '.xhtml'
 
     assert os.path.exists(tmp_cover_file)
-    cover_image = open(tmp_cover_file, 'rb').read()
-    book.set_cover("image.jpg", cover_image)
+    with open(tmp_cover_file, 'rb') as file:
+        cover_image = file.read()
+        book.set_cover("image.jpg", cover_image)
 
     # -------------------------
     # 2. Create Title Page
