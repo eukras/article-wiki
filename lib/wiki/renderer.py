@@ -5,7 +5,6 @@ Render has no state beyond its initial configuration, but we don't want to be
 repeating that everywhere, so we'll initialise once as a singleton.
 """
 
-import logging
 import re
 
 from airium import Airium
@@ -56,21 +55,6 @@ class Html(object):
     # ----------------------------------------------------
     # Blocks used in CharacterBlock
     # ----------------------------------------------------
-
-    def nav_buttons(self):
-        """
-        Make the buttons list.
-        """
-        edit_uri = self.settings.get_base_uri('edit', 'index')
-        return """
-            <div class="no-preview no-print">
-                <div class="text-center big-space">
-                  <a class="btn btn-default btn-sm" target="_blank" href="%s">
-                      <i class="fa fa-pencil"></i> Edit
-                  </a>
-                </div>
-            </div>
-            """ % (edit_uri)
 
     def generate_grid(self, data):
         """
