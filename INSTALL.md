@@ -47,6 +47,16 @@ from ENV.dist (or as otherwise set in ENV vars).
 
 There will be a generated set of API docs at `/docs`.
 
+## Testing
+
+To verify that things are working: 
+
+```
+pytest
+pytest -m integration   # <-- If there's a redis connection available
+                        #     with a disposable test database.
+```
+
 ## Production
 
 This is a FastAPI app, for which there are many deployment solution.  

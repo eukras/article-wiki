@@ -5,30 +5,25 @@ Test the redis interface for user and docs handling.
 import pytest
 from .context import lib  # noqa: F401
 
-from lib.data import Data
+from lib.data import Data, load_env_config
 from lib.wiki.sample_data import minimal_document
 from lib.wiki.utils import random_slug
 
 
-# Disable this for no; TODO: Tag as integrations.
-pytest.skip(allow_module_level=True)
+def setup():
+    config = load_env_config()
+    config['REDIS_DATABASE'] = 1
+    data = Data(config, strict=True)
+    data.redis.flushdb()
+    return data;
 
 
-config = {
-    'REDIS_HOST': 'localhost',
-    'REDIS_PORT': 6379,
-    'REDIS_DATABASE': 1,  # <-- TESTING
-    'ADMIN_USER': 'admin',
-    'TIME_ZONE': 'Australia/Sydney',
-}
-data = Data(config, strict=True)
-data.redis.flushdb()
-
-
+@pytest.mark.integration
 def test_utility_functions():
     """
     Create a hash, find its key, delete it.
     """
+    data = setup()
     prefix = 'test-utilities-'
     test_slug = random_slug(prefix)
     data.redis.hmset(test_slug, minimal_document)
@@ -39,10 +34,12 @@ def test_utility_functions():
     assert not data.redis.exists(test_slug)
 
 
+@pytest.mark.integration
 def test_auth_functions():
     """
     Create a token, get it, delete it.
     """
+    data = setup()
     test_user = {'slug': 'test'}
     token = data.login_set(test_user)
     assert data.login_get('wrong-token') is None
@@ -51,10 +48,12 @@ def test_auth_functions():
     assert data.login_get(token) is None
 
 
+@pytest.mark.integration
 def test_check_slugs():
     """
     Confirm that bad slugs cause ValueErrors
     """
+    data = setup()
     good_slugs = ['ok-good', '123-890']
     bad_slugs = ['no_terrible', '!@#$%^&*(']
     try:
@@ -69,6 +68,7 @@ def test_check_slugs():
         assert True
 
 
+@pytest.mark.integration
 def test_userSet():
     """
     User Set -- A set of user_slugs: Can be used to construct keys
@@ -77,6 +77,7 @@ def test_userSet():
 
     v.0.1.0 -- SINGLE_USER, so no pagination yet.
     """
+    data = setup()
     test_slug = random_slug('test-user-')
     count = data.userSet_count()
 
@@ -92,6 +93,7 @@ def test_userSet():
     assert count == data.userSet_count()
 
 
+@pytest.mark.integration
 def test_users():
     """
     Users -- Redis Hashes of user names and whether they're
@@ -99,6 +101,7 @@ def test_users():
 
     v.0.1.0 -- SINGLE_USER, so not super-important yet.
     """
+    data = setup()
     user_slug = random_slug('test-user-')
     key = data.user_key(user_slug)
     assert user_slug in key
@@ -116,12 +119,14 @@ def test_users():
     assert data.user_get(user_slug) is None
 
 
+@pytest.mark.integration
 def test_userDocumentSet():
     """
     UserDocumentSet -- a set of doc_slugs for each user.
 
     v.0.1.0 -- SINGLE_USER, so no pagination yet.
     """
+    data = setup()
     user_slug = random_slug('test-user-')
     key = data.userDocumentSet_key(user_slug)
     assert user_slug in key
@@ -140,12 +145,14 @@ def test_userDocumentSet():
     assert data.userDocumentSet_list(user_slug) == []
 
 
+@pytest.mark.integration
 def test_userDocuments():
     """
     UserDocuments -- Redis Hashes of {part_slug: wiki_text}.
 
     Generally speaking, userDocument_ methods manage userSet data.
     """
+    data = setup()
     user_slug = random_slug('test-user-')
     doc_slug = random_slug('test-document-')
     key = data.userDocument_key(user_slug, doc_slug)
@@ -170,12 +177,14 @@ def test_userDocuments():
     # get_dict / archive ?
 
 
+@pytest.mark.integration
 def test_userDocumentMetadata():
     """
     UserDocumentMetadata -- Redis Hashes of {key: val}.
 
     Generally speaking, userDocument_ methods manage userSet data.
     """
+    data = setup()
     user_slug = random_slug('test-user-')
     doc_slug = random_slug('test-document-')
     key = data.userDocumentMetadata_key(user_slug, doc_slug)
@@ -194,11 +203,13 @@ def test_userDocumentMetadata():
     assert not data.userDocumentMetadata_exists(user_slug, doc_slug)
 
 
+@pytest.mark.integration
 def test_userDocumentLastChanged():
     """
     Note that last_changed is just a list of metadata keys; so must also create
     metadata....
     """
+    data = setup()
     user_slug = random_slug('test-user-')
     key = data.userDocumentLastChanged_key(user_slug)
     assert user_slug in key
@@ -223,7 +234,9 @@ def test_userDocumentLastChanged():
     assert not data.userDocumentMetadata_exists(user_slug, doc_slug)
 
 
+@pytest.mark.integration
 def test_userDocumentCache():
+    data = setup()
     user_slug = random_slug('test-user-')
     doc_slug = random_slug('test-document-')
     key = data.userDocumentCache_key(user_slug, doc_slug)

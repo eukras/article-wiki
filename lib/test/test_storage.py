@@ -44,11 +44,6 @@ def test_user_archive():
     Automatically remove temporary directory afterward.
     """
     with tempfile.TemporaryDirectory() as dir_path:
-        # import pdb; pdb.set_trace()
-        archive_data = {
-            'test': minimal_document,
-            'test-2': minimal_document,
-            }
         write_archive_dir(dir_path, minimal_document)
         user_slug = random_slug('test-user-')
         zip_name = make_zip_name(user_slug)

@@ -5,6 +5,8 @@ Tests:
     lib/document.py
 """
 
+import pytest
+
 from .context import lib  # noqa: F401
 
 from lib.data import Data
@@ -25,16 +27,7 @@ config = {
 data = Data(config, strict=True)
 
 
-# Basic, untested
-# def __init__(self, data: Data = None):
-# def __repr__(self):
-# def protected_part_slugs(self):
-
-# Basic load/save/delete.
-# def load(self, user_slug: str, doc_slug: str) -> bool:
-# def save(self, pregenerate=True, update_doc_slug=True):
-# def delete(self):
-
+@pytest.mark.integration
 def test_repr_save_load_delete():
     """
     Confirms data in data out. Builds upon data.py.
@@ -106,13 +99,6 @@ def test_repr_save_load_delete():
     latest_metadata = data.userDocumentLastChanged_list(user_slug)
     assert not any([_.get('slug') == new_doc_slug for _ in latest_metadata])
     assert not data.userDocumentCache_exists(user_slug, new_doc_slug)
-
-
-
-# Testing automatic updates for the Table of Contents:
-# def set_index(self, new_text: str) -> Union[str, None]:
-# def set_part(self, old_slug: str, new_text: str) -> Union[str, None]:
-# def delete_part(self, part_slug: str):
 
 
 def test_set_part():
@@ -202,10 +188,6 @@ def test_delete_part():
     }
 
 
-# def export_txt_file(self) -> (str, str):
-#     def make_txt_name(user_slug: str, doc_slug: str) -> str:
-#     def make_txt_divider(number: str, part_slug: str) -> str:
-# def import_txt_file(self, user_slug: str, doc_slug: str, file_text: str):
 
 def test_import_and_export_document():
     """
