@@ -11,14 +11,20 @@ sudo apt-get install virtualenv
 cd root_dir  # <-- whereever this INSTALL.md file is.
 virtualenv --python=python3 .venv
 source .venv/bin/activate
-python --version  # <-- should see e.g. 3.5+
-pip --version  # <-- should see (Python e.g. 3.5+)
+python --version  # <-- should see e.g. 3.10+
+pip --version  # <-- should see (Python e.g. 3.10+)
 pip install -r requirements.txt -r requirements-dev.txt
 pip freeze  # <-- show dependencies
-sudo apt-get install zip  # <-- for downloads
 pytest lib/  # <-- unit tests
 pytest test/  # <-- web tests
 ```
+
+Note that changes to `src/` and `resources/scss` will need to be rebuilt with
+`npm run build`. This creates `dist/bundle.js` (with Rollup) and
+`static/main.css` (with SASS).
+
+
+## Database
 
 You'll need a Redis server; customise the `localhost:6379` port in `ENV.dist`
 if needed. To run one in Docker with persistent storage, use the Makefile: 
@@ -27,14 +33,23 @@ if needed. To run one in Docker with persistent storage, use the Makefile:
 make redis
 ```
 
-Run the app for dev purposes. Note that this is not an efficient way to run the
-app online; suggest `nginx`, `uwsgi`, and `systemd` (see below).
+To run the app for dev purposes:
 
 ```bash
-vim ENV.dist  # <-- Defaults to localhost:8080
+vim ENV.dist  # <-- Configure; defaults to localhost:8000
 set -a && source ENV.dist && set +a  # <-- Export all environment vars
 python command.py initialize  # <-- Create admin user, load initial docs
-python app.py
+uvicorn main:app --reload  # <-- run, and reload to pickup changes
 ```
 
-And view `http://localhost:8080`.
+Then view `http://localhost:8000`, and sign in with $ADMIN_USER and $ADMIN_PASSWORD 
+from ENV.dist (or as otherwise set in ENV vars).
+
+There will be a generated set of API docs at `/docs`.
+
+## Production
+
+This is a FastAPI app, for which there are many deployment solution.  
+
+The `install/docker` directory copntains a `Dockerfile` that can be used to build a 
+Linux container for other forms of deployment. 
