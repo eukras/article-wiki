@@ -8,7 +8,7 @@ bibliographies, and indexes that don't clutter up your text.
 
 * Author: Nigel Chapman, nigel@chapman.id.au.
 * Technologies: Python, Redis.
-* Version: v.0.1.1 (pre-beta, single user only)
+* Version: v.0.2.1 (beta, single user only)
 * License: GPL v.3; see [LICENSE.txt](LICENSE.txt).
 
 
@@ -24,7 +24,7 @@ bibliographies, and indexes that don't clutter up your text.
 
 ![Editor screenshot](media/screenshots/editor.png)
 
-* Images are of v.0.1.1.
+* Images are of v.2.1
 * See also the 'Theme' button in the footer for low-light reading or editing.
 
 
