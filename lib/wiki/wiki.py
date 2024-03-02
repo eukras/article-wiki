@@ -238,7 +238,8 @@ class Wiki(object):
                             with __.div(klass='right-margin'):
                                 with __.div(klass='sticky-buttons'):
                                     link = self.settings.get_base_uri('edit',
-                                                                      'index')
+                                                                      'index',
+                                                                      relative=True)
                                     __(side_button(name='Edit', icon='pencil',
                                                    href=link))
                 for (numbering, _slug, _, _, _) in self.outline:
@@ -249,9 +250,9 @@ class Wiki(object):
                             if not fragment and not preview:
                                 with __.div(klass='right-margin'):
                                     with __.div(klass='sticky-buttons'):
-                                        label = '§' + '.<wbr/>'.join(numbering)
+                                        label = '§' + '<wbr/>.'.join(numbering)
                                         link = self.settings.get_base_uri(
-                                                'edit', _slug)
+                                                'edit', _slug, relative=True)
                                         __(side_button(name=label, icon='pencil',
                                                        href=link))
 
@@ -261,11 +262,13 @@ class Wiki(object):
                         with __.div(klass='section-content'):
                             __(biblio_html)
                         with __.div(klass='right-margin'):
-                            with __.div(klass='sticky-buttons'):
-                                link = self.settings.get_base_uri('edit',
-                                                                  'biblio')
-                                __(side_button(name='Refs', icon='pencil',
-                                               href=link))
+                            if not fragment and not preview:
+                                with __.div(klass='sticky-buttons'):
+                                    link = self.settings.get_base_uri('edit',
+                                                                      'biblio',
+                                                                      relative=True)
+                                    __(side_button(name='Refs', icon='pencil',
+                                                   href=link))
 
         return __
 
@@ -360,7 +363,7 @@ class Wiki(object):
         content_html = blocks.html(['0'], 'index', self.settings,
                                    fragment=True)
         if not self.outline.single_page():
-            edit_base_uri = self.settings.get_base_uri('edit')
+            edit_base_uri = self.settings.get_base_uri('edit', relative=True)
             content_html += self.outline.html(edit_base_uri)
             content_html += self.outline.html_spare_parts(
                 parts, edit_base_uri

@@ -121,11 +121,12 @@ class Settings(object):
         """
         return re.sub(r'\$\[[^\]]*\]', self.decorate, text)
 
-    def get_base_uri(self, action, part=None):
+    def get_base_uri(self, action, part=None, relative=False):
         """
         Normal base URL for any given action.
         """
-        website = self.get('config:host', 'https://example.org')
+        website = '/' if relative else self.get('config:host',
+                                                'https://example.org')
         user_slug = self.get('config:user', 'guest')
         doc_slug = self.get('config:document', 'notebook')
         url_parts = [website, action, user_slug, doc_slug]
