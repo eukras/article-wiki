@@ -11,57 +11,55 @@ table of contents.
 
 - Account
 
-@app.middleware('http') -- OK: Makes login available as a global.
-@app.get('/login') -- OK: Login form.
-@app.post('/login') -- OK: Stores a login token in a cookie.
-@app.get('/logout') -- OK: Deletes the token cookie.
+@app.middleware('http') -- Makes login available as a global.
+@app.get('/login') -- Login form.
+@app.post('/login') -- Stores a login token in a cookie.
+@app.get('/logout') -- Deletes the token cookie.
 
 - Main pages
 
-@app.get('/') -- OK: Redirects to admin user page
-@app.get('/read/{user_slug}') -- OK: Shows user's fixtures/index page.
-@app.get('/read/{user_slug}/{doc_slug}') -- OK: Shows user's doc_slug page.
-@app.get('/rss/{user_slug}.xml') -- OK: Generate really simple XML.
-@app.get('/help') -- OK: Shows admin user's 'help' document.
+@app.get('/') -- Redirects to admin user page
+@app.get('/read/{user_slug}') -- Shows user's fixtures/index page.
+@app.get('/read/{user_slug}/{doc_slug}') -- Shows user's doc_slug page.
+@app.get('/rss/{user_slug}.xml') -- Generate really simple XML.
+@app.get('/help') -- Shows admin user's 'help' document.
 
 - Editing
 
-@app.get('/new-article') -- OK: Shows editor with template
-@app.get('/edit/{user_slug}/{doc_slug}/{part_slug}') -- OK: Shows editor
-@app.post('/edit/{user_slug}/{doc_slug}/{part_slug}') -- OK: Saves changes
-@app.get('/playground') -- OK: Shows play editor.
-@app.post('/playground') -- OK: Shows changes.
-@app.get('/delete/{user_slug}/{doc_slug}/{part_slug}') -- OK.
+@app.get('/new-article') -- Shows editor with template
+@app.get('/edit/{user_slug}/{doc_slug}/{part_slug}') -- Shows editor
+@app.post('/edit/{user_slug}/{doc_slug}/{part_slug}') -- Saves changes
+@app.get('/playground') -- Shows play editor.
+@app.post('/playground') -- Shows changes.
+@app.get('/delete/{user_slug}/{doc_slug}/{part_slug}') -- Delete section
 
 - Admin
 
 @app.get('/admin') -- Administrative options:
-@app.post('/admin/initialize') -- Setup database in initial state
-@app.get('/admin/import-archive/{user_slug}') -- OK: Show upload form
-@app.post('/admin/import-archive/{user_slug}') -- OK: Install a zipfile
+@app.post('/admin/initialize') -- Load pages from install/articles directory
+@app.post('/admin/regenerate') -- Regenerate all pages/metadata, cache them
+@app.get('/admin/import-archive/{user_slug}') -- Show upload form
+@app.post('/admin/import-archive/{user_slug}') -- Install a zipfile
+@app.get('/admin/expire-cache') -- Deletes cached docs for users
 
 - Import/Export
 
-@app.get('/export-archive/{user_slug}') -- OK: Download a zipfile
-@app.get('/download/{user_slug}/{doc_slug}') -- OK: Download a text file
-@app.get('/upload/{user_slug}/{doc_slug}') -- OK: Show upload form
-@app.post('/upload/{user_slug}/{doc_slug}') -- OK: Install a text file
+@app.get('/export-archive/{user_slug}') -- Download a zipfile
+@app.get('/download/{user_slug}/{doc_slug}') -- Download a text file
+@app.get('/upload/{user_slug}/{doc_slug}') -- Show upload form
+@app.post('/upload/{user_slug}/{doc_slug}') -- Install a text file
 
 - Generated content: ePubs and JPEGs; add SVG?
 
-@app.get('/epub/{user_slug}/{doc_slug}') -- OK: Generates epub.
-@app.get('/image/cover/{user_slug}/{doc_slug}.jpg') -- OK: Generates cover
-@app.get('/image/card/{user_slug}/{doc_slug}.jpg') -- OK: Generates thumb
-@app.get('/image/quote/{checksum}/{encoded}.jpg') -- OK: makes quote as image
+@app.get('/epub/{user_slug}/{doc_slug}') -- Generates epub.
+@app.get('/image/cover/{user_slug}/{doc_slug}.jpg') -- Generates cover
+@app.get('/image/card/{user_slug}/{doc_slug}.jpg') -- Generates thumb
+@app.get('/image/quote/{checksum}/{encoded}.jpg') -- makes quote as image
 
-- Special files; add sitemap?
+- Special files.
 
-@app.get('/favicon.ico') -- OK
-@app.get('/robots.txt') -- OK
-
-- Admin
-
-@app.get('/admin/expire-cache') -- OK: deletes all cached docs for users
+@app.get('/favicon.ico')
+@app.get('/robots.txt')
 """
 
 # -----
@@ -104,7 +102,7 @@ from fastapi.staticfiles import StaticFiles
 
 import uvicorn
 
-from command import initialize
+from command import initialize, refresh_metadata
 from lib.document import PROTECTED_DOC_SLUGS
 
 from lib.bokeh import make_background
@@ -800,13 +798,28 @@ async def admin():
             config=config)
     return HTMLResponse(content=html)
 
-@app.post('/admin')
+
+@app.post('/admin/initialize')
 async def admin_initialize():
     """
     Reset site to starting configuration.
     """
     require_authority_for_admin()  # else 401s
     initialize()
+    return RedirectResponse('/', status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.post('/admin/refresh')
+async def admin_refresh():
+    """
+    Regenerate, re-cache, and correct the metadata for all pages.
+    """
+    require_authority_for_admin()  # else 401s
+
+    config = load_env_config()
+    data = Data(config)
+    refresh_metadata(data)
+
     return RedirectResponse('/', status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -1204,14 +1217,14 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # ----------------------------------------------------------
 
 
-@app.get('/admin/expire-cache')
+@app.post('/admin/expire-cache')
 def expire():
     """
     Expire caches
     """
     require_authority_for_admin()  # else 403
     data.epubCache_deleteAll()
-    return PlainTextResponse(content="OK")
+    return RedirectResponse('/', status_code=status.HTTP_303_SEE_OTHER)
 
 
 # ----------------------------------------------------------
