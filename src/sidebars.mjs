@@ -299,7 +299,9 @@ function createSiteMenu() {
                 <div class="icon-button fullscreen-button"><i class="fa fa-fw fa-expand"></i> Full Screen</div>
             </div>
             <div class="space">
-                <div id="option-escape" class="option-button"><span>Show and hide the <span class="show-inline-if-tablet-or-smaller">menu</span><span class="show-inline-if-laptop-or-larger">sidebars</span> with <tt>Esc</tt></span> <i id="escape-icon" class="fa fa-fw fa-square-o"></i></div>
+                <div class="show-block-if-laptop-or-larger">
+                    <div id="option-escape" class="option-button"><span>Show and hide the <span class="show-inline-if-tablet-or-smaller">menu</span><span class="show-inline-if-laptop-or-larger">sidebars</span> with <tt>Esc</tt></span> <i id="escape-icon" class="fa fa-fw fa-square-o"></i></div>
+                </div>
                 <div class="show-block-if-laptop-or-larger">
                     <div id="option-auto-hide" class="option-button">Auto-hide sidebars when scrolling down <i id="scroll-icon" class="fa fa-fw fa-square-o"></i></div>
                 </div>
@@ -325,6 +327,9 @@ function createSiteMenu() {
                     <div><a class="icon-button" href="/admin"><i class="fa fa-fw fa-wrench"></i> Site Admin</a></div>
                     <div><a class="icon-button" href="/new-article"><i class="fa fa-fw fa-plus"></i> New Article</a></div>
                     <div><a class="icon-button" href="/logout"><i class="fa fa-fw fa-sign-out"></i> User Logout</a></div>
+                </div>
+                <div class="space">
+                    <a class="icon-button" href="https://github.com/eukras/article-wiki"><i class="fa fa-fw fa-font"></i> <span>Article Wiki</span></a>
                 </div>
             </div>
         `;
