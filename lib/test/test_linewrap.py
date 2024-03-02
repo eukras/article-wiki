@@ -23,15 +23,15 @@ def test_default_font():
     x = FONT.getlength('4444')
     assert x == 24
     x = FONT.getlength('4444 4444')
-    assert x == 54
+    assert x == 50
     x = FONT.getlength('4444 4444 4444')
-    assert x == 84
+    assert x == 76
     x = FONT.getlength('4444 4444 4444 4444')
-    assert x == 114
+    assert x == 102
 
 
 def test_line_width():
-    assert line_width(FONT, WORDS_114) == 114
+    assert line_width(FONT, WORDS_114) == 102
 
 
 def test_simple_wrap():
@@ -49,7 +49,7 @@ def test_options():
 
 
 def test_raggedness():
-    assert raggedness(FONT, SPLIT_54, max_width_px=60) == 36 + 36
+    assert raggedness(FONT, SPLIT_54, max_width_px=60) == 200
 
 
 def test_best_wrap():

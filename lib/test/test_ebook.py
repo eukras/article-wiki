@@ -11,6 +11,8 @@ from lib.ebook import write_epub
 config = {
     'REDIS_HOST': 'localhost',
     'REDIS_PORT': 6379,
+    'REDIS_USER': 'default',
+    'REDIS_PASSWORD': 'password',
     'REDIS_DATABASE': 1,  # <-- TESTING
     'ADMIN_USER': 'admin',
     'TIME_ZONE': 'Australia/Sydney',

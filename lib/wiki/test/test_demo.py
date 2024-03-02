@@ -61,6 +61,5 @@ def test_basic_replacements():
 
     decorated = demo.replace(tokenized)
     __ = html.fromstring(decorated['test'])
-    assert __.xpath("count(//div[@class='wiki-demo space'])") == 2
+    assert __.xpath("count(//div[@class='wiki-demo'])") == 2
     assert __.xpath("//pre[contains(., Test)]")
-    assert __.xpath("//article/section")

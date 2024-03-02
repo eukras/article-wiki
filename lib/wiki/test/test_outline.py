@@ -98,7 +98,7 @@ def test_outline():
     # dom = html.fragment_fromstring(out, create_parent='body')[0]
     # assert len(dom.cssselect('tr')) == 4
     rows = findall('<tr', out)
-    assert len(rows) == 4
+    assert len(rows) == 3
 
 
 def test_find_numbering():

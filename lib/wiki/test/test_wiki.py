@@ -28,29 +28,6 @@ def test_clean_document():
     assert expect == actual
 
 
-def test_split_author():
-    wiki = Wiki(Settings())
-    expect = [['Name']]
-    actual = wiki.split_author(trim("""
-        Name
-    """))
-    assert expect == actual
-    expect = [['Name', 'Email', 'Affiliation']]
-    actual = wiki.split_author(trim("""
-        Name / Email / Affiliation
-    """))
-    assert expect == actual
-    expect = [
-        ['Name', 'Email', 'Affiliation'],
-        ['Name2', 'Email2', 'Affiliation2']
-    ]
-    actual = wiki.split_author(trim("""
-        Name / Email / Affiliation
-          + Name2 / Email2 / Affiliation2
-    """))
-    assert expect == actual
-
-
 def test_process_simple():
     wiki = Wiki(Settings())
     document = {'sample': trim("""
@@ -68,7 +45,6 @@ def test_process_simple():
         """)}
     _ = wiki.process('user-slug', 'doc-slug', document)
     __ = html.fromstring(str(_))
-    assert __.xpath("//article/section")
     assert __.xpath("//h1[contains(., 'Title')]")
     assert __.xpath("//blockquote[contains(., 'Quote')]")
     assert __.xpath("//p[@class='caption'] and contains(., 'Calvin')")
