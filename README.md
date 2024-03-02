@@ -24,7 +24,7 @@ bibliographies, and indexes that don't clutter up your text.
 
 ![Editor screenshot](media/screenshots/editor.png)
 
-* Images are of v.2.1
+* Images are of v.0.2.1
 * See also the 'Theme' button in the footer for low-light reading or editing.
 
 
