@@ -81,6 +81,9 @@ article {
         font-size: $fontSizeMinus3;
         cursor: pointer;
         color: var(--desk-text);
+        &:active {
+            background-color: var(--page-outline);
+        }
         svg {
             height: 1.2rem;
             width: 1.2rem;
@@ -92,6 +95,10 @@ article {
 .left-margin {
     a.button-unit,
     button.button-unit {
+        &:hover {
+            border: 1px solid var(--desk-text);
+            border-left: none;
+        }
         padding: 0.5rem 0.75rem 0.5rem 0.5rem;
         border-left: none;
         border-radius: 0 1rem 1rem 0;
@@ -101,6 +108,10 @@ article {
 .right-margin {
     a.button-unit,
     button.button-unit {
+        &:hover {
+            border: 1px solid var(--desk-text);
+            border-right: none;
+        }
         padding: 0.5rem 0.5rem 0.5rem 0.75rem;
         border-right: none;
         border-radius: 1rem 0 0 1rem;
