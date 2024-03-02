@@ -10,9 +10,12 @@ html.theme-light {
   --side-background-left: hsla(0, 0%, 97%, 0.9);
   --side-background-right: hsl(120, 14%, 67%);
   --page-background: hsl(0, 0%, 97%);
+  --page-outline: hsl(0, 0%, 75%);
   --page-text: hsl(0, 0%, 3%);
   --page-text-secondary: hsl(0, 0%, 3%);
+  --page-text-tertiary: hsl(0, 0%, 3%);
   --page-text-link: hsl(0, 0%, 3%);
+  --page-text-link-background: hsl(120, 44%, 93%);
   --page-text-selection: hsl(83, 84%, 75%);
   --page-icon-background: hsl(0, 0%, 90%);
   --page-icon-text: hsl(120, 14%, 67%);
@@ -29,9 +32,12 @@ html.theme-dark {
   --side-background-left: hsla(0, 0%, 3%, 0.9);
   --side-background-right: hsl(248, 90%, 5%);
   --page-background: hsl(0, 0%, 3%);
+  --page-outline: hsl(0, 0%, 25%);
   --page-text: hsl(0, 0%, 50%);
   --page-text-secondary: hsl(240, 22%, 51%);
+  --page-text-tertiary: hsl(210, 67%, 78%);
   --page-text-link: hsl(0, 0%, 75%);
+  --page-text-link-background: hsl(0, 0%, 3%);
   --page-text-selection: hsl(210, 67%, 78%);
   --page-icon-background: hsl(0, 0%, 10%);
   --page-icon-text: hsl(0, 0%, 25%);
@@ -323,7 +329,7 @@ article {
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding: calc(1rem + 2vmax) 0 calc(4rem + 4vmax) 0;
+  padding: calc(1rem + 2vmax) 0 calc(6rem + 6vmax) 0;
 }
 
 .section-group {
@@ -335,15 +341,10 @@ article {
   flex: 1 1 var(--page-margin);
   text-align: left;
 }
-@media print {
-  .section-group .left-margin {
-    display: none;
-  }
-}
 .section-group .left-margin .sticky-buttons {
   align-items: flex-start;
 }
-.section-group .left-margin .sticky-buttons .button-unit {
+.section-group .left-margin .sticky-buttons button.button-unit {
   display: flex;
   flex-direction: column;
 }
@@ -362,15 +363,10 @@ article {
   flex: 1 1 var(--page-margin);
   text-align: right;
 }
-@media isPrint {
-  .section-group .section-list .section-item .right-margin {
-    display: none;
-  }
-}
 .section-group .section-list .section-item .right-margin .sticky-buttons {
   align-items: flex-end;
 }
-.section-group .section-list .section-item .right-margin .sticky-buttons .button-unit {
+.section-group .section-list .section-item .right-margin .sticky-buttons button.button-unit {
   display: flex;
   flex-direction: column;
 }
@@ -383,40 +379,45 @@ article {
   flex-direction: column;
   gap: 1rem;
 }
-.sticky-buttons .button-unit {
-  width: 2.5rem;
+.sticky-buttons a.button-unit, .sticky-buttons button.button-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid var(--page-outline);
+  width: 3rem;
   text-align: center;
-}
-.sticky-buttons .button-unit .button-box {
-  font-size: 131.712%;
-  padding: 0.4em 0.4em;
-  color: var(--page-icon-text);
-  background-color: var(--page-icon-background);
-  cursor: pointer;
-}
-.sticky-buttons .button-unit .button-box svg {
-  fill: var(--page-icon-text);
-  height: 1em;
-  width: 1em;
-}
-.sticky-buttons .button-unit .button-label {
   font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
   font-size: 71.55456%;
-  text-align: center;
-  color: var(--page-icon-text);
-  padding: 0.25rem;
+  cursor: pointer;
+  color: var(--desk-text);
+}
+.sticky-buttons a.button-unit svg, .sticky-buttons button.button-unit svg {
+  height: 1.2rem;
+  width: 1.2rem;
+  fill: var(--desk-text);
 }
 
-.left-margin .button-box {
-  border-top-right-radius: 0.3em;
-  border-bottom-right-radius: 0.3em;
+.left-margin a.button-unit,
+.left-margin button.button-unit {
+  padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+  border-left: none;
+  border-radius: 0 1rem 1rem 0;
 }
 
-.right-margin .button-box {
-  border-top-left-radius: 0.3em;
-  border-bottom-left-radius: 0.3em;
+.right-margin a.button-unit,
+.right-margin button.button-unit {
+  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+  border-right: none;
+  border-radius: 1rem 0 0 1rem;
 }
 
+@media isPrint {
+  .left-margin,
+  .right-margin {
+    display: none;
+  }
+}
 /* Navigation buttons in header */
 .section-group .left-margin,
 .section-group .right-margin {
@@ -564,10 +565,11 @@ div.headline-title {
 
 .wiki-demo-input,
 .wiki-demo-output {
-  flex: 1 1 auto;
+  flex: 1 1 50%;
   padding: 1rem;
   border: 1px dotted var(--page-text);
-  border-radius: 0.5em;
+  border-width: 1px 0 0 1px;
+  border-width: 1px 0 0 1px;
 }
 
 .wiki-demo-input pre {
@@ -758,7 +760,8 @@ td {
  */
 @media screen {
   a.web-link {
-    padding: 0 2pt;
+    padding: 0 0.25rem;
+    background-color: var(--page-text-link-background);
   }
   a.web-marker {
     padding: 0 2pt;
@@ -916,6 +919,10 @@ ul > ul, ol > ol {
   float: left;
 }
 
+.space-above {
+  margin-top: 3rem;
+}
+
 .space-left {
   margin-left: 1rem;
 }
@@ -967,7 +974,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: var(--page-text-secondary);
+  color: var(--page-text-tertiary);
   margin-top: 0;
   padding-top: 0.7rem;
   margin-bottom: 0;
@@ -1060,6 +1067,8 @@ blockquote + blockquote {
 }
 
 p.subhead {
+  text-align: center;
+  color: var(--page-text-tertiary);
   font-weight: bold;
   margin: 0;
   padding: 0.8rem 0 0.2rem 0;
