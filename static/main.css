@@ -1331,6 +1331,9 @@ article {
   cursor: pointer;
   color: var(--desk-text);
 }
+.sticky-buttons a.button-unit:active, .sticky-buttons button.button-unit:active {
+  background-color: var(--page-outline);
+}
 .sticky-buttons a.button-unit svg, .sticky-buttons button.button-unit svg {
   height: 1.2rem;
   width: 1.2rem;
@@ -1343,12 +1346,22 @@ article {
   border-left: none;
   border-radius: 0 1rem 1rem 0;
 }
+.left-margin a.button-unit:hover,
+.left-margin button.button-unit:hover {
+  border: 1px solid var(--desk-text);
+  border-left: none;
+}
 
 .right-margin a.button-unit,
 .right-margin button.button-unit {
   padding: 0.5rem 0.5rem 0.5rem 0.75rem;
   border-right: none;
   border-radius: 1rem 0 0 1rem;
+}
+.right-margin a.button-unit:hover,
+.right-margin button.button-unit:hover {
+  border: 1px solid var(--desk-text);
+  border-right: none;
 }
 
 @media isPrint {
