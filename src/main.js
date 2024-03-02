@@ -7,15 +7,15 @@ import {setSvgBackground} from './bokeh.mjs';
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    //  IOS devices can't generally handle our fullscreen SVG translucency.
-    if (!/Mac OS/.test(window.navigator.userAgent)) {
+    // Small IOS devices can't generally handle our background SVGs.
+    const not_ios = !/Mac OS/.test(window.navigator.userAgent);
+    const max_res = Math.max(window.screen.width, window.screen.height);
+    if (not_ios || max_res >= 1200) {
         setSvgBackground('#background');
     }
 
     initSidebars();
     initProgress('#progress-meter');
-
-    //  After sidebars are rendered:
     initThemes('.theme-button');
     initFullScreen('.fullscreen-button');
     initNavigation('.navigation-button', stopScrollDownIndicatorBlinking);
