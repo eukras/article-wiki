@@ -328,9 +328,6 @@ function createSiteMenu() {
                     <div><a class="icon-button" href="/new-article"><i class="fa fa-fw fa-plus"></i> New Article</a></div>
                     <div><a class="icon-button" href="/logout"><i class="fa fa-fw fa-sign-out"></i> User Logout</a></div>
                 </div>
-                <div class="space">
-                    <a class="icon-button" href="https://github.com/eukras/article-wiki"><i class="fa fa-fw fa-font"></i> <span>Article Wiki</span></a>
-                </div>
             </div>
         `;
     } else {
@@ -338,9 +335,14 @@ function createSiteMenu() {
                 <div class="space">
                     <div><a class="icon-button" href="/login"><i class="fa fa-fw fa-sign-in"></i> User Login</a></div>
                 </div>
+            `;
+    }
+    html += `
+                <div class="space">
+                    <a class="icon-button" href="https://github.com/eukras/article-wiki"><i class="fa fa-fw fa-font"></i> <span>Article Wiki</span></a>
+                </div>
             </div>
         `;
-    }
     const page = document.querySelector('#page');
     if (page) {
         const siteMenu = document.createElement('nav');
