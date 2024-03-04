@@ -281,7 +281,7 @@ html.theme-dark {
   --page-text: hsl(0, 0%, 50%);
   --page-text-secondary: hsl(240, 22%, 51%);
   --page-text-tertiary: hsl(210, 67%, 78%);
-  --page-text-link: hsl(0, 0%, 75%);
+  --page-text-link: hsl(0, 0%, 90%);
   --page-text-link-background: hsl(0, 0%, 3%);
   --page-text-selection: hsl(210, 67%, 78%);
   --page-icon-background: hsl(0, 0%, 10%);
@@ -789,7 +789,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: var(--page-text-tertiary);
+  color: var(--page-text);
   margin-top: 0;
   padding-top: 0.7rem;
   margin-bottom: 0;
@@ -1519,9 +1519,9 @@ div.headline-title {
 .wiki-demo-output {
   flex: 1 1 50%;
   padding: 1rem;
-  border: 1px dotted var(--page-text);
+  border: 1px dotted var(--page-text-secondary);
   border-width: 1px 0 0 1px;
-  border-width: 1px 0 0 1px;
+  border-top-left-radius: 0.5rem;
 }
 
 .wiki-demo-input pre {
