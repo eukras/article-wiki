@@ -14,12 +14,12 @@
             </a>
         </div>
         <div class="space-above">
-            <a href="/import-archive/{{ config['ADMIN_USER'] }}" class="button">
-                <i class="fa fa-upload"></i> Import Archive
+            <a href="/export-archive/{{ config['ADMIN_USER'] }}" class="button">
+                <i class="fa fa-copy"></i> Export Archive
             </a>
             &nbsp;
-            <a href="/import-website" class="button" disabled="DISABLED">
-                <i class="fa fa-copy"></i> Import Website
+            <a href="/import-archive/{{ config['ADMIN_USER'] }}" class="button">
+                <i class="fa fa-upload"></i> Import Archive
             </a>
         </div>
         <div class="space-above">
@@ -28,11 +28,18 @@
                     <i class="fa fa-wrench"></i> Refresh all pages
                 </button>
             </form>
+        </div>
+        <div class="space-above">
             <form method="post" action="/admin/expire-cache">
                 <button type="submit">
-                    <i class="fa fa-clock"></i> Expire cache
+                    <i class="fa fa-wrench"></i> Expire cache
                 </button>
             </form>
+        </div>
+        <div class="space-above">
+            <a href="/import-website" class="button" disabled="DISABLED">
+                <i class="fa fa-copy"></i> Import Website
+            </a>
         </div>
         <div class="space-above">
             <form method="post" action="/admin/initialize">
