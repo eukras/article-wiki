@@ -105,6 +105,7 @@ import uvicorn
 from command import initialize, refresh_metadata
 from lib.document import PROTECTED_DOC_SLUGS
 
+from lib.archive import make_zip_data
 from lib.bokeh import make_background
 from lib.data import Data, load_env_config
 from lib.document import Document
@@ -112,11 +113,9 @@ from lib.ebook import write_epub
 from lib.overlay import make_cover, make_card, make_quote
 from lib.slugs import slug
 from lib.storage import \
-    compress_archive_dir, \
     make_zip_name, \
     read_archive_dir, \
-    uncompress_archive_dir, \
-    write_archive_dir
+    uncompress_archive_dir
 from lib.wiki.blocks import get_title_data
 from lib.wiki.settings import Settings
 from lib.wiki.wiki import \
@@ -900,27 +899,21 @@ async def post_upload_txt(user_slug,
 
 
 @app.get('/export-archive/{user_slug}')
-async def export_archive(user_slug,
-                         dir_path=Depends(get_temp_dir,
-                                          use_cache=False)):
+async def export_archive(user_slug):
     """
-    Processes an export_archive file based on upload settings.
+    Downloads an export_archive file; ignores whether a doc is published or
+    not.
+    """
+    require_authority_for_admin()
 
-    (FastAPI was losing its tempdir unless it was dynamically injected.)
-    """
-    require_user(user_slug)  # else 404
-    archive_data = data.userDocument_hash(user_slug)
-    write_archive_dir(dir_path, archive_data)
     zip_name = make_zip_name(user_slug)
-    zip_path = os.path.join(dir_path, zip_name)
-    compress_archive_dir(dir_path, zip_name)
-    if os.path.exists(zip_path):
-        return FileResponse(path=zip_path, filename=zip_name)
-    else:
-        msg = "Download failed: " + zip_name
-        logging.error(msg)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail=msg)
+    doc_files = data.userDocument_hash(user_slug)
+    return Response(
+            make_zip_data(doc_files),
+            headers={
+                'Content-Type': 'application/zip',
+                'Content-Disposition': f'inline; filename="{zip_name}"'
+                })
 
 
 @app.get('/import-archive/{user_slug}')

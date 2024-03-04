@@ -1,6 +1,8 @@
 """
 Disk storage functions for Article Wiki app.
 
+NOTE: To export to ZIP, use lib/archive, which works in-memory.
+
 Article wiki need to read and write files when loading fixtures during
 installation, creating tar files for download. In future this may include
 version control operations.
@@ -144,7 +146,6 @@ def compress_archive_dir(dir_path: str, zip_name: str) -> str:
     """
     cwd = os.getcwd()
     os.chdir(dir_path)
-    # command = "zip -R {:s} {:s}".format(zip_name, "*/*")
     command = f"python -m zipfile -c {zip_name} */*"
     process = subprocess.Popen(command, shell=True)
     process.communicate()  # <-- Wait for completion!
