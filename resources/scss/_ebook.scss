@@ -11,6 +11,11 @@ section {
     page-break-before: always;
 }
 
+.section-group .left-margin,
+.section-group .section-list .section-item .right-margin {
+    display: none;
+}
+
 .wiki-demo td section,
 .wiki-demo td section footer section {
     page-break-before: auto;
