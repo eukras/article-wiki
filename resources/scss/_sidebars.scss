@@ -42,12 +42,16 @@ html.navigation-sidebars {
         /**
          * Completion visualisation, colourised by .visible
          */
-        #completion ol {
-            list-style: none;
-            max-width: 24em;
-            gap: 0.5em;
-            padding: 0;
-            margin: 0;
+        #completion {
+            margin-top: 1.5em;
+            line-height: 1em;
+            ol {
+                list-style: none;
+                max-width: 24em;
+                gap: 0.5em;
+                padding: 0;
+                margin: 0;
+            }
             ol, li {
                 display: inline;
                 padding: 0;
