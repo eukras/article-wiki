@@ -177,8 +177,9 @@ def domain_name(request: Request):
     )
 
 
-def has_authority_for_user(user_slug: str):
+def has_authority_for_user(user_slug: str, token: str):
     """Check the logged-in user has authority for the specified user."""
+    login = data.login_get(token)
     if login is not None:
         return login['is_admin'] == 1 or user_slug == login['username']
     return False
@@ -192,16 +193,16 @@ def require_login():
     return login
 
 
-def require_authority_for_user(user_slug: str):
+def require_authority_for_user(user_slug: str, token: str):
     """Die if not authorised for user."""
-    if not has_authority_for_user(user_slug):
+    if not has_authority_for_user(user_slug, token):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Unauthorised.")
 
 
-def require_authority_for_admin():
+def require_authority_for_admin(token: str):
     """Die if not authorised as admin."""
-    require_authority_for_user(config['ADMIN_USER'])
+    require_authority_for_user(config['ADMIN_USER'], token)
 
 
 def is_published(user_slug, doc_slug):
@@ -533,13 +534,14 @@ async def edit_part(
     """
     config = load_env_config()
     domain = config['SITE']
-    if not has_authority_for_user(user_slug):
+    token = request.cookies.get('token', None)
+    if not has_authority_for_user(user_slug, token):
         if not is_published(user_slug, doc_slug):
             msg = f"Document '{user_slug}/{doc_slug}' not found."
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=msg)
     if doc_slug == '_' and part_slug == 'index':
-        if not has_authority_for_user(user_slug):
+        if not has_authority_for_user(user_slug, token):
             msg = "You must be logged in to add a new document."
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail=msg)
@@ -567,7 +569,8 @@ async def edit_part(
         """.replace('PUBLICATION_DATE', today))
         html = show_editor(part_text, domain, user_slug, doc_slug, part_slug,
                            is_preview=False,
-                           can_be_saved=has_authority_for_user(user_slug))
+                           can_be_saved=has_authority_for_user(user_slug,
+                                                               token))
         return HTMLResponse(content=html)
     else:
         doc_parts = data.userDocument_get(user_slug, doc_slug)
@@ -579,7 +582,8 @@ async def edit_part(
             part_text = doc_parts[part_slug]
             html = show_editor(part_text, domain, user_slug, doc_slug,
                                part_slug, is_preview=False,
-                               can_be_saved=has_authority_for_user(user_slug))
+                               can_be_saved=has_authority_for_user(user_slug,
+                                                                   token))
             return HTMLResponse(content=html)
         else:
             part_slug = slug(title)
@@ -594,7 +598,7 @@ async def edit_part(
                 | Ctrl-SPACE | Select the current paragraph
                 ---
                 """)
-            can_be_saved = has_authority_for_user(user_slug)
+            can_be_saved = has_authority_for_user(user_slug, token)
             html = show_editor(default, domain, user_slug, doc_slug, part_slug,
                                is_preview=False, can_be_saved=can_be_saved)
             return HTMLResponse(content=html)
@@ -611,6 +615,8 @@ async def post_edit_part(user_slug: str,
     """
     Wiki editor for existing doc part (or '_' if new).
     """
+    token = request.cookies.get('token', None)
+
     domain = str(request.base_url)
     if user_slug == '_':  # New user
         msg = "Blank user '_' not supported."
@@ -622,7 +628,7 @@ async def post_edit_part(user_slug: str,
                             detail=msg)
 
     if they_selected_save:
-        require_authority_for_user(user_slug)
+        require_authority_for_user(user_slug, token)
     if not content:
         msg = "Form data was missing"
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
@@ -657,7 +663,7 @@ async def post_edit_part(user_slug: str,
 
     okay_to_save = all([
         they_selected_save is not None,
-        has_authority_for_user(user_slug)
+        has_authority_for_user(user_slug, token)
     ])
 
     if okay_to_save:
@@ -688,7 +694,7 @@ async def post_edit_part(user_slug: str,
                        document.doc_slug,
                        new_part_slug,
                        is_preview,
-                       can_be_saved=has_authority_for_user(user_slug))
+                       can_be_saved=has_authority_for_user(user_slug, token))
     return HTMLResponse(content=html)
 
 
@@ -767,7 +773,8 @@ async def delete_part(user_slug, doc_slug, part_slug, request: Request):
         - Form and confirmation step?
         - Delete parts including unused?
     """
-    require_authority_for_user(user_slug)  # or 401
+    token = request.cookies.get('token', None)
+    require_authority_for_user(user_slug, token)  # or 401
     document = Document(data)
     document.set_host(str(request.base_url))
     if not document.load(user_slug, doc_slug):
@@ -787,11 +794,12 @@ async def delete_part(user_slug, doc_slug, part_slug, request: Request):
 # -------------------------------------------------------------
 
 @app.get('/admin')
-async def admin():
+async def admin(request: Request):
     """
     Show administrative options. 
     """
-    require_authority_for_admin()  # else 401s
+    token = request.cookies.get('token', None)
+    require_authority_for_admin(token)  # else 401s
     config = load_env_config()
     html = views.get_template('admin.html').render(
             config=config)
@@ -799,21 +807,23 @@ async def admin():
 
 
 @app.post('/admin/initialize')
-async def admin_initialize():
+async def admin_initialize(request: Request):
     """
     Reset site to starting configuration.
     """
-    require_authority_for_admin()  # else 401s
+    token = request.cookies.get('token', None)
+    require_authority_for_admin(token)  # else 401s
     initialize()
     return RedirectResponse('/', status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.post('/admin/refresh')
-async def admin_refresh():
+async def admin_refresh(request: Request):
     """
     Regenerate, re-cache, and correct the metadata for all pages.
     """
-    require_authority_for_admin()  # else 401s
+    token = request.cookies.get('token', None)
+    require_authority_for_admin(token)  # else 401s
 
     config = load_env_config()
     data = Data(config)
@@ -846,9 +856,10 @@ async def download_txt(user_slug, doc_slug, request: Request):
 
 
 @app.get('/upload/{user_slug}/{doc_slug}')
-async def upload_txt_form(user_slug, doc_slug):
+async def upload_txt_form(user_slug, doc_slug, request: Request):
     """Show an upload form to upload a document."""
-    require_authority_for_user(user_slug)  # else 401s
+    token = request.cookies.get('token', None)
+    require_authority_for_user(user_slug, token)  # else 401s
     metadata = {
         'title': 'Upload a document'
     }
@@ -899,12 +910,13 @@ async def post_upload_txt(user_slug,
 
 
 @app.get('/export-archive/{user_slug}')
-async def export_archive(user_slug):
+async def export_archive(user_slug, request: Request):
     """
     Downloads an export_archive file; ignores whether a doc is published or
     not.
     """
-    require_authority_for_admin()
+    token = request.cookies.get('token', None)
+    require_authority_for_admin(token)
 
     zip_name = make_zip_name(user_slug)
     doc_files = data.userDocument_hash(user_slug)
@@ -917,11 +929,13 @@ async def export_archive(user_slug):
 
 
 @app.get('/import-archive/{user_slug}')
-async def import_archive_form(user_slug):
+async def import_archive_form(user_slug, request: Request):
     """
     Show import form for importing an archive zipfile.
     """
-    require_authority_for_user(user_slug)  # else 401s
+    token = request.cookies.get('token', None)
+    require_authority_for_user(user_slug, token)  # else 401s
+
     html = views.get_template('import.html').render(
         config=config,
         user_slug=user_slug,
@@ -953,7 +967,8 @@ async def post_import_archive(user_slug,
         Show error
     """
     config['DEBUG'] = 'YES'
-    require_authority_for_user(user_slug)  # else 401s
+    token = request.cookies.get('token', None)
+    require_authority_for_user(user_slug, token)  # else 401s
 
     name, ext = os.path.splitext(upload.filename)
     if ext != '.zip':
@@ -1211,11 +1226,12 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.post('/admin/expire-cache')
-def expire():
+def expire(request: Request):
     """
     Expire caches
     """
-    require_authority_for_admin()  # else 403
+    token = request.cookies.get('token', None)
+    require_authority_for_admin(token)  # else 403
     data.epubCache_deleteAll()
     return RedirectResponse('/', status_code=status.HTTP_303_SEE_OTHER)
 
