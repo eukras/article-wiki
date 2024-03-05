@@ -1713,6 +1713,10 @@ html.navigation-sidebars #page-outline {
   /* Display siblings of visible elements */
   /* Display immediate children of visible elements */
 }
+html.navigation-sidebars #page-outline #completion {
+  margin-top: 1.5em;
+  line-height: 1em;
+}
 html.navigation-sidebars #page-outline #completion ol {
   list-style: none;
   max-width: 24em;
@@ -1720,12 +1724,12 @@ html.navigation-sidebars #page-outline #completion ol {
   padding: 0;
   margin: 0;
 }
-html.navigation-sidebars #page-outline #completion ol ol, html.navigation-sidebars #page-outline #completion ol li {
+html.navigation-sidebars #page-outline #completion ol, html.navigation-sidebars #page-outline #completion li {
   display: inline;
   padding: 0;
   margin: 0;
 }
-html.navigation-sidebars #page-outline #completion ol .completion-unit {
+html.navigation-sidebars #page-outline #completion .completion-unit {
   display: inline-block;
   min-height: 0.55em;
   margin: 0 0.5em 0.5em 0;
