@@ -94,7 +94,6 @@ from fastapi import Depends, FastAPI, Form, HTTPException, status, \
 from fastapi.responses import \
     HTMLResponse, \
     FileResponse, \
-    PlainTextResponse, \
     RedirectResponse, \
     Response
 from fastapi.middleware.gzip import GZipMiddleware
@@ -327,7 +326,7 @@ async def do_login(username: Annotated[str, Form()] = None,
     """
     Create redis record and cookie for admin user.
     """
-    authorized = ([
+    authorized = all([
         username == config['ADMIN_USER'],
         password == config['ADMIN_USER_PASSWORD'],
     ])
@@ -341,9 +340,15 @@ async def do_login(username: Annotated[str, Form()] = None,
         response.set_cookie(key='token', value=token)
         return response
     else:
-        # bottle.response.flash("Login failed.")
-        return RedirectResponse('/login',
-                                status_code=status.HTTP_303_SEE_OTHER)
+        template = views.get_template('login.html')
+        html = template.render(
+            title="Login",
+            message="Login failed.",
+            config=config,
+            )
+        response = HTMLResponse(content=html)
+        response.delete_cookie('token')
+        return response
 
 
 @app.get('/logout')
