@@ -339,7 +339,7 @@ function createSiteMenu() {
     }
     html += `
                 <div class="space">
-                    <a class="icon-button" href="https://github.com/eukras/article-wiki"><i class="fa fa-fw fa-font"></i> <span>Article Wiki</span></a>
+                    <a class="icon-button" href="https://github.com/eukras/article-wiki" target="_blank"><i class="fa fa-fw fa-font"></i> <span>Article Wiki</span></a>
                 </div>
             </div>
         `;
