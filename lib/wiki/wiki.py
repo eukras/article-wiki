@@ -179,14 +179,14 @@ class Wiki(object):
         pipeline = [self.verbatim, self.backslashes, self.entities]
         footnote_html = pipe(pipeline, 'replace', footnote_parts)
 
-        for (numbering, slug, _, _, _) in self.outline:
-            footnotes = footnote_html.get(slug)
+        for (numbering, _slug, _, _, _) in self.outline:
+            footnotes = footnote_html.get(_slug)
             if footnotes:
                 __ = Airium()
                 with __.footer():
                     __.hr(klass='div-left div-solid')
                     __(footnotes)
-                html_parts[slug] += str(__)
+                html_parts[_slug] += str(__)
 
         __ = Airium()
         with __.article():
