@@ -7,13 +7,14 @@ inheritance)
 """
 
 import hmac
-import json
 import urllib.parse
 
+from airium import Airium
 from html import escape
 from jinja2 import Environment
 
 from lib.data import Data, load_env_config
+from lib.wiki.inline import Inline
 from lib.wiki.renderer import wrap
 from lib.wiki.utils import trim
 
@@ -100,6 +101,7 @@ class Articles(Function):
 
         config = load_env_config()
         data = Data(config)
+        inline = Inline()
 
         text = self.text.replace('$[ADMIN_USER]', data.admin_user)
 
@@ -115,36 +117,20 @@ class Articles(Function):
         if len(articles) == 0:
             return ""
 
-        env = Environment(autoescape=False)
-        tpl = env.from_string(trim("""
-            <nav class="article-cards">
-            {% for a in articles %}
-                <div class="article-card">
-
-                    <a
-                        href="/read/{{ a['user'] }}/{{ a['slug'] }}"
-                    >
-                        <div class="article-card-title balance-text">
-                            {{ a['title'] }}
-                        </div>
-                        <div class="article-card-summary balance-text">
-                            {{ a['summary'] }}
-                        </div>
-                    </a>
-
-                    {% set words = a.word_count | int %}
-                    <div class="article-card-details">
-                        {{ a['date'] }} &middot; {{ "{:,d}".format(words) }} words
-                    </div>
-
-                </div>
-            {% endfor %}
-            </nav>
-        """))
-
-        return tpl.render(
-            articles=articles
-        )
+        __ = Airium()
+        with __.nav(klass='article-cards'):
+            for a in articles:
+                word_count = int(a.get('word_count', 0))
+                details = f"{a.get('date')} &middot; {word_count:,} words"
+                with __.div(klass='article-card'):
+                    with __.a(href=f"/read/{a.get('user')}/{a.get('slug')}"):
+                        __.div(klass="article-card-title balance-text",
+                               _t=inline.process(a.get('title')))
+                        __.div(klass="article-card-summary balance-text",
+                               _t=inline.process(a.get('summary')))
+                    __.div(klass="article-card-titles",
+                           _t=details)
+        return str(__)
 
 
 class Wrapper(Function):
@@ -357,7 +343,6 @@ class Feature(Function):
         message = bytes(self.text, 'utf-8')
         checksum = hmac.new(key, message, 'sha224').hexdigest()[:16]
         encoded = urllib.parse.quote_plus(message)
-        # print(json.dumps(self.text), key, checksum)
         return trim("""
             <div class="wiki-feature no-print">
                 <img title="%s" src="/image/quote/%s/%s.jpg" />
