@@ -71,9 +71,8 @@ from typing import Annotated
 from cachetools.func import ttl_cache
 from copy import copy
 from datetime import datetime
-from feedgen.feed import FeedGenerator
 
-import urllib.parse
+from urllib.parse import unquote_plus, urljoin
 
 import hmac
 import io
@@ -99,6 +98,8 @@ from fastapi.responses import \
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from typing import Annotated
+
 import uvicorn
 
 from command import initialize, refresh_metadata
@@ -109,7 +110,9 @@ from lib.bokeh import make_background
 from lib.data import Data, load_env_config
 from lib.document import Document
 from lib.ebook import write_epub
+from lib.login import Login
 from lib.overlay import make_cover, make_card, make_quote
+from lib.rss import rss_xml
 from lib.slugs import slug
 from lib.storage import \
     make_zip_name, \
@@ -124,20 +127,18 @@ from lib.wiki.wiki import \
     reformat_part
 from lib.wiki.utils import trim
 
-
-login = None
-config = load_env_config()
+CONFIG = load_env_config()
 
 if "pytest" in sys.modules:
     logging.info("Running in PyTest: Reconfiguring to use test database.")
-    config['REDIS_DATABASE'] = config['REDIS_TEST_DATABASE']
+    CONFIG['REDIS_DATABASE'] = CONFIG['REDIS_TEST_DATABASE']
 
 app = FastAPI()
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Redis, Jinja
-data = Data(config)
+data = Data(CONFIG)
 views = JinjaTemplates(
     loader=PackageLoader('main', 'views'),
     trim_blocks=True,
@@ -149,7 +150,7 @@ views = JinjaTemplates(
 #                       Initialise DB
 # ----------------------------------------------------------
 
-is_setup = data.user_exists(config['ADMIN_USER'])
+is_setup = data.user_exists(CONFIG['ADMIN_USER'])
 if not is_setup:
     initialize()
 
@@ -159,50 +160,11 @@ if not is_setup:
 # ----------------------------------------------------------
 
 
-def abs_url(base_url: str, uri: str):
-    """
-    Prepend scheme/port/host to URI.
-    """
-    return base_url.rstrip('/') + '/' + uri.lstrip('/')
-
-
 def domain_name(request: Request):
     """
     Prepend scheme/port/host to URI.
     """
-    url = request.url
-    return '{:s}://{:s}'.format(
-        url.scheme, url.netloc
-    )
-
-
-def has_authority_for_user(user_slug: str, token: str):
-    """Check the logged-in user has authority for the specified user."""
-    login = data.login_get(token)
-    if login is not None:
-        return login['is_admin'] == 1 or user_slug == login['username']
-    return False
-
-
-def require_login():
-    """Require user is logged in."""
-    if not login:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Login required.")
-    return login
-
-
-def require_authority_for_user(user_slug: str, token: str):
-    """Die if not authorised for user."""
-    if not has_authority_for_user(user_slug, token):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail="Unauthorised.")
-
-
-def require_authority_for_admin(token: str):
-    """Die if not authorised as admin."""
-    require_authority_for_user(config['ADMIN_USER'], token)
-
+    return f'{request.url.scheme}://{request.url.netloc}'
 
 def is_published(user_slug, doc_slug):
     """Check in metadata whether document is publicly visible"""
@@ -211,15 +173,6 @@ def is_published(user_slug, doc_slug):
         if metadata.get('publish', 'NO') == 'YES':
             return True
     return False
-
-
-def require_user(user_slug: str) -> dict:
-    """Return user hash if possible, else abort 404."""
-    user = data.user_get(user_slug)  # or None
-    if not user:
-        msg = f"User '{user_slug}' not found."
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=msg)
-    return user
 
 
 def require_document(user_slug: str, doc_slug: str) -> dict:
@@ -234,6 +187,8 @@ def require_document(user_slug: str, doc_slug: str) -> dict:
 async def get_temp_dir():
     """
     Provide a temporary directory through dependency injection.
+
+    @TODO: Process this in-memory, like for export.
     """
     tmp_dir = tempfile.TemporaryDirectory()
     try:
@@ -280,7 +235,7 @@ def show_editor(source: str,
     template = views.get_template('editor.html')
     html = template.render(
         page_title="Editing: {:s}".format(title),
-        config=config,
+        config=CONFIG,
         user_slug=user_slug,
         doc_slug=doc_slug,
         part_slug=part_slug,
@@ -293,18 +248,23 @@ def show_editor(source: str,
 
 
 # ----------------------------------------------------------
-#                       User Accounts
+# TESTING
 # ----------------------------------------------------------
 
+@app.get('/test')
+async def test(
+        login: Annotated[Login, Depends(use_cache=False)],
+        ):
+    """
+    Experiment with dependency injection
+    """
+    print('LOGIN: ', login.username)
+    return login
 
-@app.middleware("http")
-async def set_login(request: Request, call_next):
-    token = request.cookies.get('token', None)
-    if token:
-        global login  # <-- To change global.
-        login = data.login_get(token)
-    response = await call_next(request)
-    return response
+
+# ----------------------------------------------------------
+#                       User Accounts
+# ----------------------------------------------------------
 
 
 @app.get('/login')
@@ -315,7 +275,7 @@ async def login_form():
     template = views.get_template('login.html')
     html = template.render(
         title="Login",
-        config=config,
+        config=CONFIG,
     )
     return HTMLResponse(content=html)
 
@@ -327,8 +287,8 @@ async def do_login(username: Annotated[str, Form()] = None,
     Create redis record and cookie for admin user.
     """
     authorized = all([
-        username == config['ADMIN_USER'],
-        password == config['ADMIN_USER_PASSWORD'],
+        username == CONFIG['ADMIN_USER'],
+        password == CONFIG['ADMIN_USER_PASSWORD'],
     ])
     if authorized:
         token = data.login_set({
@@ -344,7 +304,7 @@ async def do_login(username: Annotated[str, Form()] = None,
         html = template.render(
             title="Login",
             message="Login failed.",
-            config=config,
+            config=CONFIG,
             )
         response = HTMLResponse(content=html)
         response.delete_cookie('token')
@@ -373,12 +333,11 @@ def error_page(title, message):
     """
     Friendly recovery from an unexpected error.
     """
-    config = load_env_config()
     template = views.get_template('error.html')
     page_html = template.render(
             title=title,
             message=message,
-            config=config,
+            config=CONFIG,
             )
     return HTMLResponse(content=page_html)
 
@@ -445,23 +404,23 @@ async def read_document(user_slug, doc_slug, request: Request):
         html = wiki.process(user_slug, doc_slug, doc_parts)
         data.userDocumentCache_set(user_slug, doc_slug, html)
         metadata = wiki.compile_metadata(
-            config['TIME_ZONE'], user_slug, doc_slug)
+            CONFIG['TIME_ZONE'], user_slug, doc_slug)
         metadata['url'] = '/read/{:s}/{:s}'.format(user_slug, doc_slug)
         data.userDocumentMetadata_set(user_slug, doc_slug, metadata)
 
     uri = '/read/{:s}/{:s}'.format(user_slug, doc_slug)
-    metadata['url'] = abs_url(str(request.base_url), uri)
+    metadata['url'] = urljoin(str(request.base_url), uri)
     author_uri = '/read/{:s}'.format(user_slug)
-    metadata['author_url'] = abs_url(str(request.base_url), author_uri)
-    metadata['home_url'] = abs_url(str(request.base_url), '/')
+    metadata['author_url'] = urljoin(str(request.base_url), author_uri)
+    metadata['home_url'] = urljoin(str(request.base_url), '/')
     image_uri = '/image/card/{:s}/{:s}.jpg'.format(user_slug, doc_slug)
-    metadata['image_url'] = abs_url(str(request.base_url), image_uri)
+    metadata['image_url'] = urljoin(str(request.base_url), image_uri)
 
     template = views.get_template('read.html')
     template.trim_blocks = True
     template.lstrip_blocks = True
     page_html = template.render(
-        config=config,
+        config=CONFIG,
         metadata=metadata,
         content_html=html
     )
@@ -487,29 +446,11 @@ def cache_rss_latest(user_slug, base_url):
     Generate source data for RSS; separated to allow caching.
     """
     articles = data.userDocumentLastChanged_list(user_slug)
-    fg = FeedGenerator()
-    fg.id(abs_url(base_url, '/read/%s' % user_slug))
-    fg.title('Nigel Chapman (%s)' % base_url)
-    fg.subtitle('Long reads on Christian thought')  # <-- Set METADATA for this
-    # fg.author( {'name':'Nigel Chapman','email':'nigel@chapman.id.au'} )
-    fg.logo('https://%s/static/site-image.png' % (base_url))
-    fg.link(href='https://%s' % base_url, rel='self')
-    # fg.link(href='https://%s/rss/%s.xml' % (base_url, user_slug), rel='self')
-    fg.language('en')
-    fg.ttl(24 * 3600)
-
-    for a in articles:
-        fe = fg.add_entry()
-        article_uri = 'read/%s/%s' % (a['user'], a['slug'])
-        fe.id(abs_url(base_url, article_uri))
-        fe.title(a['title'])
-        fe.description(a['summary'])
-        fe.link(href=abs_url(base_url, article_uri))
-        fe.author(name=a['email'], email=a['author'])  # <-- Wierdly backwards
-        fe.published(a['published_time'])
-
-    feed_xml = fg.rss_str(pretty=True)
-    return feed_xml
+    if feed_xml := rss_xml(user_slug, articles, base_url):
+        return feed_xml
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="RSS feed unavailable")
 
 
 # ----------------------------------------------------------
@@ -532,21 +473,19 @@ async def edit_part(
         doc_slug,
         part_slug=None,
         title: str = 'New Section',
-        request: Request = None
+        login: Annotated[Login, Depends()] = None
         ):
     """
     Open the editor to make changes to a doc_part
     """
-    config = load_env_config()
-    domain = config['SITE']
-    token = request.cookies.get('token', None)
-    if not has_authority_for_user(user_slug, token):
-        if not is_published(user_slug, doc_slug):
+    domain = CONFIG['SITE']
+
+    if not login.controls(user_slug) and not is_published(user_slug, doc_slug):
             msg = f"Document '{user_slug}/{doc_slug}' not found."
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=msg)
     if doc_slug == '_' and part_slug == 'index':
-        if not has_authority_for_user(user_slug, token):
+        if not login.controls(user_slug):
             msg = "You must be logged in to add a new document."
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail=msg)
@@ -572,10 +511,10 @@ async def edit_part(
             - - Section A
             - Part Two
         """.replace('PUBLICATION_DATE', today))
+
         html = show_editor(part_text, domain, user_slug, doc_slug, part_slug,
                            is_preview=False,
-                           can_be_saved=has_authority_for_user(user_slug,
-                                                               token))
+                           can_be_saved=login.controls(user_slug))
         return HTMLResponse(content=html)
     else:
         doc_parts = data.userDocument_get(user_slug, doc_slug)
@@ -587,8 +526,7 @@ async def edit_part(
             part_text = doc_parts[part_slug]
             html = show_editor(part_text, domain, user_slug, doc_slug,
                                part_slug, is_preview=False,
-                               can_be_saved=has_authority_for_user(user_slug,
-                                                                   token))
+                               can_be_saved=login.controls(user_slug))
             return HTMLResponse(content=html)
         else:
             part_slug = slug(title)
@@ -603,26 +541,29 @@ async def edit_part(
                 | Ctrl-SPACE | Select the current paragraph
                 ---
                 """)
-            can_be_saved = has_authority_for_user(user_slug, token)
             html = show_editor(default, domain, user_slug, doc_slug, part_slug,
-                               is_preview=False, can_be_saved=can_be_saved)
+                               is_preview=False,
+                               can_be_saved=login.controls(user_slug))
             return HTMLResponse(content=html)
 
 
 @app.post('/edit/{user_slug}/{doc_slug}/{part_slug}')
-async def post_edit_part(user_slug: str,
-                         doc_slug: str,
-                         part_slug: str,
-                         content: Annotated[str, Form()] = None,
-                         they_selected_save: Annotated[str, Form()] = None,
-                         they_selected_preview: Annotated[str, Form()] = None,
-                         request: Request = None):
+async def post_edit_part(
+        user_slug: str,
+        doc_slug: str,
+        part_slug: str,
+        content: Annotated[str, Form()] = None,
+        they_selected_save: Annotated[str, Form()] = None,
+        they_selected_preview: Annotated[str, Form()] = None,
+        request: Request = None,
+        login: Annotated[Login, Depends()] = None,
+    ):
     """
     Wiki editor for existing doc part (or '_' if new).
     """
-    token = request.cookies.get('token', None)
+    if they_selected_save:
+        login.require_control(user_slug)
 
-    domain = str(request.base_url)
     if user_slug == '_':  # New user
         msg = "Blank user '_' not supported."
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
@@ -632,8 +573,6 @@ async def post_edit_part(user_slug: str,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail=msg)
 
-    if they_selected_save:
-        require_authority_for_user(user_slug, token)
     if not content:
         msg = "Form data was missing"
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
@@ -668,7 +607,7 @@ async def post_edit_part(user_slug: str,
 
     okay_to_save = all([
         they_selected_save is not None,
-        has_authority_for_user(user_slug, token)
+        login.controls(user_slug)
     ])
 
     if okay_to_save:
@@ -682,16 +621,12 @@ async def post_edit_part(user_slug: str,
             if old_doc.doc_slug != new_doc_slug:
                 old_doc.delete()
 
-        # Special redirects when editing fixtures
         uri = '/read/{:s}/{:s}'.format(user_slug, new_doc_slug)
-        if doc_slug == 'fixtures':
-            if part_slug == 'homepage':
-                uri = '/'
-            elif part_slug == 'author':
-                uri = '/read/{:s}'.format(user_slug)
         return RedirectResponse(uri, status_code=status.HTTP_303_SEE_OTHER)
 
     is_preview = they_selected_preview is not None
+
+    domain = str(request.base_url)
 
     html = show_editor(new_text,
                        domain,
@@ -699,7 +634,7 @@ async def post_edit_part(user_slug: str,
                        document.doc_slug,
                        new_part_slug,
                        is_preview,
-                       can_be_saved=has_authority_for_user(user_slug, token))
+                       can_be_saved=login.controls(user_slug))
     return HTMLResponse(content=html)
 
 
@@ -770,7 +705,13 @@ def editor_post(request: Request,
 
 
 @app.get('/delete/{user_slug}/{doc_slug}/{part_slug}')
-async def delete_part(user_slug, doc_slug, part_slug, request: Request):
+async def delete_part(
+        user_slug: str,
+        doc_slug: str,
+        part_slug: str,
+        request: Request,
+        login: Annotated[Login, Depends()] = None
+        ):
     """
     Delete a part from a document. Must be logged in, and be the owner.
 
@@ -778,8 +719,8 @@ async def delete_part(user_slug, doc_slug, part_slug, request: Request):
         - Form and confirmation step?
         - Delete parts including unused?
     """
-    token = request.cookies.get('token', None)
-    require_authority_for_user(user_slug, token)  # or 401
+    login.require_control(user_slug)
+
     document = Document(data)
     document.set_host(str(request.base_url))
     if not document.load(user_slug, doc_slug):
@@ -791,7 +732,7 @@ async def delete_part(user_slug, doc_slug, part_slug, request: Request):
         return RedirectResponse('/read/{:s}/{:s}'.format(user_slug, doc_slug))
     else:
         document.delete()
-        return RedirectResponse('/read/{:s}'.format(user_slug))
+        return RedirectResponse('/read/{:s}/index'.format(user_slug))
 
 
 # -------------------------------------------------------------
@@ -799,41 +740,38 @@ async def delete_part(user_slug, doc_slug, part_slug, request: Request):
 # -------------------------------------------------------------
 
 @app.get('/admin')
-async def admin(request: Request):
+async def admin(
+        login: Annotated[Login, Depends()] = None,
+        ):
     """
     Show administrative options. 
     """
-    token = request.cookies.get('token', None)
-    require_authority_for_admin(token)  # else 401s
-    config = load_env_config()
-    html = views.get_template('admin.html').render(
-            config=config)
+    login.require_admin()
+    html = views.get_template('admin.html').render(config=CONFIG)
     return HTMLResponse(content=html)
 
 
 @app.post('/admin/initialize')
-async def admin_initialize(request: Request):
+async def admin_initialize(
+        login: Annotated[Login, Depends()] = None,
+        ):
     """
     Reset site to starting configuration.
     """
-    token = request.cookies.get('token', None)
-    require_authority_for_admin(token)  # else 401s
+    login.require_admin()
     initialize()
     return RedirectResponse('/', status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.post('/admin/refresh')
-async def admin_refresh(request: Request):
+async def admin_refresh(
+        login: Annotated[Login, Depends()] = None,
+    ):
     """
     Regenerate, re-cache, and correct the metadata for all pages.
     """
-    token = request.cookies.get('token', None)
-    require_authority_for_admin(token)  # else 401s
-
-    config = load_env_config()
-    data = Data(config)
+    login.require_admin()
     refresh_metadata(data)
-
     return RedirectResponse('/', status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -861,16 +799,21 @@ async def download_txt(user_slug, doc_slug, request: Request):
 
 
 @app.get('/upload/{user_slug}/{doc_slug}')
-async def upload_txt_form(user_slug, doc_slug, request: Request):
-    """Show an upload form to upload a document."""
-    token = request.cookies.get('token', None)
-    require_authority_for_user(user_slug, token)  # else 401s
+async def upload_txt_form(
+        user_slug: str,
+        doc_slug: str,
+        login: Annotated[Login, Depends()] = None
+    ):
+    """
+    Show an upload form to upload a document.
+    """
+    login.require_control(user_slug)  # else 403s
     metadata = {
         'title': 'Upload a document'
     }
     content_html = views.get_template('upload.html').render(
         metadata=metadata,
-        config=config,
+        config=CONFIG,
         user_slug=user_slug,
         doc_slug=doc_slug,
     )
@@ -881,13 +824,15 @@ async def upload_txt_form(user_slug, doc_slug, request: Request):
 async def post_upload_txt(user_slug,
                           doc_slug,
                           upload: UploadFile,
-                          request: Request):
+                          request: Request,
+                          login: Annotated[Login, Depends()] = None,
+                          ):
     """
-    Create a document from an download file.
+    Create and save a document from a download file; show it.
     """
-    require_authority_for_user(user_slug)  # else 401s
+    login.require_control(user_slug)  # else 403s
 
-    limit_kb = int(config['UPLOAD_LIMIT_KB'])
+    limit_kb = int(CONFIG['UPLOAD_LIMIT_KB'])
     if upload.size > (limit_kb * 1024):
         msg = "The uploaded file is too large (limit: {limit_kb}K)."
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
@@ -915,14 +860,12 @@ async def post_upload_txt(user_slug,
 
 
 @app.get('/export-archive/{user_slug}')
-async def export_archive(user_slug, request: Request):
+async def export_archive(user_slug):
     """
-    Downloads an export_archive file; ignores whether a doc is published or
-    not.
+    Downloads an export_archive file.
+    - Anyone can do this
+    - Ignores whether a doc is published or not.
     """
-    token = request.cookies.get('token', None)
-    require_authority_for_admin(token)
-
     zip_name = make_zip_name(user_slug)
     doc_files = data.userDocument_hash(user_slug)
     return Response(
@@ -934,15 +877,17 @@ async def export_archive(user_slug, request: Request):
 
 
 @app.get('/import-archive/{user_slug}')
-async def import_archive_form(user_slug, request: Request):
+async def import_archive_form(
+        user_slug: str,
+        login: Annotated[Login, Depends()] = None,
+    ):
     """
     Show import form for importing an archive zipfile.
     """
-    token = request.cookies.get('token', None)
-    require_authority_for_user(user_slug, token)  # else 401s
+    login.require_control(user_slug)
 
     html = views.get_template('import.html').render(
-        config=config,
+        config=CONFIG,
         user_slug=user_slug,
     )
     return HTMLResponse(content=html)
@@ -952,6 +897,7 @@ async def import_archive_form(user_slug, request: Request):
 async def post_import_archive(user_slug,
                               upload: UploadFile,
                               request: Request,
+                              login: Annotated[Login, Depends()] = None,
                               dir_path=Depends(get_temp_dir,
                                                use_cache=False)):
     """
@@ -971,16 +917,13 @@ async def post_import_archive(user_slug,
     Else:
         Show error
     """
-    config['DEBUG'] = 'YES'
-    token = request.cookies.get('token', None)
-    require_authority_for_user(user_slug, token)  # else 401s
+    login.require_control(user_slug)
 
     name, ext = os.path.splitext(upload.filename)
     if ext != '.zip':
         logging.error("Bad uploaded file extension: " + ext)
-        msg = "The upload must be a .zip file."
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail=msg)
+                            detail="The upload must be a .zip file.")
 
     file_path = os.path.join(dir_path, upload.filename)
     with open(file_path, 'w+b') as file:
@@ -988,8 +931,6 @@ async def post_import_archive(user_slug,
 
     uncompress_archive_dir(dir_path, upload.filename)
     archive_data = read_archive_dir(dir_path)
-    if 'DEBUG' in config:
-        print(['FILE NAMES: ' + user_slug, archive_data.keys()])
 
     for doc_slug, doc_parts in archive_data.items():
         if len(doc_parts):
@@ -1000,14 +941,15 @@ async def post_import_archive(user_slug,
             })
             wiki = Wiki(settings)
             html = wiki.process(user_slug, doc_slug, doc_parts)
-            metadata = wiki.compile_metadata(config['TIME_ZONE'],
+            metadata = wiki.compile_metadata(CONFIG['TIME_ZONE'],
                                              user_slug, doc_slug)
             data.userDocument_set(user_slug, doc_slug, doc_parts, metadata)
             data.userDocumentCache_set(user_slug, doc_slug, html)
             metadata['url'] = '/read/{:s}/{:s}'.format(user_slug, doc_slug)
             data.userDocumentMetadata_set(user_slug, doc_slug, metadata)
 
-    uri = f'/read/{user_slug}'
+    # 303 to forward POST to GET
+    uri = f'/read/{user_slug}/index'
     return RedirectResponse(uri, status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -1054,7 +996,7 @@ async def generate_epub(user_slug, doc_slug):
             'icon': 'arrow-left'
         }
         reload_html = views.get_template('reload.html').render(
-            config=config,
+            config=CONFIG,
             user_slug=user_slug,
             doc_slug=doc_slug,
             title="Generating..."
@@ -1139,7 +1081,7 @@ def cache_generate_cover(user_slug: str, doc_slug: str):
         ])
         return image
     else:
-        raise HTTPException(content=status.HTTP_400_BAD_REQUEST,
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="No metadata")
 
 
@@ -1182,8 +1124,8 @@ def generate_quote(checksum, encoded, request: Request):
 
 @ttl_cache(ttl=3600)
 def cache_generate_quote(checksum, encoded, base_url):
-    decoded = urllib.parse.unquote_plus(encoded)
-    key = bytes(config['APP_HASH'], 'utf-8')
+    decoded = unquote_plus(encoded)
+    key = bytes(CONFIG['APP_HASH'], 'utf-8')
     message = bytes(decoded, 'utf-8')
     required = hmac.new(key, message, 'sha224').hexdigest()[:16]
     if checksum != required:
@@ -1231,12 +1173,14 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.post('/admin/expire-cache')
-def expire(request: Request):
+def expire(
+        login: Annotated[Login, Depends()] = None,
+    ):
     """
     Expire caches
     """
-    token = request.cookies.get('token', None)
-    require_authority_for_admin(token)  # else 403
+    login.require_admin()  # else 403
+
     data.epubCache_deleteAll()
     return RedirectResponse('/', status_code=status.HTTP_303_SEE_OTHER)
 
