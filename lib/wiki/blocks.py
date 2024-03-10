@@ -31,8 +31,10 @@ from lib.wiki.functions.base import \
     Compact, \
     Indent, \
     Feature, \
+    Footer, \
     Function, \
     Float, \
+    Header, \
     Left, \
     Print, \
     Quote, \
@@ -119,7 +121,9 @@ class BlockList(object):
             Compact,
             Feature,
             Float,
+            Footer,
             Indent,
+            Header,
             Left,
             Print,
             Quote,

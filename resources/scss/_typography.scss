@@ -357,6 +357,13 @@ img {
     max-height: 30em;
 }
 
+div.text-header, 
+div.text-footer {
+    font-size: $fontSizeMinus2;
+    margin: 1em 0 1em 2.4rem;
+    padding: 0.5em 0;
+}
+
 blockquote { 
     border: none;
     padding: 0 2.4rem 0 2.4rem;
@@ -482,6 +489,10 @@ hr.div-left {
 
 hr.div-center { 
     width: 4em;
+}
+
+hr.div-10em {
+    width: 10em;
 }
 
 hr.div-wide { 

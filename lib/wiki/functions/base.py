@@ -241,6 +241,48 @@ class Float(Wrapper):
         return wrap('float', html, self.options)
 
 
+class Footer(Wrapper):
+    """
+    Format compact end section, with a divider above
+    """
+
+    examples = [
+        trim("""
+            FOOTER ---
+            Questions and answers
+            ---
+        """),
+    ]
+
+    option_list = {
+    }
+
+    def wrap(self, html):
+        div = '<hr class="div-left div-solid div-10em" />\n\n'
+        return wrap('footer', div + html, self.options)
+
+
+class Header(Wrapper):
+    """
+    Format compact end section, with a divider above
+    """
+
+    examples = [
+        trim("""
+            HEADER ---
+            Introductory comments...
+            ---
+        """),
+    ]
+
+    option_list = {
+    }
+
+    def wrap(self, html):
+        div = '\n\n<hr class="div-left div-solid div-10em" />'
+        return wrap('header', html + div, self.options)
+
+
 class Indent(Wrapper):
     """
     Indent a section of text, optionally setting widths. Indents

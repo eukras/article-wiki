@@ -107,7 +107,7 @@ class Wiki(object):
         self.entities = Entities()
         self.verbatim = Verbatim()
 
-        # Demo is first: entities(self.backslashes(verbatim(demo)))
+        # Demo is first:
         parts = pipe([self.entities,
                       self.backslashes,
                       self.verbatim,
@@ -348,7 +348,11 @@ class Wiki(object):
         data['published_time'] = format_date(utc, tz_name, DATE_FORMAT_ISO8601)
 
         data['todo'] = self.settings.get('TODO', '')
-        data['word_count'] = self.outline.total_word_count() if self.outline else 0
+
+        if self.outline:
+            data['word_count'] = self.outline.total_word_count()
+        else:
+            data['word_count'] = 0
 
         return data
 
@@ -374,11 +378,11 @@ class Wiki(object):
                      preview=False):
         """
         Wrap section HTML in titles and nav.
-        A fragment has no heading. A preview has a heading but no context,so no
-        numbering.
+        Pre-format header and footer dividers.
         """
 
         content, _ = split_bibliography(text)
+
         blocks = BlockList(content)
         content_html = blocks.html(
             numbering, slug, self.settings, fragment, preview

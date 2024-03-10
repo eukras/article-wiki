@@ -282,6 +282,8 @@ def wrap(alignment_name, html, options):
         'center': 'text-center',
         'right': 'pull-right',
         'indent': 'text-indent',
+        'header': 'text-header',
+        'footer': 'text-footer',
     }.get(alignment_name, None)
     if class_property:
         properties += ["class=\"%s\"" % class_property]
