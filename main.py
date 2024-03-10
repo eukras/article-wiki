@@ -76,6 +76,7 @@ from urllib.parse import unquote_plus, urljoin
 
 import hmac
 import io
+import json
 import logging
 import os
 import shutil
@@ -351,6 +352,21 @@ async def error_403(request: Request, exc: HTTPException):
 
 @app.exception_handler(404)
 async def error_404(request: Request, exc: HTTPException):
+    """
+    If an article not found, check if admin user has that article.
+    (This catches changes to admin user name.)
+    """
+    if all([
+        'user_slug' in request.path_params,
+        'doc_slug' in request.path_params,
+    ]):
+        admin_slug = CONFIG['ADMIN_USER']
+        doc_slug = slug(request.path_params['doc_slug'])
+        if data.userDocument_exists(admin_slug, doc_slug):
+            uri = f'/read/{admin_slug}/{doc_slug}'
+            return RedirectResponse(
+                    uri, status_code=status.HTTP_308_PERMANENT_REDIRECT)
+
     return error_page(
         title='Not Found',
         message='This link does not match any page on this website.')
