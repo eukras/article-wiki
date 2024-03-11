@@ -448,11 +448,10 @@ async def rss_latest(user_slug, request: Request):
     """
     Generate Really Simple Syndication data for recently edited files.
     """
-    base_url = str(request.base_url)  # <-- URL type
-    rss_xml = cache_rss_latest(user_slug, base_url)
-    rss_xml_type = 'application/rss+xml; charset=utf-8'
-    return Response(content=rss_xml,
-                    media_type=rss_xml_type,
+    base_url = str(request.base_url)  # <-- URL type, so str()
+    content = cache_rss_latest(user_slug, base_url)
+    media_type = 'application/rss+xml; charset=utf-8'
+    return Response(content=content, media_type=media_type,
                     status_code=status.HTTP_200_OK)
 
 
@@ -474,7 +473,9 @@ def cache_rss_latest(user_slug, base_url):
 # ----------------------------------------------------------
 
 @app.get('/new-article')
-async def new_article():
+async def new_article(
+        login: Annotated[Login, Depends(use_cache=False)],
+        ):
     if login is not None:
         uri = f"/edit/{login['username']}/_/index"
         return RedirectResponse(uri, status_code=status.HTTP_303_SEE_OTHER)
@@ -497,9 +498,9 @@ async def edit_part(
     domain = CONFIG['SITE']
 
     if not login.controls(user_slug) and not is_published(user_slug, doc_slug):
-            msg = f"Document '{user_slug}/{doc_slug}' not found."
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail=msg)
+        msg = f"Document '{user_slug}/{doc_slug}' not found."
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=msg)
+
     if doc_slug == '_' and part_slug == 'index':
         if not login.controls(user_slug):
             msg = "You must be logged in to add a new document."
@@ -573,7 +574,7 @@ async def post_edit_part(
         they_selected_preview: Annotated[str, Form()] = None,
         request: Request = None,
         login: Annotated[Login, Depends()] = None,
-    ):
+        ):
     """
     Wiki editor for existing doc part (or '_' if new).
     """
@@ -819,7 +820,7 @@ async def upload_txt_form(
         user_slug: str,
         doc_slug: str,
         login: Annotated[Login, Depends()] = None
-    ):
+        ):
     """
     Show an upload form to upload a document.
     """
@@ -858,7 +859,7 @@ async def post_upload_txt(user_slug,
     suffix = '.txt'
     print(name)
     if not name.startswith(prefix) or not name.endswith(suffix):
-        msg = f"The filename must start with '{prefix}' and end with '{suffix}'"
+        msg = f"Filename must start with '{prefix}' and end with '{suffix}'"
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail=msg)
 
@@ -896,7 +897,7 @@ async def export_archive(user_slug):
 async def import_archive_form(
         user_slug: str,
         login: Annotated[Login, Depends()] = None,
-    ):
+        ):
     """
     Show import form for importing an archive zipfile.
     """
@@ -1004,13 +1005,6 @@ async def generate_epub(user_slug, doc_slug):
 
     elif data.epubCachePlaceholder_exists(user_slug, doc_slug):
 
-        # Show the reload-in-5-mins page
-
-        back_button = {
-            'name': 'Back',
-            'href': '/read/{:s}/{:s}'.format(user_slug, doc_slug),
-            'icon': 'arrow-left'
-        }
         reload_html = views.get_template('reload.html').render(
             config=CONFIG,
             user_slug=user_slug,
