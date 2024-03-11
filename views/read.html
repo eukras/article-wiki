@@ -4,6 +4,8 @@
 
     <title>{{ metadata.title }}</title>
 
+    <link rel="alternate" type="application/atom+xml" title="RSS Feed for {{ metadata.title }}"s href="/rss/{{ config.ADMIN_USER }}.xml" />
+
     <link rel="author" href="{{ metadata.author_url }}">
     <link rel="publisher" href="{{ metadata.home_url }}">
     <meta itemprop="name" content="{{ metadata.title }}">
