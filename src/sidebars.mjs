@@ -187,16 +187,18 @@ function calculateBackgroundOffset(time_visible, reading_time, word_count) {
 function updateCompletionBars() {
     const ratio = getCompletionScale(outline);
     const completion_list = document.querySelector('#completion');
-    outline.forEach(([tag, href, number, title, word_count]) => {
-        const key = href.slice(1);
-        const time_visible = totalSectionVisibilityTime[key] || 0;
-        const reading_time = estimateReadingTime(word_count) || 0.1;
-        const offset = calculateBackgroundOffset(time_visible, reading_time,
-                                                 word_count * ratio);
-        const a = completion_list.querySelector('[href="' + href + '"]');
-        const div = a.querySelector('.completion-unit');
-        div.style.backgroundPositionX = `${offset}em`;
-    });
+    if (completion_list) {
+        outline.forEach(([tag, href, number, title, word_count]) => {
+            const key = href.slice(1);
+            const time_visible = totalSectionVisibilityTime[key] || 0;
+            const reading_time = estimateReadingTime(word_count) || 0.1;
+            const offset = calculateBackgroundOffset(time_visible, reading_time,
+                                                     word_count * ratio);
+            const a = completion_list.querySelector('[href="' + href + '"]');
+            const div = a.querySelector('.completion-unit');
+            div.style.backgroundPositionX = `${offset}em`;
+        });
+    }
 }
 
 function changeListLevel(last_level, level) {
@@ -467,28 +469,30 @@ function blinkTimerCallback() {
 function handleVisibility(events) {
     const completion = document.querySelector('#completion');
     const outline = document.querySelector('#outline');
-    for (var event of events) {
-        const selector = '[href="#' + event.target.id + '"]';
-        const outlineLink = outline.querySelector(selector);
-        if (outlineLink !== null) {
-            if (event.isIntersecting) {
-                var li = outlineLink.closest('li')
-                li.classList.add('visible');
-                currentSectionVisiblilityTime[event.target.id] = 0;
-            } else {
-                outlineLink.closest('li').classList.remove('visible');
-                if (currentSectionVisiblilityTime[event.target.id] !== undefined) {
-                    delete currentSectionVisiblilityTime[event.target.id];
+    if (completion) {
+        for (var event of events) {
+            const selector = '[href="#' + event.target.id + '"]';
+            const outlineLink = outline.querySelector(selector);
+            if (outlineLink !== null) {
+                if (event.isIntersecting) {
+                    var li = outlineLink.closest('li')
+                    li.classList.add('visible');
+                    currentSectionVisiblilityTime[event.target.id] = 0;
+                } else {
+                    outlineLink.closest('li').classList.remove('visible');
+                    if (currentSectionVisiblilityTime[event.target.id] !== undefined) {
+                        delete currentSectionVisiblilityTime[event.target.id];
+                    }
                 }
             }
-        }
-        const completionLink = completion.querySelector(selector);
-        if (completionLink) {
-            var li = completionLink.closest('li');
-            if (event.isIntersecting) {
-                li.classList.add('visible');
-            } else {
-                li.classList.remove('visible');
+            const completionLink = completion.querySelector(selector);
+            if (completionLink) {
+                var li = completionLink.closest('li');
+                if (event.isIntersecting) {
+                    li.classList.add('visible');
+                } else {
+                    li.classList.remove('visible');
+                }
             }
         }
     }
