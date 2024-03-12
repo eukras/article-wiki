@@ -508,17 +508,23 @@ body {
   margin: 1em 0;
 }
 
+textarea::-webkit-scrollbar,
+main::-webkit-scrollbar,
 body::-webkit-scrollbar {
-  width: 1rem;
+  width: 0.75rem;
 }
 
+textarea::-webkit-scrollbar-thumb,
+main::-webkit-scrollbar-track,
 body::-webkit-scrollbar-track {
   background: transparent;
 }
 
+textarea::-webkit-scrollbar-thumb,
+main::-webkit-scrollbar-thumb,
 body::-webkit-scrollbar-thumb {
-  background-color: var(--page-text);
-  box-shadow: 0 -100vh 0 100vh var(--page-icon-background);
+  border-radius: 0.375rem;
+  background-color: var(--page-outline);
 }
 
 /**
