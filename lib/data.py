@@ -59,6 +59,7 @@ def load_env_config() -> dict:
             'ARTICLE_WIKI_CREDIT': 'YES',
             'ARTICLE_WIKI_URL': 'https://github.com/eukras/article-wiki',
             'GOOGLE_ANALYTICS_TRACKING_ID': '',
+            'GOOGLE_TAG_MANAGER_ID': '',
             'PUBLIC_DIR': '/static',
             'REDIS_DATABASE': '0',
             'REDIS_HOST': 'localhost',
