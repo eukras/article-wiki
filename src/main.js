@@ -3,6 +3,7 @@ import {initNavigation} from './navigation.mjs';
 import {initSidebars, stopScrollDownIndicatorBlinking} from './sidebars.mjs';
 import {initProgress} from './progress.mjs';
 import {initThemes} from './themes.mjs';
+import {initEditor} from './editor.mjs';
 import {setSvgBackground} from './bokeh.mjs';
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -19,5 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
     initThemes('.theme-button');
     initFullScreen('.fullscreen-button');
     initNavigation('.navigation-button', stopScrollDownIndicatorBlinking);
+    initEditor();
 
 });
