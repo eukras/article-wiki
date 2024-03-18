@@ -317,7 +317,6 @@ function createSiteMenu() {
             <div class="space">
                 <div><a class="icon-button" href="/epub/${user_slug}/${doc_slug}"><i class="fa fa-fw fa-book"></i> Download ePub</a></div>
                 <div><a class="icon-button" href="/download/${user_slug}/${doc_slug}"><i class="fa fa-fw fa-download"></i> Download Source</a></div>
-                <div><a class="icon-button" href="/upload/${user_slug}/${doc_slug}"><i class="fa fa-fw fa-upload"></i> Upload Source</a></div>
                 <div><a class="icon-button" onclick="window.print();"><i class="fa fa-fw fa-print"></i> Print to PDF</a></div>
             </div>
         `;
@@ -328,6 +327,7 @@ function createSiteMenu() {
                 <div class="space">
                     <div><a class="icon-button" href="/admin"><i class="fa fa-fw fa-wrench"></i> Site Admin</a></div>
                     <div><a class="icon-button" href="/new-article"><i class="fa fa-fw fa-plus"></i> New Article</a></div>
+                    <div><a class="icon-button" href="/upload/${user_slug}/${doc_slug}"><i class="fa fa-fw fa-upload"></i> Upload Source</a></div>
                     <div><a class="icon-button" href="/logout"><i class="fa fa-fw fa-sign-out"></i> User Logout</a></div>
                 </div>
             </div>
