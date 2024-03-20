@@ -899,7 +899,7 @@ p.subhead {
   color: var(--page-text-tertiary);
   font-weight: bold;
   margin: 0;
-  padding: 0.8rem 0 0.2rem 0;
+  padding: 0.5rem 0 0.5rem 0;
 }
 
 p + p.subhead {
@@ -1731,10 +1731,11 @@ html.navigation-sidebars #page-outline {
   /* Display immediate children of visible elements */
 }
 html.navigation-sidebars #page-outline #completion {
-  margin-top: 1.5em;
   line-height: 1em;
+  margin-top: 1.5em;
 }
 html.navigation-sidebars #page-outline #completion ol {
+  line-height: 1em;
   list-style: none;
   max-width: 24em;
   gap: 0.5em;
@@ -1742,17 +1743,19 @@ html.navigation-sidebars #page-outline #completion ol {
   margin: 0;
 }
 html.navigation-sidebars #page-outline #completion ol, html.navigation-sidebars #page-outline #completion li {
+  line-height: 1em;
   display: inline;
   padding: 0;
   margin: 0;
 }
 html.navigation-sidebars #page-outline #completion .completion-unit {
+  line-height: 1em;
   display: inline-block;
-  min-height: 0.55em;
+  min-height: 0.6rem;
   margin: 0 0.5em 0.5em 0;
   padding: 0 0.25em;
   border: solid 1px var(--desk-text);
-  border-radius: 0.275em;
+  border-radius: 0.3rem;
   background-repeat: no-repeat;
   background-size: 32em 1em;
   background-position-x: 0em;
