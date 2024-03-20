@@ -359,9 +359,10 @@ function createPageOutline() {
         <div class="sticky sidebar">
             <div class="space">
                 <a class="icon-button" href="#"><i class="fa fa-fw fa-arrow-up"></i> <span>Top of Page</span> <span id="progress-meter">0%</span></a>
-        `;
+           `;
     html += createLastReadingBookmarks();
     html += `
+                <a class="icon-button" href="#table-of-contents"><i class="fa fa-fw fa-arrow-down"></i> <span>Table of Contents</span></a>
             </div>
             <div id="completion" class="space">
         `;

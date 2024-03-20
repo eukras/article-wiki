@@ -137,7 +137,7 @@ class Outline(object):
         env = Environment(autoescape=True)
         tpl = env.from_string(trim("""
             {% if outline|length > 0 %}
-            <h2>Table of Contents</h2>
+            <h2 id="table-of-contents">Table of Contents</h2>
             <table class="table table-of-contents table-condensed">
                 <tbody>
                     {% for numbering, name, slug, title, word_count, subtotal in outline %}
