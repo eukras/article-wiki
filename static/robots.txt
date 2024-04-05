@@ -1,2 +1,9 @@
 User-agent: *
 Disallow: /edit
+Disallow: /admin
+Disallow: /upload
+Disallow: /upload-archive
+Disallow: /login
+Disallow: /logout
+Disallow: /new-article
+
