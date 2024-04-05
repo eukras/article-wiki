@@ -37,6 +37,14 @@ redis:
 		-d redis \
 		redis-server --appendonly yes
 
+redis-stack:
+	docker run \
+		--name aw-redis-stack \
+		--network host \
+		-v /docker/article-wiki-redis-ts:/data \
+		-e REDIS_ARGS="--save 60 1000 --appendonly yes" \
+		-d redis/redis-stack:latest
+
 tags:
 	tags -R --exclude .venv
 
