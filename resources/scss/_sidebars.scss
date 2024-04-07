@@ -150,5 +150,19 @@ html.navigation-sidebars {
         #outline li.visible > ol > li {
             display: block;
         }
+
+        img.sparkline {
+            width: 100%;
+            height: auto;
+        }
+    }
+}
+
+html.theme-dark {
+    #page-outline {
+        img.sparkline {
+            opacity: 0.3;
+            overflow: visible;
+        }
     }
 }

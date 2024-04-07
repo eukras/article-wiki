@@ -1811,6 +1811,15 @@ html.navigation-sidebars #page-outline #outline ol:has(> li.visible) > li {
 html.navigation-sidebars #page-outline #outline li.visible > ol > li {
   display: block;
 }
+html.navigation-sidebars #page-outline img.sparkline {
+  width: 100%;
+  height: auto;
+}
+
+html.theme-dark #page-outline img.sparkline {
+  opacity: 0.3;
+  overflow: visible;
+}
 
 /**
  * An icon-button contains two elements, icon and text

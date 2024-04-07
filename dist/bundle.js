@@ -354,10 +354,10 @@
      * Determined by being onscreen for a minimum period of time.
      * Shown in #page-navigation.
      */
-    var lastReadSectionId = ''; 
+    var lastReadSectionId = '';
 
     function estimateReadingTime(word_count) {
-        return Math.round(word_count / READING_SPEED);
+      return Math.round(word_count / READING_SPEED);
     }
 
     /**
@@ -365,174 +365,174 @@
      * @idea: Log scale for setting a boundary on large values?
      */
     function mapWordCountToBarWidth(word_count) {
-        const bar_width = Math.floor(word_count / 10) / 10;
-        const constrained = Math.max(0, Math.min(MAX_BAR_WIDTH, bar_width));
-        return constrained;
+      const bar_width = Math.floor(word_count / 10) / 10;
+      const constrained = Math.max(0, Math.min(MAX_BAR_WIDTH, bar_width));
+      return constrained;
     }
 
     const COMPLETION_WORD_LIMIT = 10000;
 
     function getCompletionScale(outline) {
-        const total_words = outline.reduce((acc, section) => {
-            return acc + section[4]; // word_count
-        }, 0);
-        if (total_words > COMPLETION_WORD_LIMIT) {
-            return COMPLETION_WORD_LIMIT / total_words;
-        } else {
-            return 1;
-        }
+      const total_words = outline.reduce((acc, section) => {
+        return acc + section[4]; // word_count
+      }, 0);
+      if (total_words > COMPLETION_WORD_LIMIT) {
+        return COMPLETION_WORD_LIMIT / total_words;
+      } else {
+        return 1;
+      }
     }
 
     function createCompletionListByRecursion(h1, outline, ratio) {
-        //  Create list items for tags (e.g. H1) and recurse for sections having
-        //  lower tags (e.g. > H1).
-        //  We want to create:
-        //  <ol>  // H1
-        //      <li>
-        //          <a href="">H1</a>
-        //          // Recurse here for H2
-        //      </li>
-        //      ...
-        //  </ol>
-        if (!ratio) {
-             var ratio = getCompletionScale(outline);
+      //  Create list items for tags (e.g. H1) and recurse for sections having
+      //  lower tags (e.g. > H1).
+      //  We want to create:
+      //  <ol>  // H1
+      //      <li>
+      //          <a href="">H1</a>
+      //          // Recurse here for H2
+      //      </li>
+      //      ...
+      //  </ol>
+      if (!ratio) {
+        var ratio = getCompletionScale(outline);
+      }
+      var html = '<ol>';
+      var h1_index = 0;
+      while (h1_index < outline.length) {
+        const [tag, href, number, title, word_count] = outline[h1_index];
+        const unit_width = mapWordCountToBarWidth(word_count * ratio);
+        const bar_width = mapWordCountToBarWidth(word_count * ratio);
+        const zero_value = bar_width - 0.7;
+        html += '<li>';
+        html += `<a class="${tag}" href="${href}">`;
+        html += `<div class="completion-unit" style="width: ${unit_width}em; background-position-x: ${zero_value}em;"></div>`,
+          html += `</a>`;
+        var distance_to_next_h1 = 1;
+        while (
+          h1_index + distance_to_next_h1 < outline.length
+          && outline[h1_index + distance_to_next_h1][0] != h1
+        ) {
+          distance_to_next_h1 += 1;
         }
-        var html = '<ol>';
-        var h1_index = 0;
-        while (h1_index < outline.length) {
-            const [tag, href, number, title, word_count] = outline[h1_index];
-            const unit_width = mapWordCountToBarWidth(word_count * ratio);
-            const bar_width = mapWordCountToBarWidth(word_count * ratio);
-            const zero_value = bar_width - 0.7;
-            html += '<li>';
-            html += `<a class="${tag}" href="${href}">`;
-            html += `<div class="completion-unit" style="width: ${unit_width}em; background-position-x: ${zero_value}em;"></div>`,
-            html += `</a>`;
-            var distance_to_next_h1 = 1;
-            while (
-                    h1_index + distance_to_next_h1 < outline.length
-                &&  outline[h1_index + distance_to_next_h1][0] != h1 
-            ) {
-                distance_to_next_h1 += 1;
-            }
-            if (distance_to_next_h1 > 1) {
-                html += createCompletionListByRecursion(
-                    incTag(h1),
-                    outline.slice(h1_index + 1, h1_index + distance_to_next_h1),
-                    ratio
-                );
-            }
-            h1_index += distance_to_next_h1;
-            html += '</li>';
+        if (distance_to_next_h1 > 1) {
+          html += createCompletionListByRecursion(
+            incTag(h1),
+            outline.slice(h1_index + 1, h1_index + distance_to_next_h1),
+            ratio
+          );
         }
-        return html + '</ol>';
+        h1_index += distance_to_next_h1;
+        html += '</li>';
+      }
+      return html + '</ol>';
     }
 
     function calculateBackgroundOffset(time_visible, reading_time, word_count) {
-        const min_value = -1.0;
-        const bar_width = mapWordCountToBarWidth(word_count);
-        const max_value = bar_width - 0.7;
-        const difference = max_value - min_value;
-        const ratio = Math.max(0, Math.min(1, time_visible / reading_time));
-        return min_value + (difference * ratio);
+      const min_value = -1.0;
+      const bar_width = mapWordCountToBarWidth(word_count);
+      const max_value = bar_width - 0.7;
+      const difference = max_value - min_value;
+      const ratio = Math.max(0, Math.min(1, time_visible / reading_time));
+      return min_value + (difference * ratio);
     }
 
     function updateCompletionBars() {
-        const ratio = getCompletionScale(outline);
-        const completion_list = document.querySelector('#completion');
-        if (completion_list) {
-            outline.forEach(([tag, href, number, title, word_count]) => {
-                const key = href.slice(1);
-                const time_visible = totalSectionVisibilityTime[key] || 0;
-                const reading_time = estimateReadingTime(word_count) || 0.1;
-                const offset = calculateBackgroundOffset(time_visible, reading_time,
-                                                         word_count * ratio);
-                const a = completion_list.querySelector('[href="' + href + '"]');
-                const div = a.querySelector('.completion-unit');
-                div.style.backgroundPositionX = `${offset}em`;
-            });
-        }
+      const ratio = getCompletionScale(outline);
+      const completion_list = document.querySelector('#completion');
+      if (completion_list) {
+        outline.forEach(([tag, href, number, title, word_count]) => {
+          const key = href.slice(1);
+          const time_visible = totalSectionVisibilityTime[key] || 0;
+          const reading_time = estimateReadingTime(word_count) || 0.1;
+          const offset = calculateBackgroundOffset(time_visible, reading_time,
+            word_count * ratio);
+          const a = completion_list.querySelector('[href="' + href + '"]');
+          const div = a.querySelector('.completion-unit');
+          div.style.backgroundPositionX = `${offset}em`;
+        });
+      }
     }
 
     function incTag(tag) {
-        //  Change e.g. H3 into H4.
-        const number = Math.round(tag.slice(1));
-        return `H${number + 1}`;
+      //  Change e.g. H3 into H4.
+      const number = Math.round(tag.slice(1));
+      return `H${number + 1}`;
     }
 
     function createLastReadingBookmarks() {
-        if (user_slug && doc_slug && outline.length > 0) {
-            return `
+      if (user_slug && doc_slug && outline.length > 0) {
+        return `
                 <a id="last-reading" class="icon-button"><i class="fa fa-fw fa-bookmark"></i> <span>Last Reading</span> <span id="last-reading-readout">&sect;0</span></a>
             `;
-        } else {
-            return '';
-        }
+      } else {
+        return '';
+      }
     }
 
     function createOutlineListByRecursion(h1, outline) {
-        //  Create list items for tags (e.g. H1) and recurse for sections having
-        //  lower tags (e.g. > H1).
-        //  We want to create:
-        //  <ol>  // H1
-        //      <li>
-        //          <a href="">H1</a>
-        //          // Recurse here for H2
-        //      </li>
-        //      ...
-        //  </ol>
-        var html = '<ol>';
-        var h1_index = 0;
-        while (h1_index < outline.length) {
-            const [tag, href, number, title, word_count] = outline[h1_index];
-            const section = number.slice(1, -1).split('.').pop();
-            html += '<li>';
-            html += `<a class="${tag}" href="${href}">${section}. ${title}</a>`;
-            var distance_to_next_h1 = 1;
-            while (
-                    h1_index + distance_to_next_h1 < outline.length
-                &&  outline[h1_index + distance_to_next_h1][0] != h1 
-            ) {
-                distance_to_next_h1 += 1;
-            }
-            if (distance_to_next_h1 > 1) {
-                html += createOutlineListByRecursion(
-                    incTag(h1),
-                    outline.slice(h1_index + 1, h1_index + distance_to_next_h1)
-                );
-            }
-            h1_index += distance_to_next_h1;
-            html += '</li>';
+      //  Create list items for tags (e.g. H1) and recurse for sections having
+      //  lower tags (e.g. > H1).
+      //  We want to create:
+      //  <ol>  // H1
+      //      <li>
+      //          <a href="">H1</a>
+      //          // Recurse here for H2
+      //      </li>
+      //      ...
+      //  </ol>
+      var html = '<ol>';
+      var h1_index = 0;
+      while (h1_index < outline.length) {
+        const [tag, href, number, title, word_count] = outline[h1_index];
+        const section = number.slice(1, -1).split('.').pop();
+        html += '<li>';
+        html += `<a class="${tag}" href="${href}">${section}. ${title}</a>`;
+        var distance_to_next_h1 = 1;
+        while (
+          h1_index + distance_to_next_h1 < outline.length
+          && outline[h1_index + distance_to_next_h1][0] != h1
+        ) {
+          distance_to_next_h1 += 1;
         }
-        return html + '</ol>';
+        if (distance_to_next_h1 > 1) {
+          html += createOutlineListByRecursion(
+            incTag(h1),
+            outline.slice(h1_index + 1, h1_index + distance_to_next_h1)
+          );
+        }
+        h1_index += distance_to_next_h1;
+        html += '</li>';
+      }
+      return html + '</ol>';
     }
 
     function getPageInfo(pathname) {
-        const readPath = /^\/read\/([a-z0-9-]+)\/([a-z0-9-]+)\/?$/;
-        const readMatch = pathname.match(readPath);
-        if (readMatch) {
-            return [readMatch[1], readMatch[2]];
-        }
-        const userPath = /^\/user\/([a-z0-9-]+)\/?$/;
-        const userMatch = pathname.match(userPath);
-        if (userMatch) {
-            return [userMatch[1], undefined];
-        }
-        return [undefined, undefined];
+      const readPath = /^\/read\/([a-z0-9-]+)\/([a-z0-9-]+)\/?$/;
+      const readMatch = pathname.match(readPath);
+      if (readMatch) {
+        return [readMatch[1], readMatch[2]];
+      }
+      const userPath = /^\/user\/([a-z0-9-]+)\/?$/;
+      const userMatch = pathname.match(userPath);
+      if (userMatch) {
+        return [userMatch[1], undefined];
+      }
+      return [undefined, undefined];
     }
 
     function createSiteMenu() {
-        var html = `
+      var html = `
         <div id="menu" class="sticky sidebar">
             <div class="space">
                 <div><a class="icon-button" href="/"><i class="fa fa-fw fa-home"></i> Home</a></div>
         `;
-        if (user_slug && doc_slug == 'index') {
-            html += `
+      if (user_slug && doc_slug == 'index') {
+        html += `
                 <div><a class="icon-button" href="/rss/${user_slug}.xml"><i class="fa fa-fw fa-rss"></i> RSS Feed</a></div>
         `;
-        }
-        html += `
+      }
+      html += `
             </div>
             <div class="space">
                 <div class="icon-button theme-button"><i class="fa fa-fw fa-adjust"></i> Dark Mode</div>
@@ -550,18 +550,18 @@
                 </div>
             </div>
         `;
-        if (user_slug && doc_slug) {
-            html += `
+      if (user_slug && doc_slug) {
+        html += `
             <div class="space">
                 <div><a class="icon-button" href="/epub/${user_slug}/${doc_slug}"><i class="fa fa-fw fa-book"></i> Download ePub</a></div>
                 <div><a class="icon-button" href="/download/${user_slug}/${doc_slug}"><i class="fa fa-fw fa-download"></i> Download Source</a></div>
                 <div><a class="icon-button" onclick="window.print();"><i class="fa fa-fw fa-print"></i> Print to PDF</a></div>
             </div>
         `;
-        }
-        const login = api.get('token');
-        if (login) {
-            html += `
+      }
+      const login = api.get('token');
+      if (login) {
+        html += `
                 <div class="space">
                     <div><a class="icon-button" href="/admin"><i class="fa fa-fw fa-wrench"></i> Site Admin</a></div>
                     <div><a class="icon-button" href="/new-article"><i class="fa fa-fw fa-plus"></i> New Article</a></div>
@@ -570,460 +570,496 @@
                 </div>
             </div>
         `;
-        } else {
-            html += `
+      } else {
+        html += `
                 <div class="space">
                     <div><a class="icon-button" href="/login"><i class="fa fa-fw fa-sign-in"></i> User Login</a></div>
                 </div>
             `;
-        }
-        html += `
+      }
+      html += `
                 <div class="space">
                     <a class="icon-button" href="https://github.com/eukras/article-wiki" target="_blank"><i class="fa fa-fw fa-font"></i> <span>Article Wiki</span></a>
                 </div>
             </div>
         `;
-        const page = document.querySelector('#page');
-        if (page) {
-            const siteMenu = document.createElement('nav');
-            siteMenu.setAttribute('id', 'site-menu');
-            siteMenu.innerHTML = html;
-            page.before(siteMenu);
-        }
+      const page = document.querySelector('#page');
+      if (page) {
+        const siteMenu = document.createElement('nav');
+        siteMenu.setAttribute('id', 'site-menu');
+        siteMenu.innerHTML = html;
+        page.before(siteMenu);
+      }
     }
 
     function createPageOutline() {
-        var html = `
+      var html = `
         <div class="sticky sidebar">
             <div class="space">
                 <a class="icon-button" href="#"><i class="fa fa-fw fa-arrow-up"></i> <span>Top of Page</span> <span id="progress-meter">0%</span></a>
            `;
-        html += createLastReadingBookmarks();
-        html += `
-                <a class="icon-button" href="#table-of-contents"><i class="fa fa-fw fa-arrow-down"></i> <span>Table of Contents</span></a>
+      html += createLastReadingBookmarks();
+      html += `
+                <a class="icon-button" href="#table-of-contents"><i class="fa fa-fw fa-list-ol"></i> <span>Table of Contents</span></a>
             </div>
-            <div id="completion" class="space">
-        `;
+           `;
+
+      const pathname = window.location.pathname;
+      if (pathname.includes('/read/') && !pathname.includes('/index')) {
+        html += `
+                <div id="completion" class="space">
+            `;
         html += createCompletionListByRecursion('H1', outline);
         html += `
-            </div>
-            <div id="outline" class="space">
-        `;
+                </div>
+                <div id="outline" class="space">
+            `;
         html += createOutlineListByRecursion('H1', outline);
         html += `
-            </div>
+                </div>
+            `;
+      }
+      html += `
         </div>
         `;
-        const page = document.querySelector('#page');
-        if (page) {
-            const pageOutline = document.createElement('nav');
-            pageOutline.setAttribute('id', 'page-outline');
-            pageOutline.innerHTML = html;
-            page.after(pageOutline);
+      const page = document.querySelector('#page');
+      if (page) {
+        const pageOutline = document.createElement('nav');
+        pageOutline.setAttribute('id', 'page-outline');
+        pageOutline.innerHTML = html;
+        page.after(pageOutline);
+      }
+    }
+
+    function createSparklines() {
+      //  If we're on the homepage then add sparkline elements after
+      //  #page-outline for all /read/ links in the page body.
+      const pathname = window.location.pathname;
+      if (pathname.includes('/read/') && pathname.includes('/index')) {
+        const pageOutline = document.querySelector('#page-outline');
+        if (pageOutline) {
+          const readLinks = document.querySelectorAll('a[href*="/read/"]');
+          if (readLinks) {
+            for (const link of [...readLinks].slice(0, 5)) {
+              const p = document.createElement('p');
+              p.setAttribute('class', 'no-indent space');
+              const div1 = document.createElement('div');
+              const svgHref = link.href.replace('/read/', '/sparkline/') + '.svg';
+              const image = document.createElement('img');
+              image.setAttribute('src', svgHref);
+              image.setAttribute('class', 'sparkline');
+              image.setAttribute('width', '140px');
+              image.setAttribute('height', '30px');
+              image.innerHtml = 'No Data';
+              div1.append(image);
+              const div2 = document.createElement('div');
+              const a = document.createElement('a');
+              a.setAttribute('href', link.href);
+              a.innerText = link.innerText.split('\n')[0];
+              div2.append(a);
+              p.append(div1);
+              p.append(div2);
+              pageOutline.append(p);
+            }
+          }
         }
+      }
     }
 
     //  Fade the sidebars
 
     function showSidebars() {
-        var html = document.querySelector('html');
-        html.classList.remove('navigation-buttons');
-        html.classList.add('navigation-sidebars');
+      var html = document.querySelector('html');
+      html.classList.remove('navigation-buttons');
+      html.classList.add('navigation-sidebars');
     }
     function hideSidebars() {
-        var html = document.querySelector('html');
-        html.classList.remove('navigation-sidebars');
-        html.classList.add('navigation-buttons');
+      var html = document.querySelector('html');
+      html.classList.remove('navigation-sidebars');
+      html.classList.add('navigation-buttons');
     }
     function removeSidebars() {
-        const selector = '#site-menu,#page-outline';
-        const sidebars = document.querySelectorAll(selector);
-        [...sidebars].forEach(sidebar => sidebar.remove());
+      const selector = '#site-menu,#page-outline';
+      const sidebars = document.querySelectorAll(selector);
+      [...sidebars].forEach(sidebar => sidebar.remove());
     }
 
     function showScrollDownIndicator() {
-        const icon = document.getElementById('scroll-icon');
-        icon.classList.remove(ICON_UNCHECKED);
-        icon.classList.remove(ICON_CHECKED);
-        icon.classList.add(ICON_SCROLL_DOWN);
+      const icon = document.getElementById('scroll-icon');
+      icon.classList.remove(ICON_UNCHECKED);
+      icon.classList.remove(ICON_CHECKED);
+      icon.classList.add(ICON_SCROLL_DOWN);
     }
     function startWaitTimer() {
-        if (waitTimer !== undefined) {
-            stopWaitTimer();
-        }
-        waitTimer = setTimeout(waitTimerCallback, WAIT_TIME);
-        mode = NAVIGATE_WAIT;
+      if (waitTimer !== undefined) {
+        stopWaitTimer();
+      }
+      waitTimer = setTimeout(waitTimerCallback, WAIT_TIME);
+      mode = NAVIGATE_WAIT;
     }
     function stopWaitTimer() {
-        clearTimeout(waitTimer);
-        waitTimer = undefined;
+      clearTimeout(waitTimer);
+      waitTimer = undefined;
     }
     function waitTimerCallback() {
-        startScrollDownIndicatorBlinking();
-        startBlinkTimer();
-        mode = NAVIGATE_STOP;
+      startScrollDownIndicatorBlinking();
+      startBlinkTimer();
+      mode = NAVIGATE_STOP;
     }
     function startScrollDownIndicatorBlinking() {
-        const action = document.getElementById('scroll-icon');
-        action.classList.add('blink');
+      const action = document.getElementById('scroll-icon');
+      action.classList.add('blink');
     }
     function stopScrollDownIndicatorBlinking() {
-        const action = document.getElementById('scroll-icon');
-        action.classList.remove('blink');
+      const action = document.getElementById('scroll-icon');
+      action.classList.remove('blink');
     }
     function hideScrollDownIndicator() {
-        const icon = document.getElementById('scroll-icon');
-        icon.classList.remove(ICON_SCROLL_DOWN);
-        icon.classList.remove(ICON_UNCHECKED);
-        icon.classList.add(ICON_CHECKED);
+      const icon = document.getElementById('scroll-icon');
+      icon.classList.remove(ICON_SCROLL_DOWN);
+      icon.classList.remove(ICON_UNCHECKED);
+      icon.classList.add(ICON_CHECKED);
     }
     function startBlinkTimer() {
-        clearTimeout(blinkTimer);
-        blinkTimer = setTimeout(blinkTimerCallback, STOP_TIME);
+      clearTimeout(blinkTimer);
+      blinkTimer = setTimeout(blinkTimerCallback, STOP_TIME);
     }
     function stopBlinkTimer() {
-        clearTimeout(blinkTimer);
-        blinkTimer = undefined;
+      clearTimeout(blinkTimer);
+      blinkTimer = undefined;
     }
     function blinkTimerCallback() {
-        hideScrollDownIndicator();
-        mode = READ;
-        hideSidebars();
+      hideScrollDownIndicator();
+      mode = READ;
+      hideSidebars();
     }
     /*
      * Handle outline updates based on scrolling-into-view.
      */
     function handleVisibility(events) {
-        const completion = document.querySelector('#completion');
-        const outline = document.querySelector('#outline');
-        if (completion) {
-            for (var event of events) {
-                const selector = '[href="#' + event.target.id + '"]';
-                const outlineLink = outline.querySelector(selector);
-                if (outlineLink !== null) {
-                    if (event.isIntersecting) {
-                        var li = outlineLink.closest('li');
-                        li.classList.add('visible');
-                        currentSectionVisiblilityTime[event.target.id] = 0;
-                    } else {
-                        outlineLink.closest('li').classList.remove('visible');
-                        if (currentSectionVisiblilityTime[event.target.id] !== undefined) {
-                            delete currentSectionVisiblilityTime[event.target.id];
-                        }
-                    }
-                }
-                const completionLink = completion.querySelector(selector);
-                if (completionLink) {
-                    var li = completionLink.closest('li');
-                    if (event.isIntersecting) {
-                        li.classList.add('visible');
-                    } else {
-                        li.classList.remove('visible');
-                    }
-                }
+      const completion = document.querySelector('#completion');
+      const outline = document.querySelector('#outline');
+      if (completion) {
+        for (var event of events) {
+          const selector = '[href="#' + event.target.id + '"]';
+          const outlineLink = outline.querySelector(selector);
+          if (outlineLink !== null) {
+            if (event.isIntersecting) {
+              var li = outlineLink.closest('li');
+              li.classList.add('visible');
+              currentSectionVisiblilityTime[event.target.id] = 0;
+            } else {
+              outlineLink.closest('li').classList.remove('visible');
+              if (currentSectionVisiblilityTime[event.target.id] !== undefined) {
+                delete currentSectionVisiblilityTime[event.target.id];
+              }
             }
+          }
+          const completionLink = completion.querySelector(selector);
+          if (completionLink) {
+            var li = completionLink.closest('li');
+            if (event.isIntersecting) {
+              li.classList.add('visible');
+            } else {
+              li.classList.remove('visible');
+            }
+          }
         }
+      }
     }
 
     /*
      * Update timers based on visible sections
      */
     function incrementVisibilityTimers() {
-        const oldBookmark = lastReadSectionId;
-        for (var key in currentSectionVisiblilityTime) {
-            currentSectionVisiblilityTime[key] += 1;
-            if (key in totalSectionVisibilityTime) {
-                totalSectionVisibilityTime[key] += 1;
-            } else {
-                totalSectionVisibilityTime[key] = 0;
-            }
-            if (currentSectionVisiblilityTime[key] > BOOKMARK_TIME) {
-                lastReadSectionId = key;
-            }
-            if (oldBookmark !== lastReadSectionId && !isAtTopOfScreen()) {
-                updateBookmark();
-                break;
-            }
+      const oldBookmark = lastReadSectionId;
+      for (var key in currentSectionVisiblilityTime) {
+        currentSectionVisiblilityTime[key] += 1;
+        if (key in totalSectionVisibilityTime) {
+          totalSectionVisibilityTime[key] += 1;
+        } else {
+          totalSectionVisibilityTime[key] = 0;
         }
-        updateCompletionBars();
+        if (currentSectionVisiblilityTime[key] > BOOKMARK_TIME) {
+          lastReadSectionId = key;
+        }
+        if (oldBookmark !== lastReadSectionId && !isAtTopOfScreen()) {
+          updateBookmark();
+          break;
+        }
+      }
+      updateCompletionBars();
     }
     function storeCompletionData() {
-        if (user_slug && doc_slug) {
-            saveUserDocVisited();
-            saveUserDocCompletion(totalSectionVisibilityTime);
-        }
+      if (user_slug && doc_slug) {
+        saveUserDocVisited();
+        saveUserDocCompletion(totalSectionVisibilityTime);
+      }
     }
 
     function saveUserDocVisited() {
-        var visited = loadUserDocVisited();
-        const key = `${user_slug}_${doc_slug}`;
-        if (!(key in visited)) {
-            visited.push(key);
-            localStorage.getItem('pages_visited', JSON.stringify(visited));
-        }
+      var visited = loadUserDocVisited();
+      const key = `${user_slug}_${doc_slug}`;
+      if (!(key in visited)) {
+        visited.push(key);
+        localStorage.getItem('pages_visited', JSON.stringify(visited));
+      }
     }
 
     function loadUserDocVisited() {
-        const json = localStorage.getItem('pages_visited') || '[]';
-        return JSON.parse(json) || [];
+      const json = localStorage.getItem('pages_visited') || '[]';
+      return JSON.parse(json) || [];
     }
 
     function saveUserDocCompletion(totalSectionVisibilityTime) {
-        const key = `completion_${user_slug}_${doc_slug}`;
-        localStorage.setItem(key, JSON.stringify(totalSectionVisibilityTime));
+      const key = `completion_${user_slug}_${doc_slug}`;
+      localStorage.setItem(key, JSON.stringify(totalSectionVisibilityTime));
     }
 
     function loadSectionVisibilityTime() {
-        const key = `completion_${user_slug}_${doc_slug}`;
-        const json = localStorage.getItem(key) || '{}';
-        return JSON.parse(json) || {};
+      const key = `completion_${user_slug}_${doc_slug}`;
+      const json = localStorage.getItem(key) || '{}';
+      return JSON.parse(json) || {};
     }
 
     //  Auto-bookmark
 
     function saveBookMark() {
-        const json = localStorage.getItem(LOCAL_STORAGE_LAST_READING);
-        if (json) {
-            let last_reading = JSON.parse(json) || {};
-            if (lastReadSectionId !== '') {
-                const key = `${user_slug}_${doc_slug}`;
-                last_reading[key] = lastReadSectionId;
-                localStorage.setItem(LOCAL_STORAGE_LAST_READING, JSON.stringify(last_reading));
-            }
+      const json = localStorage.getItem(LOCAL_STORAGE_LAST_READING);
+      if (json) {
+        let last_reading = JSON.parse(json) || {};
+        if (lastReadSectionId !== '') {
+          const key = `${user_slug}_${doc_slug}`;
+          last_reading[key] = lastReadSectionId;
+          localStorage.setItem(LOCAL_STORAGE_LAST_READING, JSON.stringify(last_reading));
         }
+      }
     }
     function isAtTopOfScreen() {
-        return window.scrollY < 50;
+      return window.scrollY < 50;
     }
 
     function loadBookmark() {
-        if (user_slug && doc_slug) {
-            const json = localStorage.getItem(LOCAL_STORAGE_LAST_READING);
-            if (json) {
-                const data = JSON.parse(json) || {};
-                const key = `${user_slug}_${doc_slug}`;
-                if (key in data) {
-                    lastReadSectionId = data[key];
-                }
-            }
+      if (user_slug && doc_slug) {
+        const json = localStorage.getItem(LOCAL_STORAGE_LAST_READING);
+        if (json) {
+          const data = JSON.parse(json) || {};
+          const key = `${user_slug}_${doc_slug}`;
+          if (key in data) {
+            lastReadSectionId = data[key];
+          }
         }
+      }
     }
 
     function updateBookmark() {
-        let maxKey = undefined;
-        for (var key in currentSectionVisiblilityTime) {
-            if (currentSectionVisiblilityTime[key] > BOOKMARK_TIME) {
-                currentSectionVisiblilityTime[key];
-                maxKey = key;
-            }
+      let maxKey = undefined;
+      for (var key in currentSectionVisiblilityTime) {
+        if (currentSectionVisiblilityTime[key] > BOOKMARK_TIME) {
+          currentSectionVisiblilityTime[key];
+          maxKey = key;
         }
-        if (maxKey != undefined) {
-            lastReadSectionId = maxKey;
-            updateLastReading();
-            saveBookMark();
-            currentSectionVisiblilityTime = {};
-        }
+      }
+      if (maxKey != undefined) {
+        lastReadSectionId = maxKey;
+        updateLastReading();
+        saveBookMark();
+        currentSectionVisiblilityTime = {};
+      }
     }
     function updateLastReading() {
-        if (lastReadSectionId !== '') {
-            var link = document.querySelector('#last-reading');
-            var readout = document.querySelector('#last-reading-readout');
-            if (link && readout) {
-                var [number, slug] = lastReadSectionId.split('_');
-                link.setAttribute('href', `#${lastReadSectionId}`);
-                readout.innerHTML = `&sect;${number}`;
-            }
+      if (lastReadSectionId !== '') {
+        var link = document.querySelector('#last-reading');
+        var readout = document.querySelector('#last-reading-readout');
+        if (link && readout) {
+          var [number, slug] = lastReadSectionId.split('_');
+          link.setAttribute('href', `#${lastReadSectionId}`);
+          readout.innerHTML = `&sect;${number}`;
         }
+      }
     }
     function handleEscapeKey() {
-        const escapeOptionEnabled = localStorage.getItem('option-escape') === 'true';
-        if (escapeOptionEnabled) {
-            cycleNavigation();
-            const icon = document.querySelector('#scroll-icon');
-            icon.classList.remove('blink');
-        }
+      const escapeOptionEnabled = localStorage.getItem('option-escape') === 'true';
+      if (escapeOptionEnabled) {
+        cycleNavigation();
+        const icon = document.querySelector('#scroll-icon');
+        icon.classList.remove('blink');
+      }
     }
 
     function initKeystrokeHandling() {
-        document.addEventListener('keyup', function (event) {
-            if (event.key == 'Escape') {
-                handleEscapeKey();
-            }
-        });
+      document.addEventListener('keyup', function(event) {
+        if (event.key == 'Escape') {
+          handleEscapeKey();
+        }
+      });
     }
 
     function handleOutlineClick() {
-        const clickOptionEnabled = localStorage.getItem('option-click') === 'true';
-        const onTabletOrSmaller = window.innerWidth <= TABLET_BREAKPOINT;
-        if (clickOptionEnabled && onTabletOrSmaller) {
-            cycleNavigation();
-        }
+      const clickOptionEnabled = localStorage.getItem('option-click') === 'true';
+      const onTabletOrSmaller = window.innerWidth <= TABLET_BREAKPOINT;
+      if (clickOptionEnabled && onTabletOrSmaller) {
+        cycleNavigation();
+      }
     }
 
     function initClickHandling() {
-        document.addEventListener('click', function (event) {
-            const outline = event.target.closest('#page-outline');
-            if (outline) {
-                handleOutlineClick();
-            }
-        });
+      document.addEventListener('click', function(event) {
+        const outline = event.target.closest('#page-outline');
+        if (outline) {
+          handleOutlineClick();
+        }
+      });
     }
 
     //  Initialisation
 
-    function handleScroll$1() 
-    {
-        const optionEnabled = localStorage.getItem('option-auto-hide') === 'true';
-        const onLaptopOrLarger = window.innerWidth > TABLET_BREAKPOINT;
-        if (optionEnabled && onLaptopOrLarger) {
+    function handleScroll$1() {
+      const optionEnabled = localStorage.getItem('option-auto-hide') === 'true';
+      const onLaptopOrLarger = window.innerWidth > TABLET_BREAKPOINT;
+      if (optionEnabled && onLaptopOrLarger) {
 
-            const scroll = verticalPosition < window.scrollY ? DOWN : UP;
-            verticalPosition = window.scrollY;
-            if (mode === READ) {
-                if (scroll === UP && lastScrollDirection === DOWN) {
-                    showSidebars();
-                    hideScrollDownIndicator();
-                    stopScrollDownIndicatorBlinking();
-                    mode = NAVIGATE;
-                }
-            } else if (mode === NAVIGATE) {
-                if (scroll === DOWN) {
-                    showScrollDownIndicator();
-                    startWaitTimer();
-                    mode = NAVIGATE_WAIT;
-                }
-            } else if (mode === NAVIGATE_WAIT) {
-                stopWaitTimer();
-                if (scroll === DOWN) {
-                    startWaitTimer();
-                    mode = NAVIGATE_WAIT;
-                } else {
-                    hideScrollDownIndicator();
-                    mode = NAVIGATE;
-                }
-            } else if (mode === NAVIGATE_STOP) {
-                startWaitTimer();
-                hideScrollDownIndicator();
-                stopScrollDownIndicatorBlinking();
-                stopBlinkTimer();
-                if (scroll === DOWN) {
-                    mode = NAVIGATE_WAIT;
-                } else {
-                    hideScrollDownIndicator();
-                    mode = NAVIGATE;
-                    stopWaitTimer();
-                }
-            }
-            lastScrollDirection = scroll;
-
-        }
-    }
-
-    function initScrollHandling()
-    {
-        document.addEventListener('scroll', function (event) {
-            handleScroll$1();
-        });
-    }
-
-    function updateEscapeOption()
-    {
-        stopWaitTimer();
-        stopBlinkTimer();
-        const icon = document.querySelector('#escape-icon');
-        if (icon) {
-            const option = localStorage.getItem('option-escape') === 'true';
-            if (option) {
-                icon.classList.remove(ICON_UNCHECKED);
-                icon.classList.add(ICON_CHECKED);
-            } else {
-                icon.classList.remove(ICON_CHECKED);
-                icon.classList.add(ICON_UNCHECKED);
-            }
+        const scroll = verticalPosition < window.scrollY ? DOWN : UP;
+        verticalPosition = window.scrollY;
+        if (mode === READ) {
+          if (scroll === UP && lastScrollDirection === DOWN) {
+            showSidebars();
+            hideScrollDownIndicator();
+            stopScrollDownIndicatorBlinking();
             mode = NAVIGATE;
-        }
-    }
-
-    function updateAutoHideOption()
-    {
-        stopWaitTimer();
-        stopBlinkTimer();
-        const icon = document.querySelector('#scroll-icon');
-        if (icon) {
-            const option = localStorage.getItem('option-auto-hide') === 'true';
-            icon.classList.remove(ICON_SCROLL_DOWN);
-            icon.classList.remove('blink');
-            if (option) {
-                icon.classList.remove(ICON_UNCHECKED);
-                icon.classList.add(ICON_CHECKED);
-            } else {
-                icon.classList.remove(ICON_CHECKED);
-                icon.classList.add(ICON_UNCHECKED);
-            }
+          }
+        } else if (mode === NAVIGATE) {
+          if (scroll === DOWN) {
+            showScrollDownIndicator();
+            startWaitTimer();
+            mode = NAVIGATE_WAIT;
+          }
+        } else if (mode === NAVIGATE_WAIT) {
+          stopWaitTimer();
+          if (scroll === DOWN) {
+            startWaitTimer();
+            mode = NAVIGATE_WAIT;
+          } else {
+            hideScrollDownIndicator();
             mode = NAVIGATE;
-        }
-    }
-
-    function updateClickOption()
-    {
-        stopWaitTimer();
-        stopBlinkTimer();
-        const icon = document.querySelector('#click-icon');
-        if (icon) {
-            const option = localStorage.getItem('option-click') === 'true';
-            if (option) {
-                icon.classList.remove(ICON_UNCHECKED);
-                icon.classList.add(ICON_CHECKED);
-            } else {
-                icon.classList.remove(ICON_CHECKED);
-                icon.classList.add(ICON_UNCHECKED);
-            }
+          }
+        } else if (mode === NAVIGATE_STOP) {
+          startWaitTimer();
+          hideScrollDownIndicator();
+          stopScrollDownIndicatorBlinking();
+          stopBlinkTimer();
+          if (scroll === DOWN) {
+            mode = NAVIGATE_WAIT;
+          } else {
+            hideScrollDownIndicator();
             mode = NAVIGATE;
+            stopWaitTimer();
+          }
         }
+        lastScrollDirection = scroll;
+
+      }
     }
 
-    function initSectionObservers() 
-    {
-        var observer = new IntersectionObserver(handleVisibility, {
-            root: null, // <-- Viewport
-            rootMargin: '-15% 0% -15% 0%',
-            threshold: 0,
-        });
-        const sections = document.getElementsByTagName('section');
-        for (const section of sections) {
-            observer.observe(section);
+    function initScrollHandling() {
+      document.addEventListener('scroll', function(event) {
+        handleScroll$1();
+      });
+    }
+
+    function updateEscapeOption() {
+      stopWaitTimer();
+      stopBlinkTimer();
+      const icon = document.querySelector('#escape-icon');
+      if (icon) {
+        const option = localStorage.getItem('option-escape') === 'true';
+        if (option) {
+          icon.classList.remove(ICON_UNCHECKED);
+          icon.classList.add(ICON_CHECKED);
+        } else {
+          icon.classList.remove(ICON_CHECKED);
+          icon.classList.add(ICON_UNCHECKED);
         }
+        mode = NAVIGATE;
+      }
     }
 
-    function initBookmarks() 
-    {
-        loadBookmark();
-        updateLastReading();
+    function updateAutoHideOption() {
+      stopWaitTimer();
+      stopBlinkTimer();
+      const icon = document.querySelector('#scroll-icon');
+      if (icon) {
+        const option = localStorage.getItem('option-auto-hide') === 'true';
+        icon.classList.remove(ICON_SCROLL_DOWN);
+        icon.classList.remove('blink');
+        if (option) {
+          icon.classList.remove(ICON_UNCHECKED);
+          icon.classList.add(ICON_CHECKED);
+        } else {
+          icon.classList.remove(ICON_CHECKED);
+          icon.classList.add(ICON_UNCHECKED);
+        }
+        mode = NAVIGATE;
+      }
     }
 
-    function initSidebars() 
-    {
-        outline = getOutline('hgroup.section-heading');
+    function updateClickOption() {
+      stopWaitTimer();
+      stopBlinkTimer();
+      const icon = document.querySelector('#click-icon');
+      if (icon) {
+        const option = localStorage.getItem('option-click') === 'true';
+        if (option) {
+          icon.classList.remove(ICON_UNCHECKED);
+          icon.classList.add(ICON_CHECKED);
+        } else {
+          icon.classList.remove(ICON_CHECKED);
+          icon.classList.add(ICON_UNCHECKED);
+        }
+        mode = NAVIGATE;
+      }
+    }
 
-        totalSectionVisibilityTime = loadSectionVisibilityTime();
+    function initSectionObservers() {
+      var observer = new IntersectionObserver(handleVisibility, {
+        root: null, // <-- Viewport
+        rootMargin: '-15% 0% -15% 0%',
+        threshold: 0,
+      });
+      const sections = document.getElementsByTagName('section');
+      for (const section of sections) {
+        observer.observe(section);
+      }
+    }
 
-        removeSidebars();
-        createSiteMenu();
-        createPageOutline();
+    function initBookmarks() {
+      loadBookmark();
+      updateLastReading();
+    }
 
-        initOptionHandler('#option-escape', 'option-escape', updateEscapeOption);
-        initOptionHandler('#option-auto-hide', 'option-auto-hide', updateAutoHideOption);
-        initOptionHandler('#option-click', 'option-click', updateClickOption);
+    function initSidebars() {
+      outline = getOutline('hgroup.section-heading');
 
-        initClickHandling();
-        initKeystrokeHandling();
-        initScrollHandling();
+      totalSectionVisibilityTime = loadSectionVisibilityTime();
 
-        initSectionObservers();
-        setInterval(incrementVisibilityTimers, 1000);
-        setInterval(storeCompletionData, 10000);
+      removeSidebars();
+      createSiteMenu();
+      createPageOutline();
+      createSparklines();
 
-        initBookmarks();
+      initOptionHandler('#option-escape', 'option-escape', updateEscapeOption);
+      initOptionHandler('#option-auto-hide', 'option-auto-hide', updateAutoHideOption);
+      initOptionHandler('#option-click', 'option-click', updateClickOption);
+
+      initClickHandling();
+      initKeystrokeHandling();
+      initScrollHandling();
+
+      initSectionObservers();
+      setInterval(incrementVisibilityTimers, 1000);
+      setInterval(storeCompletionData, 10000);
+
+      initBookmarks();
     }
 
     /**

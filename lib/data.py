@@ -35,13 +35,19 @@ import uuid
 
 import redis
 
+from datetime import datetime
 from typing import Dict, List, Union
 
+from lib.calendar import day_in_last_fortnight
 from lib.slugs import slug
 from lib.wiki.utils import random_slug
 
 
 LAST_CHANGED_MAX = 10
+
+RETENTION_DAYS = 14
+SECONDS_PER_DAY = 24 * 60 * 60
+MILLISECONDS_PER_DAY = SECONDS_PER_DAY * 1000
 
 
 def load_env_config() -> dict:
@@ -52,35 +58,35 @@ def load_env_config() -> dict:
     @todo: Add an 'ARTICLE_WIKI_' prefix?
     """
     env_defaults = {
-            'ADMIN_USER': 'admin',
-            'ADMIN_USER_PASSWORD': 'password',
-            'APP_HASH': '1111111111',
-            'APP_NAME': 'Article Wiki',
-            'ARTICLE_WIKI_CREDIT': 'YES',
-            'ARTICLE_WIKI_URL': 'https://github.com/eukras/article-wiki',
-            'GOOGLE_ANALYTICS_TRACKING_ID': '',
-            'GOOGLE_TAG_MANAGER_ID': '',
-            'PUBLIC_DIR': '/static',
-            'REDIS_DATABASE': '0',
-            'REDIS_HOST': 'localhost',
-            'REDIS_PORT': '6379',
-            'REDIS_USER': 'default',
-            'REDIS_PASSWORD': 'password',
-            'REDIS_TEST_DATABASE': '1',
-            'SINGLE_USER': 'YES',
-            'TIME_ZONE': 'Australia/Sydney',
-            'UPLOAD_LIMIT_KB': '500',
-            'WEB_HOST': 'localhost',
-            'WEB_HOST_PORT': '8080',
-        }
+        "ADMIN_USER": "admin",
+        "ADMIN_USER_PASSWORD": "password",
+        "APP_HASH": "1111111111",
+        "APP_NAME": "Article Wiki",
+        "ARTICLE_WIKI_CREDIT": "YES",
+        "ARTICLE_WIKI_URL": "https://github.com/eukras/article-wiki",
+        "GOOGLE_ANALYTICS_TRACKING_ID": "",
+        "GOOGLE_TAG_MANAGER_ID": "",
+        "PUBLIC_DIR": "/static",
+        "REDIS_DATABASE": "0",
+        "REDIS_HOST": "localhost",
+        "REDIS_PORT": "6379",
+        "REDIS_USER": "default",
+        "REDIS_PASSWORD": "password",
+        "REDIS_TEST_DATABASE": "1",
+        "SINGLE_USER": "YES",
+        "TIME_ZONE": "Australia/Sydney",
+        "UPLOAD_LIMIT_KB": "500",
+        "WEB_HOST": "localhost",
+        "WEB_HOST_PORT": "8080",
+    }
     config = {}
     for key, value in env_defaults.items():
         config[key] = os.environ.get(key, value)
 
     # Extras
-    config['SITE'] = "https://" + config['WEB_HOST']
-    if config['WEB_HOST_PORT'] not in ['80', '443']:
-        config['SITE'] += ":" + config['WEB_HOST_PORT']
+    config["SITE"] = "https://" + config["WEB_HOST"]
+    if config["WEB_HOST_PORT"] not in ["80", "443"]:
+        config["SITE"] += ":" + config["WEB_HOST_PORT"]
 
     return config
 
@@ -92,24 +98,32 @@ class Data(object):
     """
 
     def __init__(self, config: dict, strict: bool = False):
-        self.admin_user = config['ADMIN_USER']
+        self.admin_user = config["ADMIN_USER"]
         self.redis = redis.Redis(
-            config['REDIS_HOST'],
-            port=config['REDIS_PORT'],
-            username=config['REDIS_USER'],
-            password=config['REDIS_PASSWORD'],
-            db=config['REDIS_DATABASE'],
-            decode_responses=True
+            config["REDIS_HOST"],
+            port=config["REDIS_PORT"],
+            username=config["REDIS_USER"],
+            password=config["REDIS_PASSWORD"],
+            db=config["REDIS_DATABASE"],
+            decode_responses=True,
         )
         self.redis_binary = redis.Redis(
-            config['REDIS_HOST'],
-            port=config['REDIS_PORT'],
-            username=config['REDIS_USER'],
-            password=config['REDIS_PASSWORD'],
-            db=config['REDIS_DATABASE']
+            config["REDIS_HOST"],
+            port=config["REDIS_PORT"],
+            username=config["REDIS_USER"],
+            password=config["REDIS_PASSWORD"],
+            db=config["REDIS_DATABASE"],
         )
-        self.time_zone = config['TIME_ZONE']
+        self.time_zone = config["TIME_ZONE"]
         self.strict = bool(strict)
+        self.redis_ts = self.redis.ts() if self.has_time_series() else None
+
+    def has_time_series(self):
+        """
+        Determine if RedisDB has time-series feature.
+        """
+        modules = self.redis.module_list()
+        return any(module.get("name") == "timeseries" for module in modules)
 
     # ------------------
     # Pipeline Functions
@@ -167,7 +181,7 @@ class Data(object):
             self.redis.delete(key)
 
     def keys_by_prefix(self, prefix: str) -> List[str]:
-        return self.redis.keys(prefix + '*')
+        return self.redis.keys(prefix + "*")
 
     # --------------
     # Authentication
@@ -177,7 +191,7 @@ class Data(object):
         if self.user_exists(user_slug):
             raise ValueError("User {:s} exists.".format(user_slug))
         key = self.user_key(user_slug)
-        user = {'slug': user_slug, 'password': user_password, 'private': 'NO'}
+        user = {"slug": user_slug, "password": user_password, "private": "NO"}
         self.redis.hmset(key, user)
 
     def login_key(self, token: str):
@@ -192,18 +206,14 @@ class Data(object):
     def login_get(self, token: str):
         self.require_not_in_context_manager()
         if isinstance(token, str):
-            record = self.redis.hgetall(
-                self.login_key(token)
-            )
+            record = self.redis.hgetall(self.login_key(token))
             if len(record) > 0:
                 return record
         return None
 
     def login_delete(self, token):
         if isinstance(token, str):
-            self.redis.delete(
-                self.login_key(token)
-            )
+            self.redis.delete(self.login_key(token))
 
     # -----------------
     # Userset Functions
@@ -235,9 +245,7 @@ class Data(object):
 
     def userSet_count(self):
         self.require_not_in_context_manager()
-        return self.redis.zcard(
-            self.userSet_key()
-        )
+        return self.redis.zcard(self.userSet_key())
 
     # --------------
     # User Functions
@@ -249,9 +257,7 @@ class Data(object):
 
     def user_exists(self, user_slug: str) -> bool:
         self.require_not_in_context_manager()
-        return self.redis.exists(
-            self.user_key(user_slug)
-        )
+        return self.redis.exists(self.user_key(user_slug))
 
     def user_set(self, user_slug: str, user: dict):
         key = self.user_key(user_slug)
@@ -260,26 +266,21 @@ class Data(object):
 
     def user_get(self, user_slug: str) -> Union[dict, None]:
         self.require_not_in_context_manager()
-        record = self.redis.hgetall(
-            self.user_key(user_slug)
-        )
+        record = self.redis.hgetall(self.user_key(user_slug))
         return record if len(record) > 0 else None
 
     def user_delete(self, user_slug: str):
         if not self.user_exists(user_slug):
             msg = "User '{:s}' does not exist."
             raise ValueError(msg.format(user_slug))
-        self.redis.delete(
-            self.user_key(user_slug)
-        )
+        self.redis.delete(self.user_key(user_slug))
 
     def user_hash(self) -> Dict[str, hash]:
         """
         v.0.1.0: TODO: Upgrade to allow pagination.
         """
         return {
-            user_slug: self.user_get(user_slug)
-            for user_slug in self.userSet_list()
+            user_slug: self.user_get(user_slug) for user_slug in self.userSet_list()
         }
 
     # ------------------
@@ -311,9 +312,7 @@ class Data(object):
         self.redis.zrem(key, doc_slug)
 
     def userDocumentSet_count(self, user_slug: str) -> str:
-        return self.redis.zcard(
-            self.userDocumentSet_key(user_slug)
-        )
+        return self.redis.zcard(self.userDocumentSet_key(user_slug))
 
     # --------------
     # User Documents
@@ -342,21 +341,21 @@ class Data(object):
             else:
                 return test_slug
             n += 1
-        raise ValueError('A unique doc_slug could not be created.')
+        raise ValueError("A unique doc_slug could not be created.")
 
-    def userDocument_get(self,
-                         user_slug: str,
-                         doc_slug: str) -> Union[dict, None]:
+    def userDocument_get(self, user_slug: str, doc_slug: str) -> Union[dict, None]:
         self.require_not_in_context_manager()
         key = self.userDocument_key(user_slug, doc_slug)
         record = self.redis.hgetall(key)
         return record if len(record) > 0 else None
 
-    def userDocument_set(self,
-                         user_slug: str,
-                         doc_slug: str,
-                         doc_parts: dict,
-                         metadata: Union[dict, None] = None):
+    def userDocument_set(
+        self,
+        user_slug: str,
+        doc_slug: str,
+        doc_parts: dict,
+        metadata: Union[dict, None] = None,
+    ):
         key = self.userDocument_key(user_slug, doc_slug)
         self.redis.delete(key)
         self.redis.hmset(key, doc_parts)
@@ -366,7 +365,7 @@ class Data(object):
         self.userDocumentSet_set(user_slug, doc_slug)
         if metadata:
             self.userDocumentMetadata_set(user_slug, doc_slug, metadata)
-        if doc_slug not in ['fixtures', 'templates']:
+        if doc_slug not in ["fixtures", "templates"]:
             self.userDocumentLastChanged_set(user_slug, doc_slug)
 
     def userDocument_delete(self, user_slug: str, doc_slug: str):
@@ -377,9 +376,7 @@ class Data(object):
         To Do:
             Upgrade.
         """
-        self.redis.delete(
-            self.userDocument_key(user_slug, doc_slug)
-        )
+        self.redis.delete(self.userDocument_key(user_slug, doc_slug))
 
     def userDocument_list(self, user_slug: str) -> List[hash]:
         self.require_not_in_context_manager()
@@ -409,37 +406,24 @@ class Data(object):
         self.check_slugs(user_slug, doc_slug)
         return "udm:{:s}:{:s}".format(user_slug, doc_slug)
 
-    def userDocumentMetadata_exists(self,
-                                    user_slug: str,
-                                    doc_slug: str) -> bool:
+    def userDocumentMetadata_exists(self, user_slug: str, doc_slug: str) -> bool:
         self.require_not_in_context_manager()
-        return self.redis.exists(
-            self.userDocumentMetadata_key(user_slug, doc_slug)
-        )
+        return self.redis.exists(self.userDocumentMetadata_key(user_slug, doc_slug))
 
-    def userDocumentMetadata_get(self,
-                                 user_slug: str,
-                                 doc_slug: str) -> dict:
+    def userDocumentMetadata_get(self, user_slug: str, doc_slug: str) -> dict:
         self.require_not_in_context_manager()
         # hgetall returns an empty hash if no match
-        record = self.redis.hgetall(
-            self.userDocumentMetadata_key(user_slug, doc_slug)
-        )
+        record = self.redis.hgetall(self.userDocumentMetadata_key(user_slug, doc_slug))
         return record if len(record) > 0 else None
 
-    def userDocumentMetadata_set(self,
-                                 user_slug: str,
-                                 doc_slug: str,
-                                 metadata: dict):
+    def userDocumentMetadata_set(self, user_slug: str, doc_slug: str, metadata: dict):
         self.userDocumentSet_set(user_slug, doc_slug)
         udmk = self.userDocumentMetadata_key(user_slug, doc_slug)
         self.redis.delete(udmk)  # <-- Or else it merges
         self.redis.hmset(udmk, metadata)
 
     def userDocumentMetadata_delete(self, user_slug: str, doc_slug: str):
-        self.redis.delete(
-            self.userDocumentMetadata_key(user_slug, doc_slug)
-        )
+        self.redis.delete(self.userDocumentMetadata_key(user_slug, doc_slug))
 
     # ------------
     # LAST CHANGED
@@ -454,16 +438,13 @@ class Data(object):
     def userDocumentLastChanged_exists(self, user_slug: str) -> str:
         raise NotImplementedError("Use: userDocumentLastChanged_list().")
 
-    def userDocumentLastChanged_set(self,
-                                    user_slug: str,
-                                    old_doc_slug: str,
-                                    new_doc_slug: Union[str, None] = None):
+    def userDocumentLastChanged_set(
+        self, user_slug: str, old_doc_slug: str, new_doc_slug: Union[str, None] = None
+    ):
         use_doc_slug = old_doc_slug if new_doc_slug is None else new_doc_slug
 
-        old_metadata_key = self.userDocumentMetadata_key(
-            user_slug, old_doc_slug)
-        new_metadata_key = self.userDocumentMetadata_key(
-            user_slug, use_doc_slug)
+        old_metadata_key = self.userDocumentMetadata_key(user_slug, old_doc_slug)
+        new_metadata_key = self.userDocumentMetadata_key(user_slug, use_doc_slug)
 
         key = self.userDocumentLastChanged_key(user_slug)
 
@@ -474,15 +455,13 @@ class Data(object):
     def userDocumentLastChanged_list(self, user_slug: str) -> list:
         self.require_not_in_context_manager()
         key = self.userDocumentLastChanged_key(user_slug)
-        return self.get_hashes(
-            self.redis.lrange(key, 0, 10)
-        )
+        return self.get_hashes(self.redis.lrange(key, 0, 10))
 
     def userDocumentLastChanged_delete(self, user_slug: str, doc_slug: str):
         self.redis.lrem(
             self.userDocumentLastChanged_key(user_slug),
             1,
-            self.userDocumentMetadata_key(user_slug, doc_slug)
+            self.userDocumentMetadata_key(user_slug, doc_slug),
         )
 
     # -------
@@ -495,29 +474,18 @@ class Data(object):
 
     def userDocumentCache_exists(self, user_slug: str, doc_slug: str) -> bool:
         self.require_not_in_context_manager()
-        return self.redis.exists(
-            self.userDocumentCache_key(user_slug, doc_slug)
-        )
+        return self.redis.exists(self.userDocumentCache_key(user_slug, doc_slug))
 
-    def userDocumentCache_get(self,
-                              user_slug: str,
-                              doc_slug: str) -> Union[dict, None]:
+    def userDocumentCache_get(self, user_slug: str, doc_slug: str) -> Union[dict, None]:
         self.require_not_in_context_manager()
-        return self.redis.get(
-            self.userDocumentCache_key(user_slug, doc_slug)
-        )
+        return self.redis.get(self.userDocumentCache_key(user_slug, doc_slug))
 
-    def userDocumentCache_set(self,
-                              user_slug: str,
-                              doc_slug: str,
-                              text: str):
+    def userDocumentCache_set(self, user_slug: str, doc_slug: str, text: str):
         key = self.userDocumentCache_key(user_slug, doc_slug)
         self.redis.set(key, text)
 
     def userDocumentCache_delete(self, user_slug: str, doc_slug: str):
-        self.redis.delete(
-            self.userDocumentCache_key(user_slug, doc_slug)
-        )
+        self.redis.delete(self.userDocumentCache_key(user_slug, doc_slug))
 
     # ----------
     # GENERATION
@@ -530,28 +498,22 @@ class Data(object):
         self.check_slugs(user_slug, doc_slug)
         return "udep:{:s}:{:s}".format(user_slug, doc_slug)
 
-    def epubCachePlaceholder_exists(
-            self, user_slug: str, doc_slug: str) -> bool:
+    def epubCachePlaceholder_exists(self, user_slug: str, doc_slug: str) -> bool:
         self.require_not_in_context_manager()
-        return self.redis.exists(
-            self.epubCachePlaceholder_key(user_slug, doc_slug)
-        )
+        return self.redis.exists(self.epubCachePlaceholder_key(user_slug, doc_slug))
 
     def epubCachePlaceholder_get(
-            self, user_slug: str, doc_slug: str) -> Union[dict, None]:
+        self, user_slug: str, doc_slug: str
+    ) -> Union[dict, None]:
         self.require_not_in_context_manager()
-        return self.redis.get(
-            self.epubCachePlaceholder_key(user_slug, doc_slug)
-        )
+        return self.redis.get(self.epubCachePlaceholder_key(user_slug, doc_slug))
 
     def epubCachePlaceholder_set(self, user_slug: str, doc_slug: str):
         key = self.epubCachePlaceholder_key(user_slug, doc_slug)
-        self.redis.set(key, 'placeholder')
+        self.redis.set(key, "placeholder")
 
     def epubCachePlaceholder_delete(self, user_slug: str, doc_slug: str):
-        self.redis.delete(
-            self.epubCachePlaceholder_key(user_slug, doc_slug)
-        )
+        self.redis.delete(self.epubCachePlaceholder_key(user_slug, doc_slug))
 
     # Cache epubs...
 
@@ -561,27 +523,97 @@ class Data(object):
 
     def epubCache_exists(self, user_slug: str, doc_slug: str) -> bool:
         self.require_not_in_context_manager()
-        return self.redis.exists(
-            self.epubCache_key(user_slug, doc_slug)
-        )
+        return self.redis.exists(self.epubCache_key(user_slug, doc_slug))
 
-    def epubCache_get(self, user_slug: str,
-                      doc_slug: str) -> Union[dict, None]:
+    def epubCache_get(self, user_slug: str, doc_slug: str) -> Union[dict, None]:
         self.require_not_in_context_manager()
-        return self.redis_binary.get(
-            self.epubCache_key(user_slug, doc_slug)
-        )
+        return self.redis_binary.get(self.epubCache_key(user_slug, doc_slug))
 
     def epubCache_set(self, user_slug: str, doc_slug: str, text: str):
         key = self.epubCache_key(user_slug, doc_slug)
         self.redis_binary.set(key, text, ex=3600)  # <-- keep for an hour
 
     def epubCache_delete(self, user_slug: str, doc_slug: str):
-        self.redis.delete(
-            self.epubCache_key(user_slug, doc_slug)
-        )
+        self.redis.delete(self.epubCache_key(user_slug, doc_slug))
 
     def epubCache_deleteAll(self):
         for user_slug in self.userSet_list():
             for doc_slug in self.userDocumentSet_list(user_slug):
                 self.epubCache_delete(user_slug, doc_slug)
+
+    # --------------------
+    # TimeSeries functions
+    # --------------------
+
+    def timeSeries_key(self, user_slug: str, doc_slug: str, label: str) -> str:
+        """
+        Create unique key based on user/doc/label.
+        """
+        self.check_slugs(user_slug, doc_slug)
+        return "ts:{:s}:{:s}:{:s}".format(user_slug, doc_slug, label)
+
+    def timeSeries_create(
+        self, user_slug: str, doc_slug: str, label: str, days: int
+    ) -> None:
+        """
+        If this Redis DB has timeseries...
+        Setup a series with retention time.
+        """
+        if not self.redis_ts:
+            return
+
+        ts_key = self.timeSeries_key(user_slug, doc_slug, label)
+        days_ms = days * MILLISECONDS_PER_DAY
+        self.redis_ts.create(ts_key, retention_msecs=days_ms)
+
+    def timeSeries_add(
+        self, user_slug: str, doc_slug: str, label: str, value: int
+    ) -> None:
+        """
+        Insert a time value for the present moment
+        """
+        if not self.redis_ts:
+            return
+
+        ts_key = self.timeSeries_key(user_slug, doc_slug, label)
+        if not self.redis.exists(ts_key):
+            self.timeSeries_create(user_slug, doc_slug, label, RETENTION_DAYS)
+
+        self.redis_ts.add(ts_key, "*", value)
+
+    def timeSeries_dailyCount(self, user_slug: str, doc_slug: str, label: str):
+        """
+        Return [(day_number, count), ...] points for graphing.
+        """
+        if not self.redis_ts:
+            return []
+
+        ts_key = self.timeSeries_key(user_slug, doc_slug, label)
+        if not self.redis.exists(ts_key):
+            self.timeSeries_create(user_slug, doc_slug, label, RETENTION_DAYS)
+        by_day = self.redis_ts.range(
+            ts_key,
+            "-",
+            "+",
+            aggregation_type="count",
+            bucket_size_msec=MILLISECONDS_PER_DAY,
+        )
+        return [
+            (day_in_last_fortnight(timestamp / 1000), int(i)) for timestamp, i in by_day
+        ]
+
+
+class RedisTimer(object):
+
+    def __init__(self, data, user_slug, doc_slug, label):
+        self.data = data
+        self.user_slug = user_slug
+        self.doc_slug = doc_slug
+        self.label = label
+
+    def __enter__(self):
+        self.start = datetime.now()
+
+    def __exit__(self, exc_type, exc_value, exc_trace):
+        elapsed_ms = (datetime.now() - self.start).total_seconds() * 1000
+        self.data.timeSeries_add(self.user_slug, self.doc_slug, self.label, elapsed_ms)
