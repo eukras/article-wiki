@@ -15,13 +15,13 @@ from lib.wiki.sample_data import minimal_document
 from lib.wiki.utils import random_slug, trim
 
 config = {
-    'REDIS_HOST': 'localhost',
-    'REDIS_PORT': 6379,
-    'REDIS_USER': 'default',
-    'REDIS_PASSWORD': 'password',
-    'REDIS_DATABASE': 1,  # <-- TESTING
-    'ADMIN_USER': 'admin',
-    'TIME_ZONE': 'Australia/Sydney',
+    "REDIS_HOST": "localhost",
+    "REDIS_PORT": 6379,
+    "REDIS_USER": "default",
+    "REDIS_PASSWORD": "password",
+    "REDIS_DATABASE": 1,  # <-- TESTING
+    "ADMIN_USER": "admin",
+    "TIME_ZONE": "Australia/Sydney",
 }
 
 data = Data(config, strict=True)
@@ -34,10 +34,10 @@ def test_repr_save_load_delete():
     """
     data.redis.flushdb()
 
-    user_slug = random_slug('test-user-')
-    doc_slug = random_slug('test-doc-')
+    user_slug = random_slug("test-user-")
+    doc_slug = random_slug("test-doc-")
     doc = Document(data)
-    doc.set_host('http://example.org')
+    doc.set_host("http://example.org")
     doc.set_parts(user_slug, doc_slug, minimal_document)
 
     # Create
@@ -47,24 +47,26 @@ def test_repr_save_load_delete():
     assert new_doc_slug in str(doc)
     assert "(3 parts)" in str(doc)
 
-    assert new_doc_slug == 'example-document'
+    assert new_doc_slug == "example-document"
     assert data.userSet_exists(user_slug)
     assert data.userDocument_exists(user_slug, new_doc_slug)
 
-    latest_slugs = [
-        _['slug'] for _ in data.userDocumentLastChanged_list(user_slug)
-    ]
+    latest_slugs = [_["slug"] for _ in data.userDocumentLastChanged_list(user_slug)]
     assert new_doc_slug in latest_slugs
     assert data.userDocumentMetadata_exists(user_slug, new_doc_slug)
     assert data.userDocumentCache_exists(user_slug, new_doc_slug)
     assert data.userDocumentSet_exists(user_slug, new_doc_slug)
 
     # Rename
-    doc.set_index(trim("""
+    doc.set_index(
+        trim(
+            """
         New Example Document
 
         Text Goes Here!
-    """))
+    """
+        )
+    )
     new_doc_slug = doc.save(pregenerate=True, update_doc_slug=True)
     assert new_doc_slug == "new-example-document"
 
@@ -74,8 +76,8 @@ def test_repr_save_load_delete():
     assert not data.userDocumentCache_exists(user_slug, doc_slug)
 
     latest_metadata = data.userDocumentLastChanged_list(user_slug)
-    assert not any([_.get('slug') == doc_slug for _ in latest_metadata])
-    assert any([_.get('slug') == new_doc_slug for _ in latest_metadata])
+    assert not any([_.get("slug") == doc_slug for _ in latest_metadata])
+    assert any([_.get("slug") == new_doc_slug for _ in latest_metadata])
 
     assert data.userDocumentSet_exists(user_slug, new_doc_slug)
     assert data.userDocument_exists(user_slug, new_doc_slug)
@@ -97,96 +99,119 @@ def test_repr_save_load_delete():
     assert not data.userDocumentSet_exists(user_slug, new_doc_slug)
     assert not data.userDocumentMetadata_exists(user_slug, new_doc_slug)
     latest_metadata = data.userDocumentLastChanged_list(user_slug)
-    assert not any([_.get('slug') == new_doc_slug for _ in latest_metadata])
+    assert not any([_.get("slug") == new_doc_slug for _ in latest_metadata])
     assert not data.userDocumentCache_exists(user_slug, new_doc_slug)
 
 
 def test_set_part():
     """Confirms that the index is updated when a part is renamed."""
     test_parts = {
-        'index': trim("""
+        "index": trim(
+            """
             Index
 
             - Part One
             - Part Two
-            """),
-        'part-one': trim("""
+            """
+        ),
+        "part-one": trim(
+            """
             Part One
 
             Text.
-            """),
-        'part-two': trim("""
+            """
+        ),
+        "part-two": trim(
+            """
             Part Two
 
             Text.
-            """)
+            """
+        ),
     }
     doc = Document(data)
-    doc.set_parts('user-slug', 'doc-slug', test_parts)
-    old_slug = 'part-one'
-    new_text = trim("""
+    doc.set_parts("user-slug", "doc-slug", test_parts)
+    old_slug = "part-one"
+    new_text = trim(
+        """
         Part Three
 
         Text.
-        """)
+        """
+    )
     new_part_slug = doc.set_part(old_slug, new_text)
     assert new_part_slug == "part-three"
     assert doc.parts == {
-        'index': trim("""
+        "index": trim(
+            """
             Index
 
             - Part Three
             - Part Two
-            """),
-        'part-three': trim("""
+            """
+        ),
+        "part-three": trim(
+            """
             Part Three
 
             Text.
-            """),
-        'part-two': trim("""
+            """
+        ),
+        "part-two": trim(
+            """
             Part Two
 
             Text.
-            """)
+            """
+        ),
     }
 
 
 def test_delete_part():
     """Confirms that the index is updated when a part is deleted."""
     test_parts = {
-        'index': trim("""
+        "index": trim(
+            """
             Index
 
             - Part One
             - Part Two
-            """),
-        'part-one': trim("""
+            """
+        ),
+        "part-one": trim(
+            """
             Part One
 
             Text.
-            """),
-        'part-two': trim("""
+            """
+        ),
+        "part-two": trim(
+            """
             Part Two
 
             Text.
-            """)
+            """
+        ),
     }
     doc = Document(data)
-    doc.set_parts('user-slug', 'doc-slug', test_parts)
-    doc.delete_part('part-one')
+    doc.set_parts("user-slug", "doc-slug", test_parts)
+    doc.delete_part("part-one")
     assert doc.parts == {
-        'index': trim("""
+        "index": trim(
+            """
             Index
 
             - Part Two
-            """),
-        'part-two': trim("""
+            """
+        ),
+        "part-two": trim(
+            """
             Part Two
 
             Text.
-            """)
+            """
+        ),
     }
-
 
 
 def test_import_and_export_document():
@@ -194,8 +219,8 @@ def test_import_and_export_document():
     Generates an archive file and then turns it back into the original parts.
     """
     doc1 = Document(data)
-    user_slug = random_slug('test-user-')
-    doc_slug = random_slug('test-doc-')
+    user_slug = random_slug("test-user-")
+    doc_slug = random_slug("test-doc-")
     doc1.set_parts(user_slug, doc_slug, minimal_document)
     file_name, file_text = doc1.export_txt_file()
     assert user_slug in file_name
