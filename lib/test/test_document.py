@@ -14,17 +14,19 @@ from lib.document import Document
 from lib.wiki.sample_data import minimal_document
 from lib.wiki.utils import random_slug, trim
 
-config = {
-    "REDIS_HOST": "localhost",
-    "REDIS_PORT": 6379,
-    "REDIS_USER": "default",
-    "REDIS_PASSWORD": "password",
-    "REDIS_DATABASE": 1,  # <-- TESTING
-    "ADMIN_USER": "admin",
-    "TIME_ZONE": "Australia/Sydney",
-}
 
-data = Data(config, strict=True)
+def setup():
+    config = {
+        "REDIS_HOST": "localhost",
+        "REDIS_PORT": 6379,
+        "REDIS_USER": "default",
+        "REDIS_PASSWORD": "password",
+        "REDIS_DATABASE": 1,  # <-- TESTING
+        "ADMIN_USER": "admin",
+        "TIME_ZONE": "Australia/Sydney",
+    }
+    data = Data(config, strict=True)
+    return data
 
 
 @pytest.mark.integration
@@ -32,6 +34,7 @@ def test_repr_save_load_delete():
     """
     Confirms data in data out. Builds upon data.py.
     """
+    data = setup()
     data.redis.flushdb()
 
     user_slug = random_slug("test-user-")
@@ -103,6 +106,7 @@ def test_repr_save_load_delete():
     assert not data.userDocumentCache_exists(user_slug, new_doc_slug)
 
 
+@pytest.mark.integration
 def test_set_part():
     """Confirms that the index is updated when a part is renamed."""
     test_parts = {
@@ -129,6 +133,7 @@ def test_set_part():
             """
         ),
     }
+    data = setup()
     doc = Document(data)
     doc.set_parts("user-slug", "doc-slug", test_parts)
     old_slug = "part-one"
@@ -167,6 +172,7 @@ def test_set_part():
     }
 
 
+@pytest.mark.integration
 def test_delete_part():
     """Confirms that the index is updated when a part is deleted."""
     test_parts = {
@@ -193,6 +199,7 @@ def test_delete_part():
             """
         ),
     }
+    data = setup()
     doc = Document(data)
     doc.set_parts("user-slug", "doc-slug", test_parts)
     doc.delete_part("part-one")
@@ -214,10 +221,12 @@ def test_delete_part():
     }
 
 
+@pytest.mark.integration
 def test_import_and_export_document():
     """
     Generates an archive file and then turns it back into the original parts.
     """
+    data = setup()
     doc1 = Document(data)
     user_slug = random_slug("test-user-")
     doc_slug = random_slug("test-doc-")

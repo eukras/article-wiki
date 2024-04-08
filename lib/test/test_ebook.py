@@ -1,26 +1,22 @@
 """
-Test the redis interface for user and docs handling.
+Test writing epubs
 """
 
-import pytest
 import os
 
-from lib.data import Data, load_env_config
-from lib.ebook import write_epub
+import pytest
 
-config = load_env_config()
-config['REDIS_DATABASE'] = 1
-data = Data(config, strict=True)
+from lib.ebook import write_epub
 
 
 @pytest.mark.integration
 def test_write_epub():
     """
-    Create a hash, find its key, delete it.
+    Test writing epub to file
     """
-    file_path = '/tmp/admin-help.epub'
+    file_path = "/tmp/admin-help.epub"
     if os.path.exists(file_path):
         os.remove(file_path)
 
-    write_epub('admin', 'help', file_path)
+    write_epub("admin", "help", file_path)
     assert os.path.exists(file_path)

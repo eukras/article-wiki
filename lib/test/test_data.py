@@ -12,10 +12,10 @@ from lib.wiki.utils import random_slug
 
 def setup():
     config = load_env_config()
-    config['REDIS_DATABASE'] = 1
+    config["REDIS_DATABASE"] = 1
     data = Data(config, strict=True)
     data.redis.flushdb()
-    return data;
+    return data
 
 
 @pytest.mark.integration
@@ -24,7 +24,7 @@ def test_utility_functions():
     Create a hash, find its key, delete it.
     """
     data = setup()
-    prefix = 'test-utilities-'
+    prefix = "test-utilities-"
     test_slug = random_slug(prefix)
     data.redis.hmset(test_slug, minimal_document)
     assert data.redis.exists(test_slug)
@@ -40,9 +40,9 @@ def test_auth_functions():
     Create a token, get it, delete it.
     """
     data = setup()
-    test_user = {'slug': 'test'}
+    test_user = {"slug": "test"}
     token = data.login_set(test_user)
-    assert data.login_get('wrong-token') is None
+    assert data.login_get("wrong-token") is None
     assert data.login_get(token) == test_user
     data.login_delete(token)
     assert data.login_get(token) is None
@@ -54,8 +54,8 @@ def test_check_slugs():
     Confirm that bad slugs cause ValueErrors
     """
     data = setup()
-    good_slugs = ['ok-good', '123-890']
-    bad_slugs = ['no_terrible', '!@#$%^&*(']
+    good_slugs = ["ok-good", "123-890"]
+    bad_slugs = ["no_terrible", "!@#$%^&*("]
     try:
         data.check_slugs(*good_slugs)
         assert True
@@ -78,7 +78,7 @@ def test_userSet():
     v.0.1.0 -- SINGLE_USER, so no pagination yet.
     """
     data = setup()
-    test_slug = random_slug('test-user-')
+    test_slug = random_slug("test-user-")
     count = data.userSet_count()
 
     data.userSet_set(test_slug)
@@ -102,16 +102,16 @@ def test_users():
     v.0.1.0 -- SINGLE_USER, so not super-important yet.
     """
     data = setup()
-    user_slug = random_slug('test-user-')
+    user_slug = random_slug("test-user-")
     key = data.user_key(user_slug)
     assert user_slug in key
 
-    test_user = {'slug': 'my-name', 'is_admin': 'NO', 'password': 'password'}
+    test_user = {"slug": "my-name", "is_admin": "NO", "password": "password"}
     assert not data.user_exists(user_slug)
     data.user_set(user_slug, test_user)
     assert data.user_exists(user_slug)
     assert data.user_get(user_slug) == test_user
-    assert data.user_get('nonexistent-user') is None
+    assert data.user_get("nonexistent-user") is None
     assert data.user_hash()[user_slug] == test_user
 
     data.user_delete(user_slug)
@@ -127,11 +127,11 @@ def test_userDocumentSet():
     v.0.1.0 -- SINGLE_USER, so no pagination yet.
     """
     data = setup()
-    user_slug = random_slug('test-user-')
+    user_slug = random_slug("test-user-")
     key = data.userDocumentSet_key(user_slug)
     assert user_slug in key
 
-    doc_slug = random_slug('test-document-')
+    doc_slug = random_slug("test-document-")
     assert not data.userDocumentSet_exists(user_slug, doc_slug)
 
     data.userDocumentSet_set(user_slug, doc_slug)
@@ -153,8 +153,8 @@ def test_userDocuments():
     Generally speaking, userDocument_ methods manage userSet data.
     """
     data = setup()
-    user_slug = random_slug('test-user-')
-    doc_slug = random_slug('test-document-')
+    user_slug = random_slug("test-user-")
+    doc_slug = random_slug("test-document-")
     key = data.userDocument_key(user_slug, doc_slug)
     assert user_slug in key
     assert doc_slug in key
@@ -185,15 +185,15 @@ def test_userDocumentMetadata():
     Generally speaking, userDocument_ methods manage userSet data.
     """
     data = setup()
-    user_slug = random_slug('test-user-')
-    doc_slug = random_slug('test-document-')
+    user_slug = random_slug("test-user-")
+    doc_slug = random_slug("test-document-")
     key = data.userDocumentMetadata_key(user_slug, doc_slug)
     assert user_slug in key
     assert doc_slug in key
 
     assert not data.userDocumentMetadata_exists(user_slug, doc_slug)
 
-    metadata = {'doc_slug': doc_slug, 'word_count': '3000'}  # <-- str for num
+    metadata = {"doc_slug": doc_slug, "word_count": "3000"}  # <-- str for num
     data.userDocumentMetadata_set(user_slug, doc_slug, metadata)
     assert data.userDocumentMetadata_get(user_slug, doc_slug) == metadata
     assert data.userDocumentMetadata_exists(user_slug, doc_slug)
@@ -210,14 +210,14 @@ def test_userDocumentLastChanged():
     metadata....
     """
     data = setup()
-    user_slug = random_slug('test-user-')
+    user_slug = random_slug("test-user-")
     key = data.userDocumentLastChanged_key(user_slug)
     assert user_slug in key
 
     assert data.userDocumentLastChanged_list(user_slug) == []
 
-    doc_slug = random_slug('test-document-')
-    metadata = {'doc_slug': doc_slug, 'word_count': '3000'}  # <-- str for num
+    doc_slug = random_slug("test-document-")
+    metadata = {"doc_slug": doc_slug, "word_count": "3000"}  # <-- str for num
     data.userDocumentLastChanged_set(user_slug, doc_slug, doc_slug)
     data.userDocumentMetadata_set(user_slug, doc_slug, metadata)
     assert data.userDocumentLastChanged_list(user_slug) == [metadata]
@@ -237,8 +237,8 @@ def test_userDocumentLastChanged():
 @pytest.mark.integration
 def test_userDocumentCache():
     data = setup()
-    user_slug = random_slug('test-user-')
-    doc_slug = random_slug('test-document-')
+    user_slug = random_slug("test-user-")
+    doc_slug = random_slug("test-document-")
     key = data.userDocumentCache_key(user_slug, doc_slug)
     assert user_slug in key
     assert doc_slug in key
