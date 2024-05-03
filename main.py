@@ -136,6 +136,13 @@ if not data.user_exists(CONFIG["ADMIN_USER"]):
     initialize()
 
 
+# -------------------------------------------------------------
+#               Reusable Dependency Injections
+# -------------------------------------------------------------
+
+LoginDependency = Annotated[Login, Depends(use_cache=False)]
+
+
 # ----------------------------------------------------------
 #                     Utility functions
 # ----------------------------------------------------------
@@ -239,22 +246,6 @@ def show_editor(
         can_be_saved=can_be_saved,
     )
     return html
-
-
-# ----------------------------------------------------------
-# TESTING
-# ----------------------------------------------------------
-
-
-@app.get("/test")
-async def test(
-    login: Annotated[Login, Depends(use_cache=False)],
-):
-    """
-    Experiment with dependency injection
-    """
-    print("LOGIN: ", login.username)
-    return login
 
 
 # ----------------------------------------------------------
@@ -485,10 +476,10 @@ def cache_rss_latest(user_slug, base_url):
 
 @app.get("/new-article")
 async def new_article(
-    login: Annotated[Login, Depends(use_cache=False)],
+    login: LoginDependency,
 ):
     if login is not None:
-        uri = f"/edit/{login['username']}/_/index"
+        uri = f"/edit/{login.username}/_/index"
         return RedirectResponse(uri, status_code=status.HTTP_303_SEE_OTHER)
     else:
         raise HTTPException(
@@ -501,9 +492,9 @@ async def new_article(
 async def edit_part(
     user_slug,
     doc_slug,
+    login: LoginDependency,
     part_slug=None,
     title: str = "New Section",
-    login: Annotated[Login, Depends()] = None,
 ):
     """
     Open the editor to make changes to a doc_part
@@ -540,9 +531,7 @@ async def edit_part(
             - Part One
             - - Section A
             - Part Two
-        """.replace(
-                "PUBLICATION_DATE", today
-            )
+        """.replace("PUBLICATION_DATE", today)
         )
 
         html = show_editor(
@@ -604,11 +593,11 @@ async def post_edit_part(
     user_slug: str,
     doc_slug: str,
     part_slug: str,
+    login: LoginDependency,
     content: Annotated[str, Form()] = None,
     they_selected_save: Annotated[str, Form()] = None,
     they_selected_preview: Annotated[str, Form()] = None,
     request: Request = None,
-    login: Annotated[Login, Depends()] = None,
 ):
     """
     Wiki editor for existing doc part (or '_' if new).
@@ -656,7 +645,6 @@ async def post_edit_part(
     okay_to_save = all([they_selected_save is not None, login.controls(user_slug)])
 
     if okay_to_save:
-
         saved_doc_slug = document.save(pregenerate=True)
         if old_doc_slug not in PROTECTED_DOC_SLUGS:
             new_doc_slug = saved_doc_slug
@@ -765,7 +753,7 @@ async def delete_part(
     doc_slug: str,
     part_slug: str,
     request: Request,
-    login: Annotated[Login, Depends()] = None,
+    login: LoginDependency,
 ):
     """
     Delete a part from a document. Must be logged in, and be the owner.
@@ -797,7 +785,7 @@ async def delete_part(
 
 @app.get("/admin")
 async def admin(
-    login: Annotated[Login, Depends()] = None,
+    login: LoginDependency,
 ):
     """
     Show administrative options.
@@ -809,7 +797,7 @@ async def admin(
 
 @app.post("/admin/initialize")
 async def admin_initialize(
-    login: Annotated[Login, Depends()] = None,
+    login: LoginDependency,
 ):
     """
     Reset site to starting configuration.
@@ -821,7 +809,7 @@ async def admin_initialize(
 
 @app.post("/admin/refresh")
 async def admin_refresh(
-    login: Annotated[Login, Depends()] = None,
+    login: LoginDependency,
 ):
     """
     Regenerate, re-cache, and correct the metadata for all pages.
@@ -853,7 +841,9 @@ async def download_txt(user_slug, doc_slug, request: Request):
 
 @app.get("/upload/{user_slug}/{doc_slug}")
 async def upload_txt_form(
-    user_slug: str, doc_slug: str, login: Annotated[Login, Depends()] = None
+    user_slug: str,
+    doc_slug: str,
+    login: LoginDependency,
 ):
     """
     Show an upload form to upload a document.
@@ -875,7 +865,7 @@ async def post_upload_txt(
     doc_slug,
     upload: UploadFile,
     request: Request,
-    login: Annotated[Login, Depends()] = None,
+    login: LoginDependency,
 ):
     """
     Create and save a document from a download file; show it.
@@ -928,7 +918,7 @@ async def export_archive(user_slug):
 @app.get("/import-archive/{user_slug}")
 async def import_archive_form(
     user_slug: str,
-    login: Annotated[Login, Depends()] = None,
+    login: LoginDependency,
 ):
     """
     Show import form for importing an archive zipfile.
@@ -947,7 +937,7 @@ async def post_import_archive(
     user_slug,
     upload: UploadFile,
     request: Request,
-    login: Annotated[Login, Depends()] = None,
+    login: LoginDependency,
     dir_path=Depends(get_temp_dir, use_cache=False),
 ):
     """
@@ -1032,7 +1022,6 @@ async def generate_epub(user_slug, doc_slug):
     file_name = "%s_%s.epub" % (user_slug, doc_slug)
 
     if data.epubCache_exists(user_slug, doc_slug):
-
         try:
             zip_data = data.epubCache_get(user_slug, doc_slug)
             zip_data_type = "application/epub+zip"
@@ -1049,14 +1038,12 @@ async def generate_epub(user_slug, doc_slug):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=msg)
 
     elif data.epubCachePlaceholder_exists(user_slug, doc_slug):
-
         reload_html = views.get_template("reload.html").render(
             config=CONFIG, user_slug=user_slug, doc_slug=doc_slug, title="Generating..."
         )
         return HTMLResponse(content=reload_html, status_code=status.HTTP_202_ACCEPTED)
 
     else:
-
         # Generate and cache; requests for a lot of simultaneous
         # books that must all be generated could slow this down; add
         # a job queue later if that becomes necessary.
@@ -1223,7 +1210,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.post("/admin/expire-cache")
 def expire(
-    login: Annotated[Login, Depends()] = None,
+    login: LoginDependency,
 ):
     """
     Expire caches
