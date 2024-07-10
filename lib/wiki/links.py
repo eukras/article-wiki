@@ -26,10 +26,10 @@ class Links(object):
         if prefix is not None:
             self.prefix = prefix
         else:
-            self.prefix = random_slug('random_')
+            self.prefix = random_slug("random_")
 
-        regex = r'\^\[[^\]]+\][.,!?;:·]?'  # <-- see decorator
-        self.placeholders = Placeholders(regex, 'link')
+        regex = r"\^\[[^\]]+\][.,!?;:·]?"  # <-- see decorator
+        self.placeholders = Placeholders(regex, "link")
 
     # ------------------------------------------------------------
     # Insert, decorate and replace make this work as a Placeholder

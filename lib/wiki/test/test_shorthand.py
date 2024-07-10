@@ -22,10 +22,7 @@ def test_underlines():
 
 
 def test_mixed_tags():
-    _ = Shorthand([
-        ['/', 'i'],
-        ['`', 'kbd']
-    ])
+    _ = Shorthand([["/", "i"], ["`", "kbd"]])
     pairs = [
         ["simple /italics/ example", "simple <i>italics</i> example"],
         ["test/check either/or", "test/check either/or"],

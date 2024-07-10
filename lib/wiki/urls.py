@@ -22,13 +22,13 @@ class Urls(object):
 
     def __init__(self):
         "This is a thin wrapper for Placeholders"
-        url_chars = re.escape(r'.:\/_+?&=-#%~')
+        url_chars = re.escape(r".:\/_+?&=-#%~")
         regexps = [
-            r'https?://[\w%s]+\w' % url_chars,  # <-- url
-            r'[\w\.\-\_]+@[\w\.\-\_]+\w'  # <-- email
+            r"https?://[\w%s]+\w" % url_chars,  # <-- url
+            r"[\w\.\-\_]+@[\w\.\-\_]+\w",  # <-- email
         ]
-        regexp = '(' + '|'.join(regexps) + ')'
-        self.placeholders = Placeholders(regexp, 'ur')
+        regexp = "(" + "|".join(regexps) + ")"
+        self.placeholders = Placeholders(regexp, "ur")
 
     def insert(self, parts):
         "Add placeholders."
@@ -40,7 +40,7 @@ class Urls(object):
             link = "mailto:%s" % pattern
         else:
             link = pattern
-        html = "<a href=\"%s\" target=\"_blank\">%s</a>"
+        html = '<a href="%s" target="_blank">%s</a>'
         return html % (link, escape(pattern))
 
     def replace(self, html_parts):

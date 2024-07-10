@@ -27,7 +27,8 @@ class Code(Function):
     """
 
     examples = [
-        trim("""
+        trim(
+            """
             CODE (python, 45) ---
             def factorial(n):
                 \"\"\"e.g. 3! = 3 * 2 * 1\"\"\"
@@ -36,8 +37,9 @@ class Code(Function):
                 else:
                     return n * factorial(n-1)
             ---
-        """),
-        ]
+        """
+        ),
+    ]
 
     def html(self, renderer):
         """
@@ -48,14 +50,13 @@ class Code(Function):
         try:
             lexer = get_lexer_by_name(name, stripall=True)
         except Exception:
-            return renderer.alert(
-                "Format '%s' not recognized:" % name
-                ) + verbatim(self.text)
+            return renderer.alert("Format '%s' not recognized:" % name) + verbatim(
+                self.text
+            )
         nums = [_ for _ in opts if _.isdigit()]
         if nums:
             start = int(nums.pop())
-            formatter = HtmlFormatter(linenos=True, linenostart=start,
-                                      cssclass="code")
+            formatter = HtmlFormatter(linenos=True, linenostart=start, cssclass="code")
         else:
             formatter = HtmlFormatter(linenos=False, cssclass="code")
         html = highlight(self.text, lexer, formatter)

@@ -24,8 +24,8 @@ class Tags(object):
         assert isinstance(index, Index)
         self.index = index
 
-        regex = r'[#%%]\[[^\]]+\][%s]?' % re.escape(Config.punctuation)
-        self.placeholders = Placeholders(regex, 'tag')
+        regex = r"[#%%]\[[^\]]+\][%s]?" % re.escape(Config.punctuation)
+        self.placeholders = Placeholders(regex, "tag")
 
     # ------------------------------------------------------------
     # Insert, decorate and replace make this work as a Placeholder
@@ -45,9 +45,7 @@ class Tags(object):
         numbering = self.index.outline.find_numbering(part_slug)
         alias, tag, subtag, punctuation = split_pattern(pattern)
         index = self.index.get_count(part_slug)
-        return self.index.tag(
-            alias, tag, subtag, punctuation, numbering, index
-            )
+        return self.index.tag(alias, tag, subtag, punctuation, numbering, index)
 
     def replace(self, html_parts):
         """
@@ -55,9 +53,11 @@ class Tags(object):
         """
         return self.placeholders.replace(self.decorate, html_parts)
 
+
 # ---------
 # Utilities
 # ---------
+
 
 def split_pattern(pattern):
     """
@@ -72,28 +72,28 @@ def split_pattern(pattern):
         punctuation = pattern[-1]
     else:
         reference = pattern[2:-1]
-        punctuation = ''
+        punctuation = ""
 
     alias = None
 
-    clauses = reference.split(':') # <-- split once
+    clauses = reference.split(":")  # <-- split once
     if len(clauses) > 1:
-        alias, tags = ','.join(clauses[:-1]), clauses[-1]
+        alias, tags = ",".join(clauses[:-1]), clauses[-1]
     else:
         tags = reference
 
     # Split on ';' if any?
 
-    clauses = tags.split(', ', 1)  # <-- only split once
+    clauses = tags.split(", ", 1)  # <-- only split once
     if len(clauses) > 1:
         tag, subtag = clauses
     else:
-        tag, subtag = tags, ''
+        tag, subtag = tags, ""
 
     if alias == None:
         alias = tag
 
-    if pattern[0] == '#':  # <-- vs. '%', for case sensitivity
+    if pattern[0] == "#":  # <-- vs. '%', for case sensitivity
         tag = tag.lower()
         subtag = subtag.lower()
 

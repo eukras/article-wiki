@@ -18,7 +18,7 @@ class Verbatim(object):
     def __init__(self):
         "This is a thin wrapper for Placeholders"
         regex = r"{{[^}]*}}"
-        self.placeholders = Placeholders(regex, 'verbatim')
+        self.placeholders = Placeholders(regex, "verbatim")
 
     def insert(self, parts):
         "Add placeholders."

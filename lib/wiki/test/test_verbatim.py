@@ -7,16 +7,29 @@ from lib.wiki.utils import trim
 
 def test_verbatim():
     verbatim = Verbatim()
-    parts = {'test': trim("""
+    parts = {
+        "test": trim(
+            """
         Grr. {{<blink>*[Arg!]</blink>}}. {{x2}}.
-        """)}
+        """
+        )
+    }
     tokenized = verbatim.insert(parts)
-    expected = {'test': trim("""
+    expected = {
+        "test": trim(
+            """
         Grr. %sverbatim:1%s. %sverbatim:2%s.
-        """) % (DELIMITER, DELIMITER, DELIMITER, DELIMITER)}
+        """
+        )
+        % (DELIMITER, DELIMITER, DELIMITER, DELIMITER)
+    }
     assert expected == tokenized
     decorated = verbatim.replace(tokenized)
-    expected = {'test': trim("""
+    expected = {
+        "test": trim(
+            """
         Grr. &lt;blink&gt;*[Arg!]&lt;/blink&gt;. x2.
-        """)}
+        """
+        )
+    }
     assert expected == decorated

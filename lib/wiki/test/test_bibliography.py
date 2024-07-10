@@ -2,13 +2,14 @@ from .context import lib  # noqa: F401
 
 from lxml import html
 
-from lib.wiki.bibliography import \
-    Bibliography, \
-    create_unique_labels, \
-    get_sentences, \
-    nonempty_lines, \
-    split_label, \
-    split_bibliography
+from lib.wiki.bibliography import (
+    Bibliography,
+    create_unique_labels,
+    get_sentences,
+    nonempty_lines,
+    split_label,
+    split_bibliography,
+)
 
 from lib.wiki.outline import Outline, default_counters
 from lib.wiki.utils import trim
@@ -17,36 +18,41 @@ id_prefix = "PREFIX"
 
 
 def test_nonempty_lines():
-    content = trim("""
+    content = trim(
+        """
         This is a test.
 
         This is a test.
-        """)
-    assert nonempty_lines(content) == ['This is a test.'] * 2
+        """
+    )
+    assert nonempty_lines(content) == ["This is a test."] * 2
 
 
 def test_get_sentences():
     arg = "RE: Hi. There? You!"
-    out = ['RE:', 'Hi.', 'There?', 'You!']
+    out = ["RE:", "Hi.", "There?", "You!"]
     assert get_sentences(arg) == out
 
 
 def test_split_bibliography():
-    content = trim("""
+    content = trim(
+        """
         This is the body.
-        """)
-    assert split_bibliography(content) == (
-        "This is the body.", None
+        """
     )
-    content = trim("""
+    assert split_bibliography(content) == ("This is the body.", None)
+    content = trim(
+        """
         This is the body.
 
         ___
 
         This is the bibliography.
-        """)
+        """
+    )
     assert split_bibliography(content) == [
-        "This is the body.", "This is the bibliography."
+        "This is the body.",
+        "This is the bibliography.",
     ]
 
 
@@ -66,39 +72,41 @@ def test_create_unique_labels():
         "Author. 2000. Title #2. Publisher, City.",
     ]
     assert create_unique_labels(lines) == {
-        'Author. 1999.': "Title #1. Publisher, City.",
-        'Author. 2000a.': "Title #1. Publisher, City.",
-        'Author. 2000b.': "Title #2. Publisher, City.",
+        "Author. 1999.": "Title #1. Publisher, City.",
+        "Author. 2000a.": "Title #1. Publisher, City.",
+        "Author. 2000b.": "Title #2. Publisher, City.",
     }
 
 
 def test_match():
     parts = {
-        'biblio': trim("""
+        "biblio": trim(
+            """
             Author. 1999. Title #1. Publisher, City.
             Author. 2000. Title #1. Publisher, City.
             Author. 2000. Title #2. Publisher, City.
-            """),
+            """
+        ),
     }
     outline = Outline(parts, default_counters())
     bibliography = Bibliography(parts, outline, id_prefix)
-    assert bibliography.match('author') == "Author. 1999."
-    assert bibliography.match('author 2000') == "Author. 2000a."
+    assert bibliography.match("author") == "Author. 1999."
+    assert bibliography.match("author 2000") == "Author. 2000a."
 
 
 def test_get_count():
     parts = {
-        'index': 'INDEX',
-        'other': 'OTHER',
+        "index": "INDEX",
+        "other": "OTHER",
     }
     outline = Outline(parts, default_counters())
     bibliography = Bibliography(parts, outline, id_prefix)
-    assert bibliography.get_count('index') == '*'
-    assert bibliography.get_count('index') == '†'
-    assert bibliography.get_count('index') == '‡'
-    assert bibliography.get_count('other') == 'a'
-    assert bibliography.get_count('other') == 'b'
-    assert bibliography.get_count('other') == 'c'
+    assert bibliography.get_count("index") == "*"
+    assert bibliography.get_count("index") == "†"
+    assert bibliography.get_count("index") == "‡"
+    assert bibliography.get_count("other") == "a"
+    assert bibliography.get_count("other") == "b"
+    assert bibliography.get_count("other") == "c"
 
 
 def test_citation():
@@ -106,30 +114,35 @@ def test_citation():
     outline = Outline(parts, default_counters())
     bibliography = Bibliography(parts, outline, id_prefix)
     link = bibliography.citation(
-        'Author /Title/', 'p.34', '.', 'Author. 2000.', ['1', 'a'], 3
+        "Author /Title/", "p.34", ".", "Author. 2000.", ["1", "a"], 3
     )
 
-    assert '<a id="PREFIX_author-2000_1.a_3" ' + \
-           'href="#ref_PREFIX_author-2000_1.a_3">' in link
-    assert '(Author <em>Title</em>, p.34).' in link  # <-- (?)
-    assert '<sup>3</sup>' in link
-    assert '</a>' in link
+    assert (
+        '<a id="PREFIX_author-2000_1.a_3" ' + 'href="#ref_PREFIX_author-2000_1.a_3">'
+        in link
+    )
+    assert "(Author <em>Title</em>, p.34)." in link  # <-- (?)
+    assert "<sup>3</sup>" in link
+    assert "</a>" in link
 
-    back_link = '<a id="ref_PREFIX_author-2000_1.a_3" ' + \
-                'href="#PREFIX_author-2000_1.a_3">'
-    assert back_link in bibliography.citations['Author. 2000.']['1.a'][0]
+    back_link = (
+        '<a id="ref_PREFIX_author-2000_1.a_3" ' + 'href="#PREFIX_author-2000_1.a_3">'
+    )
+    assert back_link in bibliography.citations["Author. 2000."]["1.a"][0]
 
 
 def test_html_simplest():
     parts = {
-        'biblio': trim("""
+        "biblio": trim(
+            """
             Author. 1999. Title #1. Publisher, City.
             Author. 2000. Title #1. Publisher, City.
             Author. 2000. Title #2. Publisher, City.
-            """),
+            """
+        ),
     }
     outline = Outline(parts, default_counters())
     bibliography = Bibliography(parts, outline, id_prefix)
     out = bibliography.html()
-    dom = html.fragment_fromstring(out, create_parent='body')[0]
-    assert len(dom.cssselect('div.indent-hanging')) == 3
+    dom = html.fragment_fromstring(out, create_parent="body")[0]
+    assert len(dom.cssselect("div.indent-hanging")) == 3

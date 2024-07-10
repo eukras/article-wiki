@@ -24,14 +24,14 @@ class Sparkline(object):
             flip_vertically(fill_zeroes(points or DEFAULT_POINTS))
         )
 
-    def svg(self, stroke="#ddddddff", fill="#ffffff40"):
+    def svg(self, stroke="#ddddddff", fill="#ffffff40") -> str:
         __ = Airium()
         (cx, cy) = self.points[-1] if len(self.points) > 0 else (0, 0)
         with __.svg(
             xmlns="http://www.w3.org/2000/svg",
             width="140px",
             height="20px",
-            viewBox=get_view_box(self.points),
+            viewBox=get_view_box(),
             preserveAspectRatio="none",
         ):
             __.path(
@@ -63,7 +63,7 @@ def flip_vertically(points: list) -> list:
     """
     if len(points) == 0:
         return []
-    max_y = max([y for x, y in points]) + 1
+    max_y = max([y for _, y in points]) + 1
     return [(x, max_y - y) for x, y in points]
 
 
@@ -73,12 +73,12 @@ def scale_points(points: list) -> list:
     ratio of width to height for a 14 day period, and so that pixels are
     consistently square when we add a dot at the end point.
     """
-    max_y = max([y for x, y in points])
+    max_y = max([y for _, y in points])
     ratio_y = 2 / max_y
     return [(x + PAD, (y * ratio_y) + PAD) for (x, y) in points]
 
 
-def get_view_box(points: list):
+def get_view_box():
     """
     Return a bounding box for the sparkline
     """
@@ -92,20 +92,13 @@ def close_path(points: list) -> list:
     """
     if len(points) == 0:
         return []
-    max_y = max([y for x, y in points])
+    max_y = max([y for _, y in points])
     start = points[0]
     end = points[-1]
     new_points = points[:]
     new_points.insert(0, (start[0], max_y))
     new_points.append((end[0], max_y))
     return new_points
-
-
-def get_outline() -> list:
-    """
-    Return box that contains the 14 x 2 grid
-    """
-    return [(TOP, LEFT), (TOP, RIGHT), (BOTTOM, RIGHT), (BOTTOM, LEFT), (TOP, LEFT)]
 
 
 def get_path(points: list, close=False):

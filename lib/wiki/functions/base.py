@@ -33,10 +33,10 @@ class Function(object):
     def docs(self):
         "Build a minimal summary from function metadata."
         return {
-            'name': self.__class__.__name__,
-            'description': trim(self.__doc__),
-            'options': self.options,
-            'examples': self.examples,
+            "name": self.__class__.__name__,
+            "description": trim(self.__doc__),
+            "options": self.options,
+            "examples": self.examples,
         }
 
 
@@ -44,20 +44,23 @@ class Text(Function):
     """
     Text layout with preserved whitespace and wiki formatting.
     """
+
     options = {}
     examples = [
-        trim("""
+        trim(
+            """
             TEXT ---
             x x x
              x *[x] x
             ---
-        """),
+        """
+        ),
     ]
 
     def html(self, renderer):
         "Simple PRE tags"
-        if 'verse' in self.options:
-            return "<pre class=\"verse\">%s</pre>" % renderer.markup(self.text)
+        if "verse" in self.options:
+            return '<pre class="verse">%s</pre>' % renderer.markup(self.text)
         else:
             return "<pre>%s</pre>" % renderer.markup(self.text)
 
@@ -66,15 +69,18 @@ class Verbatim(Function):
     """
     Show exact text in the finished document.
     """
+
     option_list = {}
     examples = [
-        trim("""
+        trim(
+            """
         VERBATIM ---
         x x  x   x
          x x  x   x
           x x  x   x
         ---
-        """)
+        """
+        )
     ]
 
     def html(self, renderer):
@@ -89,12 +95,15 @@ class Articles(Function):
 
     Allow $[ADMIN_USER] in articles lists.
     """
+
     examples = [
-        trim("""
+        trim(
+            """
         ARTICLES ---
         $[ADMIN_USER]/article-wiki
         ---
-        """)
+        """
+        )
     ]
 
     def html(self, renderer):
@@ -103,11 +112,11 @@ class Articles(Function):
         data = Data(config)
         inline = Inline()
 
-        text = self.text.replace('$[ADMIN_USER]', data.admin_user)
+        text = self.text.replace("$[ADMIN_USER]", data.admin_user)
 
         articles = []
         for line in text.splitlines():
-            parts = line.split('/')
+            parts = line.split("/")
             if len(parts) == 2:
                 user_slug, doc_slug = parts
                 metadata = data.userDocumentMetadata_get(user_slug, doc_slug)
@@ -118,18 +127,21 @@ class Articles(Function):
             return ""
 
         __ = Airium()
-        with __.nav(klass='article-cards'):
+        with __.nav(klass="article-cards"):
             for a in articles:
-                word_count = int(a.get('word_count', 0))
+                word_count = int(a.get("word_count", 0))
                 details = f"{a.get('date')} &middot; {word_count:,} words"
-                with __.div(klass='article-card'):
+                with __.div(klass="article-card"):
                     with __.a(href=f"/read/{a.get('user')}/{a.get('slug')}"):
-                        __.div(klass="article-card-title balance-text",
-                               _t=inline.process(a.get('title')))
-                        __.div(klass="article-card-summary balance-text",
-                               _t=inline.process(a.get('summary')))
-                    __.div(klass="article-card-titles",
-                           _t=details)
+                        __.div(
+                            klass="article-card-title balance-text",
+                            _t=inline.process(a.get("title")),
+                        )
+                        __.div(
+                            klass="article-card-summary balance-text",
+                            _t=inline.process(a.get("summary")),
+                        )
+                    __.div(klass="article-card-titles", _t=details)
         return str(__)
 
 
@@ -138,6 +150,7 @@ class Wrapper(Function):
     Wrappers ONLY wrap tags around rendered HTML, but otherwise look much the
     same as Functions.
     """
+
     pass
 
 
@@ -147,7 +160,8 @@ class Left(Wrapper):
     """
 
     examples = [
-        trim("""
+        trim(
+            """
             LEFT (50%) ---
             . Big Corporation
             . Level 45
@@ -155,16 +169,17 @@ class Left(Wrapper):
             . Sydney
             . NSW 2000
             ---
-        """),
+        """
+        ),
     ]
 
     option_list = {
-        '1': "width (e.g. 5% or 5em)",
+        "1": "width (e.g. 5% or 5em)",
     }
 
     def wrap(self, html):
         "Wrap in left alignment."
-        return wrap('left', html, self.options)
+        return wrap("left", html, self.options)
 
 
 class Center(Wrapper):
@@ -173,22 +188,24 @@ class Center(Wrapper):
     """
 
     examples = [
-        trim("""
+        trim(
+            """
             CENTER (50%) ---
             . You are invited
             . to the wedding of
             . Jenny and Dave
             ---
-        """),
+        """
+        ),
     ]
 
     option_list = {
-        '1': "width (integer; % or em)",
+        "1": "width (integer; % or em)",
     }
 
     def wrap(self, html):
         "Wrap in center alignment."
-        return wrap('center', html, self.options)
+        return wrap("center", html, self.options)
 
 
 class Right(Wrapper):
@@ -197,23 +214,25 @@ class Right(Wrapper):
     """
 
     examples = [
-        trim("""
+        trim(
+            """
             RIGHT (33%) ---
             . Sender
             . Address Line
             . Locality
             . State Postcode
             ---
-        """),
+        """
+        ),
     ]
 
     option_list = {
-        '1': "width (integer; % or em)",
+        "1": "width (integer; % or em)",
     }
 
     def wrap(self, html):
         "Wrap in right alignment."
-        return wrap('right', html, self.options)
+        return wrap("right", html, self.options)
 
 
 class Float(Wrapper):
@@ -222,23 +241,25 @@ class Float(Wrapper):
     """
 
     examples = [
-        trim("""
+        trim(
+            """
             FLOAT (33%) ---
             . Sender
             . Address Line
             . Locality
             . State Postcode
             ---
-        """),
+        """
+        ),
     ]
 
     option_list = {
-        '1': "width (integer; % or em)",
+        "1": "width (integer; % or em)",
     }
 
     def wrap(self, html):
         "Wrap in right alignment."
-        return wrap('float', html, self.options)
+        return wrap("float", html, self.options)
 
 
 class Footer(Wrapper):
@@ -247,19 +268,20 @@ class Footer(Wrapper):
     """
 
     examples = [
-        trim("""
+        trim(
+            """
             FOOTER ---
             Questions and answers
             ---
-        """),
+        """
+        ),
     ]
 
-    option_list = {
-    }
+    option_list = {}
 
     def wrap(self, html):
         div = '<hr class="div-left div-solid div-10em" />\n\n'
-        return wrap('footer', div + html, self.options)
+        return wrap("footer", div + html, self.options)
 
 
 class Header(Wrapper):
@@ -268,19 +290,20 @@ class Header(Wrapper):
     """
 
     examples = [
-        trim("""
+        trim(
+            """
             HEADER ---
             Introductory comments...
             ---
-        """),
+        """
+        ),
     ]
 
-    option_list = {
-    }
+    option_list = {}
 
     def wrap(self, html):
         div = '\n\n<hr class="div-left div-solid div-10em" />'
-        return wrap('header', html + div, self.options)
+        return wrap("header", html + div, self.options)
 
 
 class Indent(Wrapper):
@@ -290,23 +313,25 @@ class Indent(Wrapper):
     """
 
     examples = [
-        trim("""
+        trim(
+            """
             INDENT (33%) ---
             . Recipient
             . Address Line
             . Locality
             . State Postcode
             ---
-        """),
+        """
+        ),
     ]
 
     option_list = {
-        '1': "width (integer; % or em)",
+        "1": "width (integer; % or em)",
     }
 
     def wrap(self, html):
         "Wrap in indentation."
-        return wrap('indent', html, self.options)
+        return wrap("indent", html, self.options)
 
 
 class Quote(Wrapper):
@@ -316,22 +341,24 @@ class Quote(Wrapper):
     """
 
     examples = [
-        trim("""
+        trim(
+            """
             QUOTE ---
             . Line
             : Indented line
             , Reference
             ---
-        """),
+        """
+        ),
     ]
 
     option_list = {
-        '1': "width (integer; % or em)",
+        "1": "width (integer; % or em)",
     }
 
     def wrap(self, html):
         "Wrap in indentation."
-        return '<blockquote>{:s}</blockquote>'.format(html)
+        return "<blockquote>{:s}</blockquote>".format(html)
 
 
 class Compact(Wrapper):
@@ -341,7 +368,8 @@ class Compact(Wrapper):
     """
 
     examples = [
-        trim("""
+        trim(
+            """
             COMPACT (2cols) ---
             lots of text lots of text lots of text lots of text lots of
             text lots of text lots of text lots of text lots of text lots
@@ -350,24 +378,23 @@ class Compact(Wrapper):
             text lots of text lots of text lots of text lots of text lots
             of text lots of text lots of text lots of text lots of text
             ---
-        """),
+        """
+        ),
     ]
 
-    option_list = {
-        '1': "2cols, 3cols (optional)"
-    }
+    option_list = {"1": "2cols, 3cols (optional)"}
 
     def wrap(self, html):
         """
         Just set bootstrap column options.
         """
-        if '2cols' in self.options:
-            columns = ' columns-x2 column-rule'
-        elif '3cols' in self.options:
-            columns = ' columns-x3 column-rule'
+        if "2cols" in self.options:
+            columns = " columns-x2 column-rule"
+        elif "3cols" in self.options:
+            columns = " columns-x3 column-rule"
         else:
-            columns = ''
-        return "<div class=\"compact%s\">%s</div>" % (columns, html)
+            columns = ""
+        return '<div class="compact%s">%s</div>' % (columns, html)
 
 
 class Feature(Function):
@@ -381,15 +408,20 @@ class Feature(Function):
         Show an image/quote tag for the text.
         """
         config = load_env_config()
-        key = bytes(config['APP_HASH'], 'utf-8')
-        message = bytes(self.text, 'utf-8')
-        checksum = hmac.new(key, message, 'sha224').hexdigest()[:16]
+        key = bytes(config["APP_HASH"], "utf-8")
+        message = bytes(self.text, "utf-8")
+        checksum = hmac.new(key, message, "sha224").hexdigest()[:16]
         encoded = urllib.parse.quote_plus(message)
-        return trim("""
+        return (
+            trim(
+                """
             <div class="wiki-feature no-print">
                 <img title="%s" src="/image/quote/%s/%s.jpg" />
             </div>
-            """) % (escape(self.text), checksum, encoded)
+            """
+            )
+            % (escape(self.text), checksum, encoded)
+        )
 
 
 class Box(Wrapper):
@@ -398,7 +430,8 @@ class Box(Wrapper):
     """
 
     examples = [
-        trim("""
+        trim(
+            """
             BOX ---
             lots of text lots of text lots of text lots of text lots of
             text lots of text lots of text lots of text lots of text lots
@@ -407,17 +440,17 @@ class Box(Wrapper):
             text lots of text lots of text lots of text lots of text lots
             of text lots of text lots of text lots of text lots of text
             ---
-        """),
+        """
+        ),
     ]
 
-    option_list = {
-    }
+    option_list = {}
 
     def wrap(self, html):
         """
         Wrap inner HTML.
         """
-        return "<div class=\"box-dotted\">%s</div>" % html
+        return '<div class="box-dotted">%s</div>' % html
 
 
 class Web(Wrapper):
@@ -426,21 +459,22 @@ class Web(Wrapper):
     """
 
     examples = [
-        trim("""
+        trim(
+            """
             WEB ---
             This text will only appear in web format.
             ---
-        """),
+        """
+        ),
     ]
 
-    option_list = {
-    }
+    option_list = {}
 
     def wrap(self, html):
         """
         Restrict text to appearing online only.
         """
-        return "<div class=\"web-only\">%s</div>" % html
+        return '<div class="web-only">%s</div>' % html
 
 
 class Print(Wrapper):
@@ -449,18 +483,19 @@ class Print(Wrapper):
     """
 
     examples = [
-        trim("""
+        trim(
+            """
             PRINT ---
             This text will only appear in print/PDF/eBook format.
             ---
-        """),
+        """
+        ),
     ]
 
-    option_list = {
-    }
+    option_list = {}
 
     def wrap(self, html):
         """
         Restrict text to only appearing in print.
         """
-        return "<div class=\"print-only\">%s</div>" % html
+        return '<div class="print-only">%s</div>' % html

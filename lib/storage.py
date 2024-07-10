@@ -28,6 +28,7 @@ from lib.slugs import slug
 # Load and Save Directories
 # -------------------------
 
+
 def save_dir(dir_path: str, document: dict, delete_files: bool = False):
     """
     Save a dictionary to a directory as text files.
@@ -47,7 +48,7 @@ def save_dir(dir_path: str, document: dict, delete_files: bool = False):
         for path in glob.glob(txt_files):
             os.remove(path)
     for key in document:
-        target = os.path.join(dir_path, key + '.txt')
+        target = os.path.join(dir_path, key + ".txt")
         fp = codecs.open(target, "w", "utf-8")
         fp.write(document[key])
         fp.close()
@@ -66,12 +67,12 @@ def load_dir(dir_path: str) -> dict:
     document = {}
     if not os.path.isdir(dir_path):
         raise ValueError("No directory at {:s}".format(dir_path))
-    file_pattern = os.path.join(dir_path, '*.txt')
+    file_pattern = os.path.join(dir_path, "*.txt")
     file_paths = glob.glob(file_pattern)
     for path in file_paths:
-        name = path.replace(dir_path + '/', '').replace('.txt', '')
+        name = path.replace(dir_path + "/", "").replace(".txt", "")
         part_slug = slug(name)
-        with open(path, 'r') as file:
+        with open(path, "r") as file:
             document[part_slug] = file.read()
         print("READ: {:s} ({:d})".format(part_slug, len(document[part_slug])))
     return document
@@ -81,14 +82,14 @@ def load_dir(dir_path: str) -> dict:
 # Generate zip file
 # -----------------
 
+
 def make_zip_name(user_slug: str) -> str:
     """
     Formats a timestamped archive name for this user_slug.
     """
     name = "article-wiki_{:s}_{:02d}{:02d}{:02d}_{:02}{:02d}.zip"
     now = datetime.datetime.now()
-    return name.format(user_slug, now.year, now.month, now.day, now.hour,
-                       now.minute)
+    return name.format(user_slug, now.year, now.month, now.day, now.hour, now.minute)
 
 
 def read_archive_dir(dir_path: str) -> Dict[str, Dict[str, str]]:
@@ -100,14 +101,14 @@ def read_archive_dir(dir_path: str) -> Dict[str, Dict[str, str]]:
     documentHash = {}
     if not os.path.isdir(dir_path):
         raise ValueError("No directory at {:s}".format(dir_path))
-    file_pattern = os.path.join(dir_path, '*')
+    file_pattern = os.path.join(dir_path, "*")
     for path in glob.glob(file_pattern):
-        print('PATH', path)
+        print("PATH", path)
         if os.path.isdir(path):
-            name = os.path.basename(path).replace('.txt', '')
+            name = os.path.basename(path).replace(".txt", "")
             part_slug = slug(name)
             documentHash[part_slug] = load_dir(path)
-            print('len %d' % len(documentHash[part_slug]))
+            print("len %d" % len(documentHash[part_slug]))
     return documentHash
 
 
@@ -151,7 +152,7 @@ def compress_archive_dir(dir_path: str, zip_name: str) -> str:
     process.communicate()  # <-- Wait for completion!
     os.chdir(cwd)
     zip_path = os.path.join(dir_path, zip_name)
-    print('ZIP_PATH', zip_path)
+    print("ZIP_PATH", zip_path)
     return zip_path
 
 

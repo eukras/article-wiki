@@ -14,6 +14,7 @@ from lib.wiki.renderer import alert, verbatim
 
 # No SVG in initial conversion of ebooks.
 
+
 class Dot(Function):
     """
     DOT :::
@@ -25,14 +26,14 @@ class Dot(Function):
 
     acceptable_formats = [  # From `man dot`,
         # - for drawing directed graphs (default for 'digraph')
-        'dot',
+        "dot",
         # - for drawing undirected graphs (default for 'graph')
-        'neato',
-        'twopi',            # - for radial layouts of graphs
-        'circo',            # - for circular layout of graphs
-        'fdp',              # - for drawing undirected graphs
-        'sfdp',             # - for drawing large undirected graphs
-        'patchwork',        # - for tree maps
+        "neato",
+        "twopi",  # - for radial layouts of graphs
+        "circo",  # - for circular layout of graphs
+        "fdp",  # - for drawing undirected graphs
+        "sfdp",  # - for drawing large undirected graphs
+        "patchwork",  # - for tree maps
     ]
 
     def syntax(self, renderer):
@@ -51,8 +52,7 @@ class Dot(Function):
         - http://www.graphviz.org/pdf/dotguide.pdf
         """
         self.renderer = renderer
-        return verbatim(self.syntax.__doc__ %
-                        '|'.join(self.acceptable_formats))
+        return verbatim(self.syntax.__doc__ % "|".join(self.acceptable_formats))
 
     def html(self, renderer):
         """
@@ -64,22 +64,22 @@ class Dot(Function):
             return alert(self.syntax(renderer))
 
         dot_format = self.options.pop()
-        if dot_format == '':
+        if dot_format == "":
             dot_format = self._guess_format(self.text)
         if dot_format not in self.acceptable_formats:
             return alert(self.syntax(renderer))
 
-        pattern = "<div classs=\"svg-wrapper\">%s</div>"
+        pattern = '<div classs="svg-wrapper">%s</div>'
         return pattern % self._generate_svg(dot_format, self.text)
 
     def _guess_format(self, dot_string):
         """
         Regular directed or undirected graphs can be guessed.
         """
-        if 'digraph' in dot_string:
-            return 'dot'
+        if "digraph" in dot_string:
+            return "dot"
         else:
-            return 'neato'
+            return "neato"
 
     def _generate_svg(self, dot_format, dot_string):
         """
@@ -87,20 +87,18 @@ class Dot(Function):
         installed; see requirements_apt.txt; ONLY tested on *NIX.
         """
         command = [
-            'dot',
-            '-K',
+            "dot",
+            "-K",
             dot_format,
-            '-T'
-            'svg',
-            '-Nfontname=Schoolbook',
-            '-Nfontsize=11']
+            "-T" "svg",
+            "-Nfontname=Schoolbook",
+            "-Nfontsize=11",
+        ]
 
-        file_in = dot_string.encode('utf-8')
-        file_out = subprocess.run(
-            command, stdout=subprocess.PIPE, input=file_in
-            )
-        result = file_out.stdout.decode('utf-8')
-        parts = result.split('<svg', 1)
+        file_in = dot_string.encode("utf-8")
+        file_out = subprocess.run(command, stdout=subprocess.PIPE, input=file_in)
+        result = file_out.stdout.decode("utf-8")
+        parts = result.split("<svg", 1)
         if len(parts) == 2:
             img_tag = "<img src='data:image/svg+xml;utf8,<svg%s' />"
             html = img_tag % parts[1]

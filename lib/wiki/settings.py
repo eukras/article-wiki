@@ -44,8 +44,8 @@ class Settings(object):
         have already had DEMO blocks removed, as they can also contain
         settings.
         """
-        if 'index' in parts:
-            blocks = BlockList(parts['index']).find('CharacterBlock', '$')
+        if "index" in parts:
+            blocks = BlockList(parts["index"]).find("CharacterBlock", "$")
             for block in blocks:
                 self.read_settings_block(block.content)
 
@@ -57,7 +57,7 @@ class Settings(object):
         $ AUTHOR = Me
         $ DATE = 2017-06-12
         """
-        vals = split_to_dictionary(text, prefix='$', delimiter='=')
+        vals = split_to_dictionary(text, prefix="$", delimiter="=")
         self._.update(vals)
 
     def set(self, key, value):
@@ -91,7 +91,7 @@ class Settings(object):
         # @TODO: Implement patterns: $[tw:eukras]
 
         value = pattern[2:-1]
-        if value[-2:] == '++':
+        if value[-2:] == "++":
             # Counters: @todo: Allow actual counters? 1/a/A/i/I/g/G?
             var = value[0:-2]
             if var in self._:
@@ -101,7 +101,7 @@ class Settings(object):
                 else:
                     return "<del>$[%s]++</del> (Not a number!)" % var
             else:
-                self._[var] = '1'
+                self._[var] = "1"
                 return "%s" % (self._[var])
         else:
             if value in self._:
@@ -119,30 +119,29 @@ class Settings(object):
         """
         Process $[value] markers in text.
         """
-        return re.sub(r'\$\[[^\]]*\]', self.decorate, text)
+        return re.sub(r"\$\[[^\]]*\]", self.decorate, text)
 
     def get_base_uri(self, action, part=None, relative=False):
         """
         Normal base URL for any given action.
         """
-        website = '/' if relative else self.get('config:host',
-                                                'https://example.org')
-        user_slug = self.get('config:user', 'guest')
-        doc_slug = self.get('config:document', 'notebook')
+        website = "/" if relative else self.get("config:host", "https://example.org")
+        user_slug = self.get("config:user", "guest")
+        doc_slug = self.get("config:document", "notebook")
         url_parts = [website, action, user_slug, doc_slug]
         if part:
             url_parts += [part]
-        return '/'.join([_.strip('/') for _ in url_parts])
+        return "/".join([_.strip("/") for _ in url_parts])
 
     def set_config(self, key, list_):
         """
         Use an un-sluggable prefix to store info that users can't set.
         """
         assert isinstance(list_, list)
-        self._['config:' + key] = list_
+        self._["config:" + key] = list_
 
     def get_config(self, key, alternative):
         """
         Use an un-sluggable prefix to store info that users can't set.
         """
-        return self.get('config:' + key, alternative)
+        return self.get("config:" + key, alternative)

@@ -15,12 +15,12 @@ next(counter) == u'XII'  # <-- and so on.
 import roman
 
 
-ROMAN_LETTERS = 'abcdefghijklmnopqrstuvwxyz'
-GREEK_LETTERS = 'αβγδεζηθικλμνξοπρστυφχψω'
-SYMBOL_MARKERS = '*†‡§‖¶'
+ROMAN_LETTERS = "abcdefghijklmnopqrstuvwxyz"
+GREEK_LETTERS = "αβγδεζηθικλμνξοπρστυφχψω"
+SYMBOL_MARKERS = "*†‡§‖¶"
 
 
-def new_counter(label='1'):
+def new_counter(label="1"):
     """
     Factory method: Creates a counter by its CLASSES label. Use an uppercase
     letter to get an uppercase counter.
@@ -35,15 +35,16 @@ def new_counter(label='1'):
     """
     uppercase = True
     return {
-        'A': Letters('a', uppercase, ROMAN_LETTERS),
-        'a': Letters('a', not uppercase, ROMAN_LETTERS),
-        'G': Letters('α', uppercase, GREEK_LETTERS),
-        'g': Letters('α', not uppercase, GREEK_LETTERS),
-        'I': RomanNumerals('i', uppercase),
-        'i': RomanNumerals('i', not uppercase),
-        '*': Symbols('*'),
-        }.get(label, Numbers(1))  # <-- Default.
-
+        "A": Letters("a", uppercase, ROMAN_LETTERS),
+        "a": Letters("a", not uppercase, ROMAN_LETTERS),
+        "G": Letters("α", uppercase, GREEK_LETTERS),
+        "g": Letters("α", not uppercase, GREEK_LETTERS),
+        "I": RomanNumerals("i", uppercase),
+        "i": RomanNumerals("i", not uppercase),
+        "*": Symbols("*"),
+    }.get(
+        label, Numbers(1)
+    )  # <-- Default.
 
 
 class Numbers(object):
@@ -53,7 +54,8 @@ class Numbers(object):
     Uppercase is ignored, obviously; it's just there for a consistent
     interface among the counters.
     """
-    def __init__(self, value='1', uppercase=False):
+
+    def __init__(self, value="1", uppercase=False):
         self.value = int(value)
 
     def __iter__(self):
@@ -72,7 +74,7 @@ class RomanNumerals(object):
     I, II, III, IV, V, VI, VII, VIII, IX, XI, XII, XIII, XIV, ...
     """
 
-    def __init__(self, value='i', uppercase=False):
+    def __init__(self, value="i", uppercase=False):
         """
         Only accept significant characters; however, our only interest is in
         counting from 'i', and no other verification is applied.
@@ -94,9 +96,9 @@ class RomanNumerals(object):
         try:
             numeral = str(roman.toRoman(self.value))  # <-- returns uppercase
             self.value += 1
-        except roman.RomanError as e: # <-- Out of range; start again.
+        except roman.RomanError as e:  # <-- Out of range; start again.
             # print e
-            numeral = 'I'
+            numeral = "I"
             self.value = 2
         return numeral if self.uppercase else numeral.lower()
 
@@ -105,7 +107,8 @@ class Letters(object):
     """
     a, b, c, ... z, aa, ab, ... az, ba, bb, ...
     """
-    def __init__(self, value='a', uppercase=False, pool=ROMAN_LETTERS):
+
+    def __init__(self, value="a", uppercase=False, pool=ROMAN_LETTERS):
         assert isinstance(value, str) or value is None
         self.value = value.lower() if value is not None else pool[0]
         self.uppercase = bool(uppercase)
@@ -129,7 +132,8 @@ class Symbols(object):
     Uppercase is ignored, obviously; it's just there for a consistent
     interface among the counters.
     """
-    def __init__(self, value='*', uppercase=False, pool=SYMBOL_MARKERS):
+
+    def __init__(self, value="*", uppercase=False, pool=SYMBOL_MARKERS):
         assert isinstance(value, str) or value is None
         self.value = value
         self.pool = pool
@@ -147,6 +151,7 @@ class Symbols(object):
 #  Incrementor functions
 #  ---------------------
 
+
 def letter_increment(value, pool):
     """
     For lowercase letters we should see:
@@ -161,6 +166,7 @@ def letter_increment(value, pool):
         return letter_increment(value[:-1], pool) + pool[0]
     else:
         return value[:-1] + pool[pool.find(value[-1]) + 1]
+
 
 def symbol_increment(value, pool):
     """

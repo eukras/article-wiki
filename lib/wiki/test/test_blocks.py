@@ -7,16 +7,17 @@ from lxml import html
 
 from .context import lib  # noqa: F401
 
-from lib.wiki.blocks import \
-    BlockList, \
-    CharacterBlock, \
-    Divider, \
-    FunctionBlock, \
-    get_title_data, \
-    list_block, \
-    Paragraph, \
-    start_of_block, \
-    table_block
+from lib.wiki.blocks import (
+    BlockList,
+    CharacterBlock,
+    Divider,
+    FunctionBlock,
+    get_title_data,
+    list_block,
+    Paragraph,
+    start_of_block,
+    table_block,
+)
 
 from lib.wiki.functions.base import Text
 from lib.wiki.renderer import Html
@@ -31,18 +32,20 @@ def class_list(blocks):
 
 def test_start_of_block():
     "Advance the cursor to next non-whitespace start-of-line."
-    text = trim("""
+    text = trim(
+        """
         01 3 5
 
         8
 
 
         12
-        """)
-    assert text[0] == '0'
-    assert text[5] == '5'
-    assert text[8] == '8'
-    assert text[12:14] == '12'
+        """
+    )
+    assert text[0] == "0"
+    assert text[5] == "5"
+    assert text[8] == "8"
+    assert text[12:14] == "12"
     assert start_of_block(text, -1) == 0
     assert start_of_block(text, 0) == 0
     assert start_of_block(text, 4) == 8
@@ -55,42 +58,55 @@ def test_start_of_block():
 
 
 def test_paragraph():
-    block = Paragraph(trim("""
+    block = Paragraph(
+        trim(
+            """
         x
         y
         x
-        """))
-    assert block.text() == 'x y x'
-    assert block.html_only(Html(), Settings()) == '<p>x y x</p>'
+        """
+        )
+    )
+    assert block.text() == "x y x"
+    assert block.html_only(Html(), Settings()) == "<p>x y x</p>"
 
 
 def test_divider():
-    block = Divider(trim("""
+    block = Divider(
+        trim(
+            """
         - - -
-        """))
-    assert block.text() == '- - -'
+        """
+        )
+    )
+    assert block.text() == "- - -"
     assert block.html_only(Html(), Settings()) == '<hr class="div-solid" />'
 
 
 def test_character_block():
-    block = CharacterBlock(trim("""
+    block = CharacterBlock(
+        trim(
+            """
         @ X
-        """))
-    assert block.text() == '\n@ X'  # <-- with leading space for a heading
+        """
+        )
+    )
+    assert block.text() == "\n@ X"  # <-- with leading space for a heading
     expected = '<p class="subhead">X</p>'
     assert block.html_only(Html(), Settings()) == expected
 
 
 def test_function_block():
-    block = FunctionBlock(Text, [], '-', 'x')
-    assert block.text() == 'TEXT ---\nx\n---'
-    assert block.html_only(Html(), Settings()) == '<pre>x</pre>'
+    block = FunctionBlock(Text, [], "-", "x")
+    assert block.text() == "TEXT ---\nx\n---"
+    assert block.html_only(Html(), Settings()) == "<pre>x</pre>"
 
 
 def test_blocklist():
     "List of blocks..."
     # 1
-    text = trim("""
+    text = trim(
+        """
         @ Heading
 
         Paragraph
@@ -108,20 +124,22 @@ def test_blocklist():
         TEXT ---
         Text
         ---
-        """)
+        """
+    )
     blocks = BlockList(text)
     assert class_list(blocks) == [
-        'CharacterBlock',
-        'Paragraph',
-        'Divider',
-        'Paragraph',
-        'FunctionBlock',
-        'Paragraph',
-        'FunctionBlock',
+        "CharacterBlock",
+        "Paragraph",
+        "Divider",
+        "Paragraph",
+        "FunctionBlock",
+        "Paragraph",
+        "FunctionBlock",
     ]
     assert blocks.text() == "\n" + text
     # 2
-    text = trim("""
+    text = trim(
+        """
         TEXT ---
         Text
         ---
@@ -140,16 +158,17 @@ def test_blocklist():
         ---
 
         Paragraph
-        """)
+        """
+    )
     blocks = BlockList(text)
     assert class_list(blocks) == [
-        'FunctionBlock',
-        'CharacterBlock',
-        'Paragraph',
-        'Divider',
-        'Paragraph',
-        'FunctionBlock',
-        'Paragraph',
+        "FunctionBlock",
+        "CharacterBlock",
+        "Paragraph",
+        "Divider",
+        "Paragraph",
+        "FunctionBlock",
+        "Paragraph",
     ]
     assert blocks.text() == text
 
@@ -158,7 +177,8 @@ def test_find():
     """
     s
     """
-    text = trim("""
+    text = trim(
+        """
         Title
 
         = Summary
@@ -170,12 +190,13 @@ def test_find():
         @ Subheading
 
         OK
-        """)
+        """
+    )
     blocks = BlockList(text)
-    headings = blocks.find('CharacterBlock', "@")
+    headings = blocks.find("CharacterBlock", "@")
     assert class_list(headings) == [
-        'CharacterBlock',
-        'CharacterBlock',
+        "CharacterBlock",
+        "CharacterBlock",
     ]
 
 
@@ -183,13 +204,15 @@ def test_pop_titles():
     """
     We should be able to extract the title and summary lines.
     """
-    text = trim("""
+    text = trim(
+        """
         Title
 
         = Summary
 
         Text
-        """)
+        """
+    )
     blocks = BlockList(text)
     title, summary = blocks.pop_titles()
     assert title == "Title"
@@ -201,11 +224,13 @@ def test_pop_titles_minimal():
     """
     We should be able to extract the title and summary lines.
     """
-    text = trim("""
+    text = trim(
+        """
         Title
 
         = Summary
-        """)
+        """
+    )
     blocks = BlockList(text)
     title, summary = blocks.pop_titles()
     assert title == "Title"
@@ -217,9 +242,11 @@ def test_pop_titles_oneline():
     """
     We should be able to extract the title and summary lines.
     """
-    text = trim("""
+    text = trim(
+        """
         Title
-        """)
+        """
+    )
     blocks = BlockList(text)
     title, summary = blocks.pop_titles()
     assert title == "Title"
@@ -232,7 +259,8 @@ def test_get_title_data():
     Index.txt should identify a sensible title (or 'Untitled'). A caption after
     the title is the summary.
     """
-    index = trim("""
+    index = trim(
+        """
         This is the TITLE!
 
         = This is the SUMMARY!
@@ -244,24 +272,29 @@ def test_get_title_data():
         This is the text.
 
         This is the text.
-        """)
-    slug, title, title_slug, summary = get_title_data(index, 'index')
-    assert slug == 'index'
-    assert title == 'This is the TITLE!'
-    assert title_slug == 'this-is-the-slug'
-    assert summary == 'This is the SUMMARY!'
+        """
+    )
+    slug, title, title_slug, summary = get_title_data(index, "index")
+    assert slug == "index"
+    assert title == "This is the TITLE!"
+    assert title_slug == "this-is-the-slug"
+    assert summary == "This is the SUMMARY!"
 
 
 def test_empty_function_block():
-    spaced = trim("""
+    spaced = trim(
+        """
         COMPACT ---
 
         ---
-        """)
-    unspaced = trim("""
+        """
+    )
+    unspaced = trim(
+        """
         COMPACT ---
         ---
-        """)
+        """
+    )
     blocks = BlockList(spaced)
     assert blocks.text() == unspaced
     blocks = BlockList(unspaced)
@@ -270,40 +303,44 @@ def test_empty_function_block():
 
 def test_empty_blocklist():
     "Test function block with zero lines"
-    text = trim("""
+    text = trim(
+        """
         TEXT ---
         Hi!
         ---
-        """)
+        """
+    )
     blocks = BlockList(text)
-    assert class_list(blocks) == ['FunctionBlock']
+    assert class_list(blocks) == ["FunctionBlock"]
     assert blocks.text() == text
 
 
 def test_nested_blocklist():
     "Test function block with zero lines"
-    text = trim("""
+    text = trim(
+        """
         LEFT (35%) ---
         TEXT ===
         Hi!
         ===
         ---
-        """)
+        """
+    )
     blocks = BlockList(text)
-    assert class_list(blocks) == ['FunctionBlock']
-    subclass_list = [
-        _.__class__.__name__ for _ in list(iter(blocks))[0].blocks
-    ]
-    assert subclass_list == ['FunctionBlock']
+    assert class_list(blocks) == ["FunctionBlock"]
+    subclass_list = [_.__class__.__name__ for _ in list(iter(blocks))[0].blocks]
+    assert subclass_list == ["FunctionBlock"]
     assert blocks.text() == text
 
 
 def test_list_block():
     "Test function block with zero lines"
-    text = trim("""
+    text = trim(
+        """
         # Test 1
         # Test 2
-        """)
+        """
+    )
     actual = list_block(text, Settings())
     print(actual)
     __ = html.fromstring(str(actual))
@@ -315,10 +352,12 @@ def test_list_block():
 
 def test_list_block_recursor():
     "Test function block with zero lines"
-    text = trim("""
+    text = trim(
+        """
         # Test 1
         # # Test 2
-        """)
+        """
+    )
     actual = list_block(text, Settings())
     print(actual)
     __ = html.fromstring(str(actual))
@@ -330,11 +369,14 @@ def test_list_block_recursor():
 
 def test_table_block():
     "Simple table, with headers"
-    text = trim("""
+    text = trim(
+        """
         | Test 1 | Test 2
         | Test 3 | Test 4
-        """)
-    expect = trim("""
+        """
+    )
+    expect = trim(
+        """
         <table class="table table-condensed">
         <tbody>
         <tr>
@@ -347,6 +389,7 @@ def test_table_block():
         </tr>
         </tbody>
         </table>
-        """)
+        """
+    )
     actual = table_block(text, Settings())
     assert expect == actual

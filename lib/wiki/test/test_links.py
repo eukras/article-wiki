@@ -7,12 +7,12 @@ from lib.wiki.links import Links
 from lib.wiki.outline import Outline, default_counters
 from lib.wiki.utils import trim
 
-id_prefix ="PREFIX"
+id_prefix = "PREFIX"
 
 
 def test_split_pattern():
-    assert split_pattern("^[Link]!") == ("Link", '!')
-    assert split_pattern("^[Link]") == ("Link", '')
+    assert split_pattern("^[Link]!") == ("Link", "!")
+    assert split_pattern("^[Link]") == ("Link", "")
 
 
 def sample_doc():
@@ -20,7 +20,8 @@ def sample_doc():
     Basic document outline.
     """
     return {
-        'index': trim("""
+        "index": trim(
+            """
             My Document
 
             $ AUTHOR = Me!
@@ -33,20 +34,26 @@ def sample_doc():
             - - Topic Two Subsection One.
             - Topic Three
             - Topic Four
-            """),
-        'topic-one': trim("""
+            """
+        ),
+        "topic-one": trim(
+            """
             Topic One.
 
             This topic contains no footnotes.
-            """),
-        'topic-two': trim("""
+            """
+        ),
+        "topic-two": trim(
+            """
             Topic Two.
 
             This topic contains a ^[footnote]!
 
             ^ The author, private conversation.
-            """),
-        'topic-two-subsection-one': trim("""
+            """
+        ),
+        "topic-two-subsection-one": trim(
+            """
             Topic Two Subsection One.
 
             This topic contains a ^[link] as well as a
@@ -54,23 +61,28 @@ def sample_doc():
 
             ^ http://example.org
             ^ The author, private conversation.
-            """),
-        'topic-three': trim("""
+            """
+        ),
+        "topic-three": trim(
+            """
             Topic Three
 
             This topic contains a ^[link] but not a
             ^[footnote]!
 
             ^ http://example.org
-            """),
-        'topic-four': trim("""
+            """
+        ),
+        "topic-four": trim(
+            """
             Topic Four.
 
             This topic contains only a ^[footnote]!
 
             ^ http://example.org
             ^ The author, private conversation.
-            """),
+            """
+        ),
     }
 
 
@@ -84,5 +96,5 @@ def test_footnotes():
     new_parts = links.insert(parts)
     end_parts = links.replace(new_parts)
     out = footnotes.html()
-    dom = html.fragment_fromstring(out, create_parent='body')[0]
-    assert len(dom.cssselect('sup')) == 6
+    dom = html.fragment_fromstring(out, create_parent="body")[0]
+    assert len(dom.cssselect("sup")) == 6

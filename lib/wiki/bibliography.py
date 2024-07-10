@@ -4,7 +4,6 @@ Manage a simple bibliography list, of full-line records.
 @todo: ibid. and op. cit.
 """
 
-
 import re
 
 from jinja2 import Environment
@@ -70,7 +69,7 @@ class Bibliography(object):
         terms = get_words(strip_markup(citation))
         for label in self.entries:
             entry = self.entries[label]
-            lowercase_entry = label.lower() + ' ' + entry.lower()
+            lowercase_entry = label.lower() + " " + entry.lower()
             if all([_ in lowercase_entry for _ in terms]):
                 return label
         return default
@@ -80,7 +79,7 @@ class Bibliography(object):
         Return the footnote counter for this part:
         """
         if part_slug not in self.counters:
-            if part_slug == 'index':
+            if part_slug == "index":
                 self.counters[part_slug] = Symbols()
             else:
                 self.counters[part_slug] = Letters()
@@ -104,31 +103,53 @@ class Bibliography(object):
             self.citations[label][number] = []
 
         # Use a '-' leader to suppress brackets.
-        if citation[0] == '-':
+        if citation[0] == "-":
             use_citation = citation[1:]
-            bracket_open, bracket_close = '', ''
+            bracket_open, bracket_close = "", ""
         else:
             use_citation = citation
-            bracket_open, bracket_close = '(', ')'
+            bracket_open, bracket_close = "(", ")"
 
         citation_markup = self.inline.process(use_citation)
 
         if note.strip() != "":
             note_markup = self.inline.process(note)
-            link = "<a id=\"%s_%s\" href=\"#ref_%s_%s\">%s%s, %s%s%s" \
-                   "<sup>%s</sup></a>" % \
-                   (self.id_prefix, nav_id, self.id_prefix, nav_id,
-                    bracket_open, citation_markup, note_markup, bracket_close,
-                    punctuation, count)
+            link = (
+                '<a id="%s_%s" href="#ref_%s_%s">%s%s, %s%s%s'
+                "<sup>%s</sup></a>"
+                % (
+                    self.id_prefix,
+                    nav_id,
+                    self.id_prefix,
+                    nav_id,
+                    bracket_open,
+                    citation_markup,
+                    note_markup,
+                    bracket_close,
+                    punctuation,
+                    count,
+                )
+            )
         else:
-            link = "<a id=\"%s_%s\" href=\"#ref_%s_%s\">%s%s%s%s" \
-                   "<sup>%s</sup></a>" % \
-                   (self.id_prefix, nav_id, self.id_prefix, nav_id,
-                    bracket_open, citation_markup, bracket_close,
-                    punctuation, count)
+            link = '<a id="%s_%s" href="#ref_%s_%s">%s%s%s%s' "<sup>%s</sup></a>" % (
+                self.id_prefix,
+                nav_id,
+                self.id_prefix,
+                nav_id,
+                bracket_open,
+                citation_markup,
+                bracket_close,
+                punctuation,
+                count,
+            )
 
-        ref_link = "<a id=\"ref_%s_%s\" href=\"#%s_%s\">%s</a>" % \
-                   (self.id_prefix, nav_id, self.id_prefix, nav_id, count)
+        ref_link = '<a id="ref_%s_%s" href="#%s_%s">%s</a>' % (
+            self.id_prefix,
+            nav_id,
+            self.id_prefix,
+            nav_id,
+            count,
+        )
         self.citations[label][number] += [ref_link]
 
         return link
@@ -140,7 +161,8 @@ class Bibliography(object):
         assert isinstance(self.entries, dict)
 
         env = Environment(autoescape=True)
-        tpl = env.from_string("""
+        tpl = env.from_string(
+            """
             {% if entries|length > 0 %}
             <section id="{{ id_prefix }}-bibliography" class="bibliography">
             <div class="section-content">
@@ -173,15 +195,16 @@ class Bibliography(object):
             </div>
             </section>
             {% endif %}
-            """)
+            """
+        )
 
         if not self.entries:
-            return '';
+            return ""
         return tpl.render(
             single_page=self.outline.single_page(),
             entries=self.entries,
             citations=self.citations,
-            id_prefix=self.id_prefix
+            id_prefix=self.id_prefix,
         )
 
 
@@ -195,9 +218,9 @@ def get_number(numbering):
     Take array of ['x', 'y', 'z']; return 'x.y.z'.
     """
     if isinstance(numbering, list):
-        return '.'.join([str(_) for _ in numbering])
+        return ".".join([str(_) for _ in numbering])
     else:
-        return '0'
+        return "0"
 
 
 def get_nav_id(label, numbering, count):
@@ -206,14 +229,14 @@ def get_nav_id(label, numbering, count):
     #ref-nav_id is the bibliography anchor
     """
     number = get_number(numbering)
-    return slug(label) + '_' + number + '_' + str(count)
+    return slug(label) + "_" + number + "_" + str(count)
 
 
 def nonempty_lines(content):
     """
     Add bibliography lines to the bibliography list.
     """
-    return [_.strip() for _ in content.splitlines() if _.strip() != '']
+    return [_.strip() for _ in content.splitlines() if _.strip() != ""]
 
 
 def split_bibliography(part):
@@ -221,10 +244,7 @@ def split_bibliography(part):
     Divide text from bibliography if a block of at least three underscores
     is found.
     """
-    divisions = re.split(
-        "\n\n_{3,} *\n\n",
-        part,
-        1)  # <-- only the first split
+    divisions = re.split("\n\n_{3,} *\n\n", part, 1)  # <-- only the first split
     if len(divisions) == 2:
         return divisions
     else:
@@ -237,7 +257,7 @@ def collate_bibliography(parts):
     """
     lines = []
     for key, section in parts.items():
-        if key == 'biblio':
+        if key == "biblio":
             lines += nonempty_lines(section)
         else:
             _, biblio = split_bibliography(section)
@@ -251,13 +271,13 @@ def split_label(entry):
     Take a bibliography entry and return a tuple of author-year labels, and the
     remainder of the line.
     """
-    four_digits = re.compile(r'\d{4}')
+    four_digits = re.compile(r"\d{4}")
     sentences = get_sentences(entry)
-    head, tail = ' '.join(sentences[:1]), ' '.join(sentences[1:])
+    head, tail = " ".join(sentences[:1]), " ".join(sentences[1:])
     if len(sentences) > 1:
         match_author_year = four_digits.match(sentences[1])
         if match_author_year:
-            head, tail = ' '.join(sentences[:2]), ' '.join(sentences[2:])
+            head, tail = " ".join(sentences[:2]), " ".join(sentences[2:])
     return head, tail
 
 

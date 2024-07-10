@@ -13,11 +13,11 @@ class Entities(object):
     Extract backslashes characters; restore with backslashes removed.
     """
 
-    regex = r'\&\w+;'
+    regex = r"\&\w+;"
 
     def __init__(self):
         "This is a thin wrapper for Placeholders"
-        self.placeholders = Placeholders(self.regex, 'en')
+        self.placeholders = Placeholders(self.regex, "en")
 
     def insert(self, parts):
         "Add placeholders."

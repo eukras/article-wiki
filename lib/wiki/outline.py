@@ -32,24 +32,25 @@ class Outline(object):
         Create contents list, replace cross-references with placeholders.
         """
 
-        if 'index' in parts:
-            hierarchy = extract_outline(parts['index'], counters)
+        if "index" in parts:
+            hierarchy = extract_outline(parts["index"], counters)
         else:
             hierarchy = create_outline(parts)  # <-- counters? Hmmz.
 
         self.elements = [
-            (numbering,
-             slug,
-             title,
-             title_slug,
-             count_words(parts[slug]) if slug in parts else 0)
+            (
+                numbering,
+                slug,
+                title,
+                title_slug,
+                count_words(parts[slug]) if slug in parts else 0,
+            )
             for numbering, (slug, title, title_slug, summary) in hierarchy
         ]
-        if 'index' in parts:
-            slug, title, title_slug, _ = get_title_data(
-                parts['index'], 'index')
-            num_words = count_words(parts['index'])
-            element = (['0'], slug, title, title_slug, num_words)
+        if "index" in parts:
+            slug, title, title_slug, _ = get_title_data(parts["index"], "index")
+            num_words = count_words(parts["index"])
+            element = (["0"], slug, title, title_slug, num_words)
             self.elements.insert(0, element)
 
         self.errors = {}  # <-- store wiki errors in the outline
@@ -58,10 +59,12 @@ class Outline(object):
         """
         Simple text representation
         """
-        return "".join([
-            "%s %s:%s (%s)\n" % ('.'.join(numbering), slug, title, word_count)
-            for (numbering, slug, title, _, word_count) in self.elements
-        ])
+        return "".join(
+            [
+                "%s %s:%s (%s)\n" % (".".join(numbering), slug, title, word_count)
+                for (numbering, slug, title, _, word_count) in self.elements
+            ]
+        )
 
     def __iter__(self):
         """
@@ -80,11 +83,13 @@ class Outline(object):
         Confirm that there is just one page that isn't index or biblio.
         """
         slugs = [slug for (_, slug, _, _, _) in self.elements]
-        return all([
-            len(slugs) == 1,
-            # 'index' not in slugs, # <-- Allowing single-page view of index.
-            'biblio' not in slugs,
-        ])
+        return all(
+            [
+                len(slugs) == 1,
+                # 'index' not in slugs, # <-- Allowing single-page view of index.
+                "biblio" not in slugs,
+            ]
+        )
 
     def find_title(self, match_numbering):
         """
@@ -99,7 +104,7 @@ class Outline(object):
         """
         Return the numbering for a part, by slug.
         """
-        for (numbering, slug, _, _, _) in self.elements:
+        for numbering, slug, _, _, _ in self.elements:
             if numbering == match_numbering:
                 return slug
         return default
@@ -108,7 +113,7 @@ class Outline(object):
         """
         Return the numbering for a part, by slug.
         """
-        for (numbering, slug, _, _, _) in self.elements:
+        for numbering, slug, _, _, _ in self.elements:
             if slug == part_slug:
                 return numbering
         return default
@@ -126,8 +131,9 @@ class Outline(object):
         if part_slug not in self.errors:
             self.errors[part_slug] = []
         self.errors[part_slug] += [(pattern, message)]
-        return "<kbd class=\"wr-error\" title=\"%s\">%s</kbd>" % (
-            escape(pattern), escape(message)
+        return '<kbd class="wr-error" title="%s">%s</kbd>' % (
+            escape(pattern),
+            escape(message),
         )
 
     def html(self, edit_base_uri):
@@ -135,7 +141,9 @@ class Outline(object):
         Generate a table of contents.
         """
         env = Environment(autoescape=True)
-        tpl = env.from_string(trim("""
+        tpl = env.from_string(
+            trim(
+                """
             {% if outline|length > 0 %}
             <h2 id="table-of-contents">Table of Contents</h2>
             <table class="table table-of-contents table-condensed">
@@ -197,23 +205,29 @@ class Outline(object):
                 </tbody>
             </table>
             {% endif %}
-            """))
+            """
+            )
+        )
         inline = Inline()
         max_depth = max([len(nums) for (nums, _, _, _, _) in self.elements])
-        formatted = [(numbering,
-                      anchor_name(numbering, slug),
-                      slug,
-                      inline.process(title),
-                      '{:,d}'.format(word_count),
-                      '{:,d}'.format(subtotal),
-                      ) for (numbering, slug, title, total_slug, word_count, subtotal)
-                     in totalize(self.elements)
-                     ]
+        formatted = [
+            (
+                numbering,
+                anchor_name(numbering, slug),
+                slug,
+                inline.process(title),
+                "{:,d}".format(word_count),
+                "{:,d}".format(subtotal),
+            )
+            for (numbering, slug, title, total_slug, word_count, subtotal) in totalize(
+                self.elements
+            )
+        ]
         return tpl.render(
             outline=formatted,
             max_depth=max_depth,
             edit_base_uri=edit_base_uri,
-            total_word_count='{:,d}'.format(self.total_word_count())
+            total_word_count="{:,d}".format(self.total_word_count()),
         )
 
     def errors_html(self):
@@ -221,7 +235,9 @@ class Outline(object):
         Render an errors summary: @todo
         """
         env = Environment(autoescape=True)
-        tpl = env.from_string(trim("""
+        tpl = env.from_string(
+            trim(
+                """
             <nav id="table-of-contents">
                 {% for number, name, title, word_count in outline %}
                 <div class="row">
@@ -237,7 +253,9 @@ class Outline(object):
                 </div>
                 {% endfor %}
             </nav>
-            """))
+            """
+            )
+        )
         return tpl.render(errors=self.errors)
 
     def html_spare_parts(self, doc_parts, edit_base_uri):
@@ -249,12 +267,15 @@ class Outline(object):
         """
         found = [slug for (_, slug, _, _, _) in self.elements]
         spare_parts = [
-            _ for _ in list(doc_parts.keys())
-            if _ not in found and _ not in ['index', 'biblio']
+            _
+            for _ in list(doc_parts.keys())
+            if _ not in found and _ not in ["index", "biblio"]
         ]
 
         env = Environment(autoescape=True)
-        tpl = env.from_string(trim("""
+        tpl = env.from_string(
+            trim(
+                """
             {% if spare_parts|length > 0 %}
             <div class="wiki-note">
                 These parts  do not appear in the index's outline:
@@ -264,11 +285,10 @@ class Outline(object):
                 ({{ spare_parts|length }}).
             </div>
             {% endif %}
-            """))
-        return tpl.render(
-            spare_parts=spare_parts,
-            edit_base_uri=edit_base_uri
+            """
+            )
         )
+        return tpl.render(spare_parts=spare_parts, edit_base_uri=edit_base_uri)
 
 
 # ----------------
@@ -281,7 +301,7 @@ def default_counters():
     Default to: Numerals, Lowercase Alpha, Lowercase Roman, Lowercase Greek,
     Uppercase Alpha, Uppercase Roman, Uppercase Greek.
     """
-    return ['1', 'a', 'i', 'g', 'A', 'I', 'G']
+    return ["1", "a", "i", "g", "A", "I", "G"]
 
 
 def anchor_name(numbering, slug):
@@ -291,8 +311,8 @@ def anchor_name(numbering, slug):
     assert len(numbering) > 0
     assert isinstance(slug, str)
 
-    number = '.'.join([str(_) for _ in numbering])
-    return number + '_' + slug
+    number = ".".join([str(_) for _ in numbering])
+    return number + "_" + slug
 
 
 def extract_title(text):
@@ -336,8 +356,10 @@ def create_outline(parts: dict):
     """
     Sort the parts by their titles/slugs.
     """
-    return [([str(number + 1)], get_title_data(parts[_], _))
-            for number, _ in enumerate(sorted(parts.keys()))]
+    return [
+        ([str(number + 1)], get_title_data(parts[_], _))
+        for number, _ in enumerate(sorted(parts.keys()))
+    ]
 
 
 def extract_outline(text: str, counters: list) -> list:
@@ -349,18 +371,16 @@ def extract_outline(text: str, counters: list) -> list:
     """
     for _ in BlockList(text):
         if isinstance(_, CharacterBlock) and _.control_character == "-":
-            hierarchy = split_to_recursive_array(_.content, '- ')
+            hierarchy = split_to_recursive_array(_.content, "- ")
             enumeration = enumerate_list(hierarchy, counters, [])
-            outline = [(numbering, (slug(_), _, slug(_), ''))
-                       for numbering, _ in enumeration]
+            outline = [
+                (numbering, (slug(_), _, slug(_), "")) for numbering, _ in enumeration
+            ]
             return outline
     return []
 
 
-def html_heading(numbering: list,
-                 title: str,
-                 slug: str,
-                 base_edit_uri: str) -> str:
+def html_heading(numbering: list, title: str, slug: str, base_edit_uri: str) -> str:
     """
     Generate the first line of each block, including the anchor tag, and
     any navigational links.
@@ -368,7 +388,9 @@ def html_heading(numbering: list,
     The numbering depth determines H1..H6.
     """
     env = Environment(autoescape=True)
-    tpl = env.from_string(trim("""
+    tpl = env.from_string(
+        trim(
+            """
         <div class="pull-right">
             <span>
                 <a href="{{ base_edit_uri }}{{ slug }}">Edit</a>
@@ -379,13 +401,15 @@ def html_heading(numbering: list,
                 {{ title }}
             </a>
         </{{ tag }}>
-        """))
+        """
+        )
+    )
     return tpl.render(
         base_edit_uri=base_edit_uri,
         name=anchor_name(numbering, slug),
         slug=slug,
-        tag='h%d' % max(1, min(6, len(numbering))),
-        title=title
+        tag="h%d" % max(1, min(6, len(numbering))),
+        title=title,
     )
 
 
@@ -394,7 +418,7 @@ def iterate_parts(parts: dict) -> Generator[tuple, None, None]:
     Static method: put a parts dictionary in order; mainly for export.
     """
     outline = Outline(parts, default_counters())
-    for (numbering, slug, title, title_slug, _) in outline:
+    for numbering, slug, title, title_slug, _ in outline:
         if slug in parts:
             # Standardize?
             yield numbering, title, slug, parts[slug]

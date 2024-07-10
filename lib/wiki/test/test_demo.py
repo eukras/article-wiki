@@ -24,7 +24,9 @@ def test_basic_replacements():
     """
     settings = Settings()
     demo = Demo(settings)
-    parts = {'test': trim("""
+    parts = {
+        "test": trim(
+            """
         Test
 
         DEMO ===
@@ -42,9 +44,13 @@ def test_basic_replacements():
         ===
 
         Test
-        """)}
+        """
+        )
+    }
     tokenized = demo.insert(parts)
-    expected = {'test': trim("""
+    expected = {
+        "test": trim(
+            """
         Test
 
         %sdemo:1%s
@@ -56,10 +62,13 @@ def test_basic_replacements():
         %sdemo:2%s
 
         Test
-        """) % (DELIMITER, DELIMITER, DELIMITER, DELIMITER)}
+        """
+        )
+        % (DELIMITER, DELIMITER, DELIMITER, DELIMITER)
+    }
     assert expected == tokenized
 
     decorated = demo.replace(tokenized)
-    __ = html.fromstring(decorated['test'])
+    __ = html.fromstring(decorated["test"])
     assert __.xpath("count(//div[@class='wiki-demo'])") == 2
     assert __.xpath("//pre[contains(., Test)]")

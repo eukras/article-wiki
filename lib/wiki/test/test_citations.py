@@ -19,50 +19,60 @@ id_prefix = "PREFIX"
 
 
 def test_split_pattern():
-    assert split_pattern("~[Smith]") == ("Smith", '', '')
+    assert split_pattern("~[Smith]") == ("Smith", "", "")
     assert split_pattern("~[Smith, p.34].") == ("Smith", "p.34", ".")
-    assert split_pattern("~[Smith, Title, p.34].") == \
-        ("Smith, Title", "p.34", ".")
+    assert split_pattern("~[Smith, Title, p.34].") == ("Smith, Title", "p.34", ".")
 
 
 def test_constructor():
     parts = {
-        'index': trim("""
+        "index": trim(
+            """
             My Document!
 
             It contains a reference to ~[Chapman, /Conversation/, p.34].
-        """),
-        'biblio': trim("""
+        """
+        ),
+        "biblio": trim(
+            """
             Chapman, Nigel. 2014. Private conversation.
             Chapman, Nigel. 2014. Private conversation. #2.
-        """),
+        """
+        ),
     }
 
     outline = Outline(parts, default_counters())
     bibliography = Bibliography(parts, outline, id_prefix)
     citations = Citations(bibliography)
 
-    assert bibliography.entries == SortedDict({
-        "Chapman, Nigel. 2014a.": "Private conversation.",
-        "Chapman, Nigel. 2014b.": "Private conversation. #2.",
-        })
+    assert bibliography.entries == SortedDict(
+        {
+            "Chapman, Nigel. 2014a.": "Private conversation.",
+            "Chapman, Nigel. 2014b.": "Private conversation. #2.",
+        }
+    )
 
     new_parts = citations.insert(parts)
 
     assert new_parts == {
-        'index': trim("""
+        "index": trim(
+            """
             My Document!
 
             It contains a reference to %scitation:1%s
-            """) % (DELIMITER, DELIMITER),       # ^ note the missing fullstop
-        'biblio': trim("""
+            """
+        )
+        % (DELIMITER, DELIMITER),  # ^ note the missing fullstop
+        "biblio": trim(
+            """
             Chapman, Nigel. 2014. Private conversation.
             Chapman, Nigel. 2014. Private conversation. #2.
-            """),
-        }
+            """
+        ),
+    }
 
     end_parts = citations.replace(new_parts)
-    assert '<em>Conversation</em>' in end_parts['index']
-    assert 'p.34' in end_parts['index']
-    dom = html.fragment_fromstring(end_parts['index'], create_parent='body')[0]
-    assert len(dom.cssselect('a')) == 1
+    assert "<em>Conversation</em>" in end_parts["index"]
+    assert "p.34" in end_parts["index"]
+    dom = html.fragment_fromstring(end_parts["index"], create_parent="body")[0]
+    assert len(dom.cssselect("a")) == 1

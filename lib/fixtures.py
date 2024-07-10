@@ -15,7 +15,7 @@ def fixtures_list() -> List[str]:
     """
     Returns doc_slugs of documents to load or save as fixtures.
     """
-    return ['index', 'help']
+    return ["index", "help"]
 
 
 def fixtures_dir(doc_slug: str) -> str:
@@ -23,7 +23,7 @@ def fixtures_dir(doc_slug: str) -> str:
     Finds path to the fixtures directory for a document slug.
     """
     this_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(this_dir, '..', 'install', 'articles', doc_slug)
+    return os.path.join(this_dir, "..", "install", "articles", doc_slug)
 
 
 def load_user_document(data: Data, user_slug: str, doc_slug: str):
@@ -36,7 +36,7 @@ def load_user_document(data: Data, user_slug: str, doc_slug: str):
     src_dict = load_dir(src_dir)
     data.userDocument_set(user_slug, doc_slug, src_dict, {})
     data.userDocumentCache_delete(user_slug, doc_slug)
-    print(f'Loaded: {doc_slug} ({len(src_dict)})')
+    print(f"Loaded: {doc_slug} ({len(src_dict)})")
 
 
 def save_user_document(data: Data, user_slug: str, doc_slug: str):
@@ -46,7 +46,7 @@ def save_user_document(data: Data, user_slug: str, doc_slug: str):
     dst_dir = fixtures_dir(doc_slug)
     dst_dict = data.userDocument_get(user_slug, doc_slug)
     save_dir(dst_dir, dst_dict)
-    print(f'Saved: {doc_slug} ({len(dst_dict)})')
+    print(f"Saved: {doc_slug} ({len(dst_dict)})")
 
 
 def load_fixtures(data):

@@ -7,7 +7,7 @@ most evenly spaced lines with a given maximum width in pixels.
 3. Choose the option with minimum raggedness
 """
 
-from PIL import ImageFont
+from PIL.ImageFont import ImageFont
 
 
 def simple_wrap(font: ImageFont, words: list, max_width_px: int) -> list:
@@ -18,12 +18,12 @@ def simple_wrap(font: ImageFont, words: list, max_width_px: int) -> list:
     line = []
     for word in words:
         test_line = line + [word]
-        test_string = ' '.join(test_line)
+        test_string = " ".join(test_line)
         width = line_width(font, test_line)
         if width > max_width_px:
             if len(line) == 0:
-                lines += [[word]]   # <-- Always at least one word
-                line = []           # <-- Still
+                lines += [[word]]  # <-- Always at least one word
+                line = []  # <-- Still
             else:
                 lines += [line]
                 line = [word]
@@ -38,6 +38,7 @@ def best_wrap(font: ImageFont, words: list, max_width_px: int) -> list:
     For each of a representative range of line wrapping options, produce a
     score of raggedness. Lowest score wins.
     """
+
     def sorting_function(lines):
         return raggedness(font, lines, max_width_px)
 

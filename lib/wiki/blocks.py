@@ -24,54 +24,50 @@ from jinja2 import Environment
 
 from lib.slugs import slug
 
-from lib.wiki.functions.base import \
-    Articles, \
-    Box, \
-    Center, \
-    Compact, \
-    Indent, \
-    Feature, \
-    Footer, \
-    Function, \
-    Float, \
-    Header, \
-    Left, \
-    Print, \
-    Quote, \
-    Right, \
-    Text, \
-    Verbatim, \
-    Web, \
-    Wrapper
-from lib.wiki.functions.table import \
-    Table
+from lib.wiki.functions.base import (
+    Articles,
+    Box,
+    Center,
+    Compact,
+    Indent,
+    Feature,
+    Footer,
+    Function,
+    Float,
+    Header,
+    Left,
+    Print,
+    Quote,
+    Right,
+    Text,
+    Verbatim,
+    Web,
+    Wrapper,
+)
+from lib.wiki.functions.table import Table
 
 from lib.wiki.config import Config
-from lib.wiki.geometry import \
-    split_to_array, \
-    split_to_dictionary, \
-    split_to_recursive_array
-from lib.wiki.renderer import \
-    alert, \
-    generate_table, \
-    Html, \
-    parse_table_data, \
-    rule, \
-    section_heading, \
-    space, \
-    tag
+from lib.wiki.geometry import (
+    split_to_array,
+    split_to_dictionary,
+    split_to_recursive_array,
+)
+from lib.wiki.renderer import (
+    alert,
+    generate_table,
+    Html,
+    parse_table_data,
+    rule,
+    section_heading,
+    space,
+    tag,
+)
+
 # from lib.wiki.icons import \
 # expand_shorthand
-from lib.wiki.placeholders import \
-    is_placeholder
-from lib.wiki.inline import \
-    Inline
-from lib.wiki.utils import \
-    clean_text, \
-    one_line, \
-    random_slug, \
-    split_options, \
-    trim
+from lib.wiki.placeholders import is_placeholder
+from lib.wiki.inline import Inline
+from lib.wiki.utils import clean_text, one_line, random_slug, split_options, trim
 
 
 class BlockList(object):
@@ -111,33 +107,40 @@ class BlockList(object):
         the text it contained, repeat until finished.
         """
 
-        function_pattern = re.compile((
-            r"([A-Z]+)\s+(\([^)]+\)\s)?\s*([%s])\3\3\s*\n"
-        ) % re.escape(Config.delimiters))
+        function_pattern = re.compile(
+            (r"([A-Z]+)\s+(\([^)]+\)\s)?\s*([%s])\3\3\s*\n")
+            % re.escape(Config.delimiters)
+        )
 
-        wrappers = {_.__name__.upper(): _ for _ in [
-            Box,
-            Center,
-            Compact,
-            Feature,
-            Float,
-            Footer,
-            Indent,
-            Header,
-            Left,
-            Print,
-            Quote,
-            Right,
-            Web,
-        ]}
+        wrappers = {
+            _.__name__.upper(): _
+            for _ in [
+                Box,
+                Center,
+                Compact,
+                Feature,
+                Float,
+                Footer,
+                Indent,
+                Header,
+                Left,
+                Print,
+                Quote,
+                Right,
+                Web,
+            ]
+        }
 
-        functions = {_.__name__.upper(): _ for _ in [
-            Articles,
-            Grid,
-            Table,
-            Text,
-            Verbatim,
-        ]}
+        functions = {
+            _.__name__.upper(): _
+            for _ in [
+                Articles,
+                Grid,
+                Table,
+                Text,
+                Verbatim,
+            ]
+        }
 
         functions.update(wrappers)  # <-- Wrappers are functions too
 
@@ -161,9 +164,9 @@ class BlockList(object):
                     new_cursor = end + 5
                     block_text = text[cursor:new_cursor].strip()
                     content = "\n".join(block_text.splitlines()[1:-1])
-                    block = FunctionBlock(functions[name],
-                                          split_options(options),
-                                          div, content)
+                    block = FunctionBlock(
+                        functions[name], split_options(options), div, content
+                    )
                     self.blocks.append(block)
                     cursor = new_cursor
                     continue
@@ -181,7 +184,7 @@ class BlockList(object):
                 if _ in Config.dividers:
                     self.blocks += [Divider(_)]
                 elif len(_) > 1:
-                    if _[0] in Config.all_control_chars and _[1] == ' ':
+                    if _[0] in Config.all_control_chars and _[1] == " ":
                         self.blocks += [CharacterBlock(_)]
                     else:
                         self.blocks += [Paragraph(_)]
@@ -192,10 +195,12 @@ class BlockList(object):
         """
         Show current state for debugging.
         """
-        return "\n".join([
-            "%s: %s" % (block.__class__.__name__, block.content)
-            for block in self.blocks
-        ])
+        return "\n".join(
+            [
+                "%s: %s" % (block.__class__.__name__, block.content)
+                for block in self.blocks
+            ]
+        )
 
     def find(self, class_name, control_characters: str = None) -> list:
         """
@@ -204,16 +209,18 @@ class BlockList(object):
         found = []
         for _ in self.blocks:
             if _.__class__.__name__ == class_name:
-                if class_name == 'CharacterBlock':
-                    if (_.control_character is None or
-                            _.control_character in control_characters):
+                if class_name == "CharacterBlock":
+                    if (
+                        _.control_character is None
+                        or _.control_character in control_characters
+                    ):
                         found += [_]
                 else:
                     found += [_]
         return found
 
     def text(self):
-        """"
+        """ "
         Return canonical wiki text, meaning:
 
         - No trailing whitespace
@@ -228,20 +235,23 @@ class BlockList(object):
         comment, then the second block's content as a summary, if it is a
         caption. Content will be trimmed with an ellipsis added, as one line.
         """
-        title, summary = '', ''
+        title, summary = "", ""
         if len(self.blocks) > 0:
             if isinstance(self.blocks[0], Paragraph):
-                title = one_line(shorten(self.blocks[0].content, 128,
-                                         placeholder="..."))
+                title = one_line(
+                    shorten(self.blocks[0].content, 128, placeholder="...")
+                )
             if isinstance(self.blocks[0], CharacterBlock):
-                if self.blocks[0].control_character == '%':
-                    title = one_line(shorten(self.blocks[0].content[2:], 128,
-                                             placeholder="..."))
+                if self.blocks[0].control_character == "%":
+                    title = one_line(
+                        shorten(self.blocks[0].content[2:], 128, placeholder="...")
+                    )
         if len(self.blocks) > 1:
             if isinstance(self.blocks[1], CharacterBlock):
                 if self.blocks[1].control_character == Config.caption:
-                    summary = one_line(shorten(self.blocks[1].content[2:], 128,
-                                               placeholder="..."))
+                    summary = one_line(
+                        shorten(self.blocks[1].content[2:], 128, placeholder="...")
+                    )
         return title, summary
 
     def pop_titles(self):
@@ -249,13 +259,13 @@ class BlockList(object):
         Return title and summary, removing from blocks.
         @todo: REFACTOR: Very similar to title_and_summary().
         """
-        title, summary = '', ''
+        title, summary = "", ""
         if len(self.blocks) > 0:
             _ = self.blocks[0]
             if isinstance(_, Paragraph):
                 title = _.content
                 self.blocks.pop(0)
-            if isinstance(_, CharacterBlock) and _.control_character == '%':
+            if isinstance(_, CharacterBlock) and _.control_character == "%":
                 title = _.content
                 self.blocks.pop(0)
         if len(self.blocks) > 0:
@@ -264,8 +274,10 @@ class BlockList(object):
                 if _.control_character == Config.caption:
                     summary = _.content[2:]
                     self.blocks.pop(0)
-        return (str(shorten(title, 128, placeholder='...')),
-                str(shorten(summary, 128, placeholder='...')))
+        return (
+            str(shorten(title, 128, placeholder="...")),
+            str(shorten(summary, 128, placeholder="...")),
+        )
 
     def html(self, numbering, slug, settings, fragment=False, preview=False):
         """
@@ -280,11 +292,11 @@ class BlockList(object):
         renderer = Html({})
         renderer.settings = copy(settings)
         out = []
-        if not fragment and slug != 'index':
+        if not fragment and slug != "index":
             title, summary = self.pop_titles()
             nav_id = get_section_nav_id(numbering, slug)
-            number = '.'.join([str(_) for _ in numbering])
-            if summary != '':
+            number = ".".join([str(_) for _ in numbering])
+            if summary != "":
                 subtitle = renderer.inline.process(summary)
             else:
                 subtitle = None
@@ -319,10 +331,10 @@ def get_title_data(text: str, part_slug: str) -> (str, str, str, str):
     blocks = BlockList(clean_text(text))
     title, summary = blocks.title_and_summary()
     title_slug = slug(title)
-    for _ in blocks.find('CharacterBlock', '$'):
-        settings = split_to_dictionary(_.text(), prefix='$', delimiter='=')
-        if 'SLUG' in settings:
-            title_slug = slug(settings['SLUG'])
+    for _ in blocks.find("CharacterBlock", "$"):
+        settings = split_to_dictionary(_.text(), prefix="$", delimiter="=")
+        if "SLUG" in settings:
+            title_slug = slug(settings["SLUG"])
     return part_slug, title, title_slug, summary
 
 
@@ -356,7 +368,7 @@ class Paragraph(Block):
         if is_placeholder(self.content):
             html = settings.replace(self.content)
         else:
-            html = tag('p', settings.replace(self.content))
+            html = tag("p", settings.replace(self.content))
         return (html, settings)
 
 
@@ -381,22 +393,24 @@ class Divider(Block):
         """
         html = {
             # Markers
-            '*': '<p class="text-center text-large space"><span>✻</span></p>',
-            '-': rule('div-solid div-center'),
-            '* * *': trim("""
+            "*": '<p class="text-center text-large space"><span>✻</span></p>',
+            "-": rule("div-solid div-center"),
+            "* * *": trim(
+                """
                 <p class="text-center text-large big-space">
                     <span>✻ ✻ ✻</span>
                 </p>
-                """),
-            '- - -': rule('div-solid'),
-            '. . .': rule('div-dotted div-wide'),
-            '= = =': rule('div-thick div-wide'),
+                """
+            ),
+            "- - -": rule("div-solid"),
+            ". . .": rule("div-dotted div-wide"),
+            "= = =": rule("div-thick div-wide"),
             # Spacers
-            '~': space(1),
-            '~ ~': space(2),
-            '~ ~ ~': space(3),
-            '~ ~ ~ ~': space(4),
-        }.get(self.content, '')
+            "~": space(1),
+            "~ ~": space(2),
+            "~ ~ ~": space(3),
+            "~ ~ ~ ~": space(4),
+        }.get(self.content, "")
         return (html, settings)
 
 
@@ -423,7 +437,7 @@ class CharacterBlock(Block):
         Leave lines beginning with a control character unwrapped.
         """
         tuples = split_to_array(self.content, Config.all_control_chars)
-        lines = [char + ' ' + one_line(line) for char, line in tuples]
+        lines = [char + " " + one_line(line) for char, line in tuples]
         space_above = "\n" if self.control_character in Config.subheads else ""
         return space_above + "\n".join(lines)
 
@@ -432,11 +446,11 @@ class CharacterBlock(Block):
         Call the right layout function from the renderer...
         """
         renderer.settings = settings or {}
-        html, _ = '', copy(renderer.settings)
+        html, _ = "", copy(renderer.settings)
         _ = self.control_character
         content = settings.replace(self.content)
         if _ in Config.nulls:
-            html = ''
+            html = ""
         elif _ in Config.setters:
             settings.read_settings_block(content)
         elif _ in Config.subheads:
@@ -458,7 +472,7 @@ class CharacterBlock(Block):
         elif _ in Config.glosses:
             html = gloss_block(content, settings)
         else:
-            html = alert('Unrecognized control character: %s')
+            html = alert("Unrecognized control character: %s")
         return (html, settings)
 
 
@@ -482,7 +496,7 @@ class FunctionBlock(Block):
         A wrapper contains blocks; a regular function contains text whose
         meaning is specific to the function being called.
         """
-        assert hasattr(options, '__iter__')  # non-string iterable
+        assert hasattr(options, "__iter__")  # non-string iterable
         self.function_class = function_class  # <-- a class
         self.options, self.divider = options, divider
         self.content = text
@@ -497,10 +511,10 @@ class FunctionBlock(Block):
         """
         class_name = self.function_class.__name__.upper()
         if len(self.options) > 0:
-            args = ', '.join(self.options)
-            line = '%s (%s) %s' % (class_name, args, self.divider * 3)
+            args = ", ".join(self.options)
+            line = "%s (%s) %s" % (class_name, args, self.divider * 3)
         else:
-            line = '%s %s' % (class_name, self.divider * 3)
+            line = "%s %s" % (class_name, self.divider * 3)
         parts = [line]
         if issubclass(self.function_class, Wrapper):
             content = self.blocks.text()
@@ -509,7 +523,7 @@ class FunctionBlock(Block):
         if content != "":
             parts += [content]
         parts += [self.divider * 3]
-        return '\n'.join(parts)
+        return "\n".join(parts)
 
     def html(self, renderer, settings):
         """
@@ -517,17 +531,18 @@ class FunctionBlock(Block):
         If it is a function, generate HTML from content.
         """
         if issubclass(self.function_class, Wrapper):
-            dummy_numbering, dummy_slug = ['0'], 'slug'
+            dummy_numbering, dummy_slug = ["0"], "slug"
             inner_html = self.blocks.html(
                 dummy_numbering, dummy_slug, settings, fragment=True
             )
-            function = self.function_class(self.options, '')  # <-- ignore text
+            function = self.function_class(self.options, "")  # <-- ignore text
             html = function.wrap(inner_html)
         else:
             function = self.function_class(self.options, self.content)
             # settings.replace(self.content))
             html = function.html(renderer)
         return (html, settings)
+
 
 # --------------------------------------
 # FunctionBlocks that utilise BlockLists
@@ -553,13 +568,15 @@ class Grid(Function):
             html_cells = []
             for cell in [cell.strip() for cell in row.split("---")]:
                 blocks = BlockList(clean_text(cell))
-                slug = random_slug('grid-')
+                slug = random_slug("grid-")
                 html = blocks.html([0], slug, renderer.settings, fragment=True)
                 html_cells.append(html)
             html_rows.append(html_cells)
 
         env = Environment(autoescape=True)
-        tpl = env.from_string(trim("""
+        tpl = env.from_string(
+            trim(
+                """
             <table class="table table-condensed">
             <tbody>
             {% for html_row in html_rows %}
@@ -571,7 +588,9 @@ class Grid(Function):
             {% endfor %}
             </tbody>
             </table>
-        """))
+        """
+            )
+        )
 
         return tpl.render(html_rows=html_rows)
 
@@ -593,12 +612,10 @@ def start_of_block(text: str, cursor: int) -> int:
     """
     _ = min(len(text), max(0, cursor))  # <-- 0..len(text)
     while _ < len(text):
-        two_preceding_newlines = any([
-            _ == 0,
-            _ == 1 and text[0] == '\n',
-            text[_ - 2:_] == '\n\n'
-        ])
-        if two_preceding_newlines and text[_] not in ' \n':
+        two_preceding_newlines = any(
+            [_ == 0, _ == 1 and text[0] == "\n", text[_ - 2 : _] == "\n\n"]
+        )
+        if two_preceding_newlines and text[_] not in " \n":
             return _
         else:
             _ += 1
@@ -609,8 +626,8 @@ def get_section_nav_id(numbering, title):
     """
     #nav_id is the section anchor
     """
-    number = '.'.join([str(_) for _ in numbering])
-    return number + '_' + str(title)
+    number = ".".join([str(_) for _ in numbering])
+    return number + "_" + str(title)
 
 
 def align_block(content, settings):
@@ -623,23 +640,25 @@ def align_block(content, settings):
     out = []
     for char, line in lines:
         class_name = {
-            '.': 'text-left',
-            ';': 'text-center',
-            ',': 'text-right',
-            ':': 'indent',
-            '~': 'indent-hanging',
-        }.get(char, '')
-        out += [tag('div', line, class_name)]
+            ".": "text-left",
+            ";": "text-center",
+            ",": "text-right",
+            ":": "indent",
+            "~": "indent-hanging",
+        }.get(char, "")
+        out += [tag("div", line, class_name)]
     if len(out) > 0:
-        return "".join([
-            '<div class="wr-align-block space">',
-            '<span>',
-            ''.join(out),
-            '</span>',
-            '</div>',
-        ])
+        return "".join(
+            [
+                '<div class="wr-align-block space">',
+                "<span>",
+                "".join(out),
+                "</span>",
+                "</div>",
+            ]
+        )
     else:
-        return ''
+        return ""
 
 
 def note_block(content, settings):
@@ -651,9 +670,10 @@ def note_block(content, settings):
     def note_line(part):
         char, text = part
         if char == '"':
-            return tag('p', text, 'note')
+            return tag("p", text, "note")
         else:
             return alert(content)
+
     out = map(note_line, lines)
     return "\n".join(out)
 
@@ -667,10 +687,11 @@ def subhead_block(content, settings):
 
     def subhead_line(part):
         char, text = part
-        if char == '@':
-            return tag('p', text, 'subhead')
+        if char == "@":
+            return tag("p", text, "subhead")
         else:
             return alert(content)
+
     out = map(subhead_line, lines)
     return "\n".join(out)
 
@@ -685,10 +706,10 @@ def quote_block(content, settings):
     lines = split_to_array(content, prefixes=Config.quotes + Config.caption)
     out = []
     for char, content in lines:
-        if char == '>':
-            out += [tag('blockquote', content)]
+        if char == ">":
+            out += [tag("blockquote", content)]
         elif char == Config.caption:
-            out += [tag('p', content, 'caption')]
+            out += [tag("p", content, "caption")]
     if len(out) > 0:
         return "\n".join(out)
     else:
@@ -703,7 +724,7 @@ def caption_block(content, settings):
     out = []
     for char, content in lines:
         if char == Config.caption:
-            out += [tag('p', content, 'caption')]
+            out += [tag("p", content, "caption")]
     if len(out) > 0:
         return "\n".join(out)
     else:
@@ -721,6 +742,7 @@ def list_block(text, settings):
     _ Custom Markers (checkboxes by default)
     _ _ Custom Markers
     """
+
     def list_block_recursor(char, items, settings, depth=1):
         """
         Recursion handler for list_block().
@@ -729,27 +751,27 @@ def list_block(text, settings):
         $ CONTINUE = ... is the count to use if NUMBERING = continue
         """
         inline = Inline()
-        list_tag = 'ol' if char == '#' else 'ul'
-        properties = ['']
-        if list_tag == 'ol' and depth == 1:
-            numbering = settings.get('NUMBERING', '')
+        list_tag = "ol" if char == "#" else "ul"
+        properties = [""]
+        if list_tag == "ol" and depth == 1:
+            numbering = settings.get("NUMBERING", "")
             if numbering.isdigit():
                 properties += ['start="%s"' % numbering]
-                settings.set('CONTINUE', int(numbering))
-                settings.set('NUMBERING', '')
-            elif numbering == 'continue':
-                properties += ['start="%s"' % settings.get('CONTINUE')]
-                settings.set('NUMBERING', '')
+                settings.set("CONTINUE", int(numbering))
+                settings.set("NUMBERING", "")
+            elif numbering == "continue":
+                properties += ['start="%s"' % settings.get("CONTINUE")]
+                settings.set("NUMBERING", "")
             else:
-                settings.set('CONTINUE', 1)
-        if char == '_':
+                settings.set("CONTINUE", 1)
+        if char == "_":
             properties += ['class="checkboxes"']
 
         # XHTML (for ebooks) requires that a child list appears inside the
         # preceeding <li> rather than inside it's own <li>. So we'll accumulate
         # display_items distinct from structural items, and join these into an
         # HTML list at the end.
-        open_tag = "<%s%s>" % (list_tag, ' '.join(properties))
+        open_tag = "<%s%s>" % (list_tag, " ".join(properties))
         display_items = []
         for item in items:
             if isinstance(item, list):
@@ -757,14 +779,12 @@ def list_block(text, settings):
                 # sublist. Append to that:
                 if len(display_items) > 0:
                     last = len(display_items) - 1
-                    sub_list = list_block_recursor(
-                        char, item, settings, depth + 1
-                    )
+                    sub_list = list_block_recursor(char, item, settings, depth + 1)
                     display_items[last] += sub_list
             else:
                 display_items += [inline.process(item)]
-                if list_tag == 'ol' and depth == 1:
-                    settings.set('CONTINUE', settings.get('CONTINUE') + 1)
+                if list_tag == "ol" and depth == 1:
+                    settings.set("CONTINUE", settings.get("CONTINUE") + 1)
         close_tag = "</%s>" % list_tag
         lines = [open_tag]
         for item in display_items:
@@ -774,7 +794,7 @@ def list_block(text, settings):
 
     # May need a character-aware recursor to support mixed levels.
     char = text[0]
-    items = split_to_recursive_array(text, char + ' ')
+    items = split_to_recursive_array(text, char + " ")
     return list_block_recursor(char, items, settings)
 
 
@@ -792,13 +812,13 @@ def column_block(text, settings):
     """
     char = text[0]
     parts = split_to_array(text, prefixes=char)
-    html = ''
+    html = ""
     parts = parts[:4]  # <-- max. 4 parts
     twelfths = round(12 / len(parts))
-    bootstrap_class = 'col-md-%d' % twelfths
+    bootstrap_class = "col-md-%d" % twelfths
     for char, content in parts:
-        html += tag('p', content, 'float-left %s' % bootstrap_class)
-    html += "<div style=\"clear: both\"></div>"
+        html += tag("p", content, "float-left %s" % bootstrap_class)
+    html += '<div style="clear: both"></div>'
     return html
 
 
@@ -807,21 +827,21 @@ def quiz_block(text, settings):
     Build HTML from text.
     """
     inline = Inline()
-    q_html, a_html = [], [];
-    for char, line in split_to_array(text, '?=', capture_characters=True):
-        if char == '?':
+    q_html, a_html = [], []
+    for char, line in split_to_array(text, "?=", capture_characters=True):
+        if char == "?":
             q_html.append(inline.process(line))
-        if char == '=':
+        if char == "=":
             a_html.append(inline.process(line))
     __ = Airium()
-    with __.div(klass='quiz'):
+    with __.div(klass="quiz"):
         if q_html:
-            with __.ol(klass='questions'):
+            with __.ol(klass="questions"):
                 for line in q_html:
                     with __.li():
                         __(line)
         if a_html:
-            with __.ol(klass='answers'):
+            with __.ol(klass="answers"):
                 for line in a_html:
                     with __.li():
                         __(line)
@@ -844,13 +864,15 @@ def gloss_block(text, settings):
             source_html = inline.process(parts.pop(0))
             translations_html = [inline.process(part) for part in parts]
             if num is not None:
-                gloss += [[(str(num), ''), (source_html, translations_html)]]
+                gloss += [[(str(num), ""), (source_html, translations_html)]]
                 num = None
             else:
                 gloss += [[(source_html, translations_html)]]
 
     env = Environment(autoescape=True)
-    tpl = env.from_string(trim("""
+    tpl = env.from_string(
+        trim(
+            """
         <div class="gloss">
         {% for translation_group in gloss %}
             <div class="phrase-group">
@@ -865,7 +887,9 @@ def gloss_block(text, settings):
             </div>
         {% endfor %}
         </div>
-    """))
+    """
+        )
+    )
 
     return tpl.render(gloss=gloss)
 
@@ -876,6 +900,6 @@ def table_block(text, settings):
     """
     char = text[0]
     divisions = split_to_array(text, Config.tables, capture_characters=False)
-    has_headers = (char == '!')
+    has_headers = char == "!"
     data, options = parse_table_data(divisions, has_headers)
     return generate_table(data, options)

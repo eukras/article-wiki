@@ -18,14 +18,16 @@ class Table(Function):
     """
 
     examples = [
-        trim("""
+        trim(
+            """
             TABLE (crl$, headers) ---
             ID, First Name, Last Name, Salary
             123, Felicity, Masters, 160000
             7, Clive, Warner, 45000
             ---
-        """),
-        ]
+        """
+        ),
+    ]
 
     def html(self, renderer):
         """

@@ -17,32 +17,38 @@ def test_backslashes():
     Using backslash replacement for testing; there is an actual backslashes
     class that does this in the wiki.
     """
-    parts = {'test': trim(r"""
+    parts = {
+        "test": trim(
+            r"""
         That\'s what it\'s about.
-        """)}
+        """
+        )
+    }
 
-    marker = 'test'
+    marker = "test"
 
-    delimiter = '|'  # <-- For easy testing. This normally defaults to
+    delimiter = "|"  # <-- For easy testing. This normally defaults to
     #     chr(30), an invisible 'record separator' in ASCII.
 
-    def callback(x, _): return x[1:]  # <-- Remove leading slash from pattern;
+    def callback(x, _):
+        return x[1:]  # <-- Remove leading slash from pattern;
+
     #     Ignore slug.
 
-    backslashes = Placeholders(r'\\.', marker, delimiter)
+    backslashes = Placeholders(r"\\.", marker, delimiter)
 
     tokenized = backslashes.insert(parts)
-    assert {'test': "That|test:1|s what it|test:2|s about."} == tokenized
+    assert {"test": "That|test:1|s what it|test:2|s about."} == tokenized
 
     decorated = backslashes.replace(callback, tokenized)
-    assert {'test': "That's what it's about."} == decorated
+    assert {"test": "That's what it's about."} == decorated
 
 
 def test_is_placeholder():
     """
     Stripped text must contain ONLY a placeholder.
     """
-    placeholder = Placeholders("a", 'AAAA')
+    placeholder = Placeholders("a", "AAAA")
     text = " %s\n" % placeholder.get_placeholder(1)
     assert is_placeholder(text)
     assert not is_placeholder("! " + text)

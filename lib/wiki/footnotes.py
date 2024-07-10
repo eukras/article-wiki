@@ -83,14 +83,14 @@ class Footnotes(object):
 
         link_markup, punctuation = split_pattern(pattern)
 
-        footnote_text = ''
+        footnote_text = ""
         if part_slug in self.footnotes:
             if count in self.footnotes[part_slug]:
                 footnote_text = self.footnotes[part_slug][count]
 
-        rel_me = ''
-        if footnote_text.startswith(tuple(['http:', 'https:', 'mailto:'])):
-            if footnote_text.endswith('|rel=me'):
+        rel_me = ""
+        if footnote_text.startswith(tuple(["http:", "https:", "mailto:"])):
+            if footnote_text.endswith("|rel=me"):
                 ref_text = footnote_text[:-7]
                 rel_me = ' rel="me"'
             else:
@@ -99,35 +99,63 @@ class Footnotes(object):
             ref_text = self.inline.process(footnote_text)
 
         _ = '<a class="%s" id="%s_footnote_%s" href="#%s_link_%s">%s</a>'
-        ref_link = _ % ('web-marker', self.id_prefix,
-                        nav_id, self.id_prefix, nav_id, count)
+        ref_link = _ % (
+            "web-marker",
+            self.id_prefix,
+            nav_id,
+            self.id_prefix,
+            nav_id,
+            count,
+        )
 
         if number not in self.backlinks:
             self.backlinks[number] = {}
 
         self.backlinks[number][count] = (ref_link, ref_text)
 
-        if footnote_text.startswith(tuple(['http:', 'https:', 'mailto:'])):
+        if footnote_text.startswith(tuple(["http:", "https:", "mailto:"])):
 
-            link = trim("""
+            link = (
+                trim(
+                    """
                 <a class="web-link" title="%s" href="%s"%s
                    target="_blank">%s</a>%s<a class="web-marker"
                    id="%s_link_%s" href="#%s_footnote_%s"><sup>%s</sup></a>
-                """) % (
-                strip_markup(ref_text), ref_text, rel_me,
-                link_markup, punctuation, self.id_prefix, nav_id,
-                self.id_prefix, nav_id, count
+                """
+                )
+                % (
+                    strip_markup(ref_text),
+                    ref_text,
+                    rel_me,
+                    link_markup,
+                    punctuation,
+                    self.id_prefix,
+                    nav_id,
+                    self.id_prefix,
+                    nav_id,
+                    count,
+                )
             )
 
         else:
 
-            link = trim("""
+            link = (
+                trim(
+                    """
                 %s%s<a class="web-marker" title="%s" id="%s_link_%s"
                     href="#%s_footnote_%s"><sup>%s</sup></a>
-                """) % (
-                self.inline.process(link_markup), punctuation,
-                strip_markup(footnote_text), self.id_prefix, nav_id,
-                self.id_prefix, nav_id, count
+                """
+                )
+                % (
+                    self.inline.process(link_markup),
+                    punctuation,
+                    strip_markup(footnote_text),
+                    self.id_prefix,
+                    nav_id,
+                    self.id_prefix,
+                    nav_id,
+                    count,
+                )
             )
 
         return link
@@ -158,7 +186,8 @@ class Footnotes(object):
             assert isinstance(_, tuple)
 
         env = Environment(autoescape=True)
-        tpl = env.from_string("""
+        tpl = env.from_string(
+            """
             <section id="{{ id_prefix }}-footnotes">
             {% if backlinks|length < 2 %}
                 {% for number, entries in backlinks %}
@@ -182,15 +211,13 @@ class Footnotes(object):
                 {% endfor %}
             {% endif %}
             </section>
-            """)
+            """
+        )
 
         if len(self.backlinks) == 0:
             return ""
         else:
-            return tpl.render(
-                backlinks=list(self.sort()),
-                id_prefix=self.id_prefix
-            )
+            return tpl.render(backlinks=list(self.sort()), id_prefix=self.id_prefix)
 
     def html_parts(self) -> list:
         """
@@ -199,7 +226,7 @@ class Footnotes(object):
         parts = {}
         backlinks = list(self.sort())
         for number, entries in backlinks:
-            numbering = number.split('.')
+            numbering = number.split(".")
             slug = self.outline.find_slug(numbering)
             parts[slug] = ""
             for count, (ref_link, ref_text) in entries:
@@ -218,9 +245,9 @@ def get_number(numbering):
     Take array of ['x', 'y', 'z'], and return 'x.y.z'.
     """
     if isinstance(numbering, list):
-        return '.'.join([str(_) for _ in numbering])
+        return ".".join([str(_) for _ in numbering])
     else:
-        return '0'  # <-- for the index
+        return "0"  # <-- for the index
 
 
 def get_nav_id(numbering, count):
@@ -237,7 +264,7 @@ def match_links(text):
     Collect the link tags in a block of text.
     """
 
-    pattern = r'\^\[[^\]]+\][%s]?' % re.escape(Config.punctuation)
+    pattern = r"\^\[[^\]]+\][%s]?" % re.escape(Config.punctuation)
     return {count: _ for count, _ in zip(Numbers(), re.findall(pattern, text))}
 
 
@@ -245,11 +272,16 @@ def match_footnotes(text):
     """
     Find the footnote references in a block of text.
     """
-    def join_lists(_): return [elem for sublist in _ for elem in sublist]
-    footnotes = join_lists([
-        split_to_array(_.content, '^', capture_characters=False)
-        for _ in BlockList(text).find('CharacterBlock', '^')
-    ])
+
+    def join_lists(_):
+        return [elem for sublist in _ for elem in sublist]
+
+    footnotes = join_lists(
+        [
+            split_to_array(_.content, "^", capture_characters=False)
+            for _ in BlockList(text).find("CharacterBlock", "^")
+        ]
+    )
     return {count: _ for count, _ in zip(Numbers(), footnotes)}
 
 
@@ -262,5 +294,5 @@ def split_pattern(pattern):
         punctuation = pattern[-1]
     else:
         link_markup = pattern[2:-1]
-        punctuation = ''
+        punctuation = ""
     return (link_markup, punctuation)

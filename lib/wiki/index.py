@@ -63,14 +63,16 @@ class Index(object):
         if number not in self.tags[tag][subtag]:
             self.tags[tag][subtag][number] = []
 
-        link = trim("""
+        link = (
+            trim(
+                """
                 <a id=\"%s\" href=\"#ref_%s\">%s%s<sup>%s</sup></a>
-            """) % (
-            nav_id, nav_id, alias, punctuation, count
+            """
+            )
+            % (nav_id, nav_id, alias, punctuation, count)
         )
 
-        ref_link = "<a id=\"ref_%s\" href=\"#%s\">%s</a>" % \
-                   (nav_id, nav_id, count)
+        ref_link = '<a id="ref_%s" href="#%s">%s</a>' % (nav_id, nav_id, count)
 
         self.tags[tag][subtag][number] += [ref_link]
         return link
@@ -100,7 +102,9 @@ class Index(object):
         assert isinstance(self.tags, dict)
 
         env = Environment(autoescape=True)
-        tpl = env.from_string(trim("""
+        tpl = env.from_string(
+            trim(
+                """
             <section id="index">
             {% if not single_page %}
                 <h1><a href="#index">Index</a></h1>
@@ -123,7 +127,9 @@ class Index(object):
             {% endfor %}
             </div>
             </section>
-            """))
+            """
+            )
+        )
 
         if len(self.tags) == 0:
             return ""
@@ -144,9 +150,9 @@ def get_number(numbering):
     Take array of ['x', 'y', 'z'], and return 'x.y.z'.
     """
     if isinstance(numbering, list):
-        return '.'.join([str(_) for _ in numbering])
+        return ".".join([str(_) for _ in numbering])
     else:
-        return '0'  # <-- for the index
+        return "0"  # <-- for the index
 
 
 def get_nav_id(tag, subtag, numbering, count):
@@ -155,6 +161,5 @@ def get_nav_id(tag, subtag, numbering, count):
     #ref_nav_id is the anchor in the end matter
     """
     number = get_number(numbering)
-    items = [_ for _ in [slug(tag), slug(subtag), number, str(count)]
-             if _ != '']
-    return '_'.join(items)
+    items = [_ for _ in [slug(tag), slug(subtag), number, str(count)] if _ != ""]
+    return "_".join(items)

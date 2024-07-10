@@ -16,9 +16,10 @@ from lib.overlay import make_cover
 from lib.wiki.settings import Settings
 from lib.wiki.wiki import Wiki
 
-COLOR_TEXT = (248, 248, 248)        # <-- Alabaster
-COLOR_SHADOW = (154, 174, 154)      # <-- Some greeny gray thing
+COLOR_TEXT = (248, 248, 248)  # <-- Alabaster
+COLOR_SHADOW = (154, 174, 154)  # <-- Some greeny gray thing
 COLOR_BACKGROUND = (160, 184, 160)  # <-- Norway, Summer Green, Pewter
+
 
 def write_epub(user_slug, doc_slug, file_path):
 
@@ -43,19 +44,21 @@ def write_epub(user_slug, doc_slug, file_path):
 
     # Pre-processing...
 
-    settings = Settings({
-        'config:user': user_slug,
-        'config:document': doc_slug,
-    })
+    settings = Settings(
+        {
+            "config:user": user_slug,
+            "config:document": doc_slug,
+        }
+    )
     wiki = Wiki(settings)
     xhtml = wiki.process(user_slug, doc_slug, document)
-    metadata = wiki.compile_metadata(config['TIME_ZONE'], user_slug, doc_slug)
-    metadata['url'] = '/read/{:s}/{:s}'.format(user_slug, doc_slug),
+    metadata = wiki.compile_metadata(config["TIME_ZONE"], user_slug, doc_slug)
+    metadata["url"] = ("/read/{:s}/{:s}".format(user_slug, doc_slug),)
 
-    title = metadata.get('title', 'Untitled')
-    summary = metadata.get('summary', '')
-    author = metadata.get('author', 'Anonymous')
-    date = metadata.get('date', '')
+    title = metadata.get("title", "Untitled")
+    summary = metadata.get("summary", "")
+    author = metadata.get("author", "Anonymous")
+    date = metadata.get("date", "")
 
     # -------------------------
     # 0. CREATE BOOK
@@ -63,19 +66,16 @@ def write_epub(user_slug, doc_slug, file_path):
     book = epub.EpubBook()
 
     # set metadata
-    book.set_identifier(user_slug + '+' + doc_slug)
+    book.set_identifier(user_slug + "+" + doc_slug)
     book.set_title(title)
-    book.set_language('en')
+    book.set_language("en")
     book.add_author(author)
 
     # define CSS style
-    with open('static/epub.css') as f:
+    with open("static/epub.css") as f:
         style = f.read()
     global_css = epub.EpubItem(
-        uid="style_nav",
-        file_name="style/nav.css",
-        media_type="text/css",
-        content=style
+        uid="style_nav", file_name="style/nav.css", media_type="text/css", content=style
     )
     book.add_item(global_css)
 
@@ -84,13 +84,14 @@ def write_epub(user_slug, doc_slug, file_path):
 
     tmp_cover_file = "/tmp/%s-%s-cover.png" % (user_slug, doc_slug)
     image = make_background((1600, 2200), (160, 184, 160))
-    cover = make_cover(image, [title, summary, author, date],
-                       [COLOR_TEXT, COLOR_SHADOW])
+    cover = make_cover(
+        image, [title, summary, author, date], [COLOR_TEXT, COLOR_SHADOW]
+    )
     cover.save(tmp_cover_file, "JPEG")
-    chapter_file_name = doc_slug + '.xhtml'
+    chapter_file_name = doc_slug + ".xhtml"
 
     assert os.path.exists(tmp_cover_file)
-    with open(tmp_cover_file, 'rb') as file:
+    with open(tmp_cover_file, "rb") as file:
         cover_image = file.read()
         book.set_cover("image.jpg", cover_image)
 
@@ -108,13 +109,13 @@ def write_epub(user_slug, doc_slug, file_path):
         <div>http://chapman.wiki/read/%s/%s</div>
     </body>
     </html>
-    """ % (date_string, user_slug, doc_slug)
-
-    c1 = epub.EpubHtml(
-        title="About this book",
-        file_name="title.xhtml",
-        lang='en'
+    """ % (
+        date_string,
+        user_slug,
+        doc_slug,
     )
+
+    c1 = epub.EpubHtml(title="About this book", file_name="title.xhtml", lang="en")
     c1.content = title_xhtml
     c1.add_item(global_css)
     book.add_item(c1)
@@ -122,11 +123,7 @@ def write_epub(user_slug, doc_slug, file_path):
     # -------------------------
     # 3. Create Chapter
 
-    c2 = epub.EpubHtml(
-        title=title,
-        file_name=chapter_file_name,
-        lang='en'
-    )
+    c2 = epub.EpubHtml(title=title, file_name=chapter_file_name, lang="en")
     c2.content = xhtml
     c2.add_item(global_css)
     book.add_item(c2)
@@ -142,7 +139,7 @@ def write_epub(user_slug, doc_slug, file_path):
     book.add_item(epub.EpubNav())
 
     # basic spine
-    book.spine = ['nav', c1, c2]
+    book.spine = ["nav", c1, c2]
 
     # write to the file
     epub.write_epub(file_path, book, {})

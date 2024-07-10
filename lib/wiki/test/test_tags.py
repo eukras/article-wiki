@@ -12,25 +12,28 @@ from lib.wiki.utils import trim
 
 
 def test_split_pattern():
-    assert split_pattern("#[Tag]") == ("Tag", 'tag', '', '')
-    assert split_pattern("#[Tag, subtag]!") == (
-        "Tag", 'tag', 'subtag', '!')
-    assert split_pattern("#[tags:tag]") == ("tags", 'tag', '', '')
-    assert split_pattern("%[Tag]") == ("Tag", 'Tag', '', '')
+    assert split_pattern("#[Tag]") == ("Tag", "tag", "", "")
+    assert split_pattern("#[Tag, subtag]!") == ("Tag", "tag", "subtag", "!")
+    assert split_pattern("#[tags:tag]") == ("tags", "tag", "", "")
+    assert split_pattern("%[Tag]") == ("Tag", "Tag", "", "")
 
 
 def test_constructor():
     parts = {
-        'index': trim("""
+        "index": trim(
+            """
             My Document!
 
             It contains a #[Tag] and a %[Tag].
 
             ` Part One
-        """),
-        'part-one': trim("""
+        """
+        ),
+        "part-one": trim(
+            """
             Or an #[alias: Tag, subtag]?
-        """),
+        """
+        ),
     }
 
     outline = Outline(parts, default_counters())
@@ -40,19 +43,25 @@ def test_constructor():
     new_parts = tags.insert(parts)
 
     assert new_parts == {
-        'index': trim("""
+        "index": trim(
+            """
             My Document!
 
             It contains a %stag:1%s and a %stag:2%s
 
             ` Part One
-            """) % (DELIMITER, DELIMITER, DELIMITER, DELIMITER),
-        'part-one': trim("""
+            """
+        )
+        % (DELIMITER, DELIMITER, DELIMITER, DELIMITER),
+        "part-one": trim(
+            """
             Or an %stag:1%s
-            """) % (DELIMITER, DELIMITER),
+            """
+        )
+        % (DELIMITER, DELIMITER),
     }
 
     end_parts = tags.replace(new_parts)
 
-    assert 'Tag<sup>i</sup>' in end_parts['index']
-    assert 'Tag.<sup>ii</sup>' in end_parts['index']
+    assert "Tag<sup>i</sup>" in end_parts["index"]
+    assert "Tag.<sup>ii</sup>" in end_parts["index"]

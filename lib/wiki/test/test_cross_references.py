@@ -17,27 +17,31 @@ def test_replace():
     Includes testing link creation.
     """
     parts = {
-        'index': trim("""
+        "index": trim(
+            """
             Test document
 
             - The Simple Test
             - The More Complex Test
-            """),
-        'test': trim("""
+            """
+        ),
+        "test": trim(
+            """
             This is a @[simple] test.
 
             This is a @[-more complex] test.
-            """),
-        }
+            """
+        ),
+    }
 
     outline = Outline(parts, default_counters())
     placeholders = CrossReferences(parts, outline)
 
     tokenized = placeholders.insert(parts)
     html_parts = placeholders.replace(tokenized)
-    out = html_parts['test']
+    out = html_parts["test"]
 
-    assert 'The Simple Test' in out
-    assert '&sect;2' in out  # <-- complex uses shorthand
-    assert 'the-simple-test' in out
-    assert 'the-more-complex-test' in out
+    assert "The Simple Test" in out
+    assert "&sect;2" in out  # <-- complex uses shorthand
+    assert "the-simple-test" in out
+    assert "the-more-complex-test" in out

@@ -28,14 +28,14 @@ def clean_document(parts_dict):
     """
     parts, files = {}, []
     for key, text in parts_dict.items():
-        keyparts = key.split('.')
+        keyparts = key.split(".")
         if len(keyparts) == 1:
             parts[str(key)] = clean_text(text)
         elif len(keyparts) == 2:
             identifier, suffix = keyparts
-            if suffix in ['txt']:
+            if suffix in ["txt"]:
                 parts[str(identifier)] = clean_text(text)
-            elif suffix in ['png', 'jpg']:
+            elif suffix in ["png", "jpg"]:
                 files += [str(key)]
             else:
                 pass
@@ -49,7 +49,7 @@ def clean_text(text):
     Strip placeholder characters, and normalize line endings.
     """
     return strip_placeholder_delimiters(
-        str(text.replace('\r\n', '\n').replace('\r', '\n'))
+        str(text.replace("\r\n", "\n").replace("\r", "\n"))
     ).strip()
 
 
@@ -59,9 +59,11 @@ def compose(functions):
     """
     assert all([isinstance(_, collections.abc.Callable) for _ in functions])
 
-    def composer(fn_1, fn_2): return lambda _: fn_1(fn_2(_))
+    def composer(fn_1, fn_2):
+        return lambda _: fn_1(fn_2(_))
 
-    def initialiser(_): return _
+    def initialiser(_):
+        return _
 
     return reduce(composer, functions, initialiser)
 
@@ -73,7 +75,7 @@ def count_words(text):
     @todo Better to count from finished HTML.
     @todo Needs options to keep/omit footnotes and bibliography.
     """
-    return len(re.findall(r'[\w\_\']+', text))
+    return len(re.findall(r"[\w\_\']+", text))
 
 
 def html_escape(text):
@@ -90,7 +92,7 @@ def html_escape(text):
     return "".join(html_escape_table.get(c, c) for c in text)
 
 
-def get_option(options, index, of_type='all', default=''):
+def get_option(options, index, of_type="all", default=""):
     """
     Get the nth option of a particular type (if specified)
 
@@ -110,28 +112,25 @@ def get_option(options, index, of_type='all', default=''):
 
         @used self.get_option().
         """
-        if value.endswith('%'):
+        if value.endswith("%"):
             return "%d%%" % max(1, min(99, int(value[:-1])))
-        elif value.endswith('em'):
+        elif value.endswith("em"):
             return "%dem" % max(1, min(99, int(value[:-2])))
         else:
             return "auto"
 
-    if of_type in ('dimension', 'digits', 'combine'):
+    if of_type in ("dimension", "digits", "combine"):
         use_type = of_type
     else:
-        use_type = 'string'
-    if use_type == 'combine':
-        return ' '.join(options)
-    if use_type == 'dimension':
-        opts = [_ for _ in options if _.endswith('%') or _.endswith('em')]
+        use_type = "string"
+    if use_type == "combine":
+        return " ".join(options)
+    if use_type == "dimension":
+        opts = [_ for _ in options if _.endswith("%") or _.endswith("em")]
         value = opts[index - 1] if index <= len(opts) else default
-        return css_dimension(value) if value else ''
-    elif use_type == 'digits':
-        opts = [
-            _ for _ in options
-            if intify(_, default=None) is not None
-        ]
+        return css_dimension(value) if value else ""
+    elif use_type == "digits":
+        opts = [_ for _ in options if intify(_, default=None) is not None]
         value = opts[index - 1] if index <= len(opts) else default
         return intify(value)
     else:
@@ -143,8 +142,8 @@ def intify(x, default=0):
     """
     Integers from arbitrary input, else default value
     """
-    digits = re.sub('[^0-9]', '', str(x))
-    return int(digits) if digits != '' else default
+    digits = re.sub("[^0-9]", "", str(x))
+    return int(digits) if digits != "" else default
 
 
 def one_line(text: str) -> str:
@@ -152,7 +151,7 @@ def one_line(text: str) -> str:
     All continuous whitespace (incl. tabs, line breaks) becomes a single
     space. AKA normalise spacing.
     """
-    return re.sub(r'\s+', ' ', text.strip())
+    return re.sub(r"\s+", " ", text.strip())
 
 
 def parse_date(date: str, tz_name: str) -> Union[datetime, None]:
@@ -168,7 +167,7 @@ def parse_date(date: str, tz_name: str) -> Union[datetime, None]:
     """
     try:
         tz_local = pytz.timezone(tz_name)
-        tz_utc = pytz.timezone('UTC')
+        tz_utc = pytz.timezone("UTC")
         local = parser.parse(date)
         utc = tz_local.localize(local).astimezone(tz_utc)
         return utc.strftime(DATE_FORMAT_ISO8601)
@@ -230,8 +229,8 @@ def split_options(options: str) -> str:
     """
     if not options:
         return []
-    text = options.strip('() ')
-    opts = [_.strip() for _ in text.split(',') if _ != '']
+    text = options.strip("() ")
+    opts = [_.strip() for _ in text.split(",") if _ != ""]
     return opts
 
 
@@ -245,7 +244,7 @@ def trim(text: str) -> str:
     # Remove empty lines at start and end.
     body = trim_lines(text)
     # Count leading spaces in the first line.
-    leading, _ = re.split(r'\S', body, 1)
+    leading, _ = re.split(r"\S", body, 1)
     ltrim_cols = len(leading)
     # Trim that number of leading spaces from all lines.
     lines = [line[ltrim_cols:] for line in body.splitlines()]
@@ -260,13 +259,13 @@ def trim_lines(text):
     revlines = []
     hit = False
     for line in reversed(text.splitlines()):
-        hit = hit or not line.strip() == ''
+        hit = hit or not line.strip() == ""
         if hit:
             revlines.append(line)
     lines = []
     hit = False
     for line in reversed(revlines):
-        hit = hit or not line.strip() == ''
+        hit = hit or not line.strip() == ""
         if hit:
             lines.append(line)
     return "\n".join(lines)

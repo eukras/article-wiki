@@ -9,7 +9,7 @@ def day_in_last_fortnight(ts: int) -> int:
     """
     index_time = datetime.fromtimestamp(ts)
     two_weeks_ago = datetime.now() - timedelta(days=14)
-    if (index_time < two_weeks_ago):
+    if index_time < two_weeks_ago:
         return None
     return index_time.toordinal() - two_weeks_ago.toordinal()
 
@@ -18,4 +18,4 @@ def yyyymmdd_from_ts(ts: int) -> str:
     """
     No need to handle historical timezones; assume default.
     """
-    return datetime.fromtimestamp(ts/1000).strftime('%Y-%m-%d')
+    return datetime.fromtimestamp(ts / 1000).strftime("%Y-%m-%d")

@@ -9,17 +9,13 @@ def test_urls():
     Test that URLs are matched and restored
     """
     url = r"https://example.org"
-    parts = {'test': url}
+    parts = {"test": url}
     _ = Urls()
     tokenized = _.insert(parts)
-    expected = {'test': DELIMITER.join([
-        "", "ur:1", ""
-    ])}
+    expected = {"test": DELIMITER.join(["", "ur:1", ""])}
     assert expected == tokenized
     decorated = _.replace(tokenized)
-    expected = {
-        'test': "<a href=\"%s\" target=\"_blank\">%s</a>" % (url, url)
-    }
+    expected = {"test": '<a href="%s" target="_blank">%s</a>' % (url, url)}
     assert expected == decorated
 
 
@@ -29,15 +25,11 @@ def test_emails():
     """
     email = "hello@example.org"
     emailto = "mailto:%s" % email
-    parts = {'test': email}
+    parts = {"test": email}
     _ = Urls()
     tokenized = _.insert(parts)
-    expected = {'test': DELIMITER.join([
-        "", "ur:1", ""
-    ])}
+    expected = {"test": DELIMITER.join(["", "ur:1", ""])}
     assert expected == tokenized
     decorated = _.replace(tokenized)
-    expected = {
-        'test': "<a href=\"%s\" target=\"_blank\">%s</a>" % (emailto, email)
-    }
+    expected = {"test": '<a href="%s" target="_blank">%s</a>' % (emailto, email)}
     assert expected == decorated

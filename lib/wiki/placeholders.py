@@ -8,7 +8,7 @@ import collections
 
 # High Voltage U+26a1; special marker.
 # Will be stripped from any text in which it appears.
-DELIMITER = '⚡'
+DELIMITER = "⚡"
 
 
 class Placeholders(object):
@@ -43,21 +43,22 @@ class Placeholders(object):
         # Preconditions:
         assert len(marker) > 0
         assert isinstance(marker, str)
-        assert re.search(r'^\w+$', marker)
+        assert re.search(r"^\w+$", marker)
         assert isinstance(delimiter, str)
         assert len(delimiter) == 1
         try:
-            self.pattern_regex = re.compile(regex, re.MULTILINE|re.DOTALL)
+            self.pattern_regex = re.compile(regex, re.MULTILINE | re.DOTALL)
         except re.error:
             assert False, "Invalid regex"
 
         self.delimiter = delimiter
         self.marker = marker
         self.placeholder_regex = re.compile(
-            re.escape(self.delimiter) +
-            re.escape(self.marker) + r':(\d+)' +
             re.escape(self.delimiter)
-            )
+            + re.escape(self.marker)
+            + r":(\d+)"
+            + re.escape(self.delimiter)
+        )
 
         self.patterns = {}
 
@@ -73,10 +74,7 @@ class Placeholders(object):
         and then be replaced with HTML in replace().
         """
         assert isinstance(index, int)
-        return "%s%s:%d%s" % (self.delimiter,
-                               self.marker,
-                               index,
-                               self.delimiter)
+        return "%s%s:%d%s" % (self.delimiter, self.marker, index, self.delimiter)
 
     def insert(self, parts):
         """
@@ -88,10 +86,7 @@ class Placeholders(object):
         on a list of HTML in the same order.
         """
         assert isinstance(parts, dict)
-        assert all([
-            isinstance(_, str) and isinstance(parts[_], str)
-            for _ in parts
-            ])
+        assert all([isinstance(_, str) and isinstance(parts[_], str) for _ in parts])
 
         new_parts = {}
         self.patterns = {}
@@ -100,15 +95,15 @@ class Placeholders(object):
 
             self.patterns[slug] = []
             cursor, counter = 0, 1
-            new_text = ''
+            new_text = ""
 
             matches = self.pattern_regex.finditer(text)
             for _ in matches:
-                self.patterns[slug] += [text[_.start():_.end()]]
-                new_text += text[cursor:_.start()]
-                new_text += self.delimiter + \
-                    self.marker + ':' + str(counter) + \
-                    self.delimiter
+                self.patterns[slug] += [text[_.start() : _.end()]]
+                new_text += text[cursor : _.start()]
+                new_text += (
+                    self.delimiter + self.marker + ":" + str(counter) + self.delimiter
+                )
                 cursor = _.end()
                 counter += 1
             new_text += text[cursor:]
@@ -137,19 +132,19 @@ class Placeholders(object):
         assert isinstance(html_parts, dict)
         assert all([isinstance(_, str) for _ in html_parts])
         # if len(self.patterns) != len(html_parts):
-            # print self.patterns.keys().sort()
-            # print html_parts.keys().sort()
+        # print self.patterns.keys().sort()
+        # print html_parts.keys().sort()
 
         new_html_parts = {}
 
         for slug, text in html_parts.items():
             matches = self.placeholder_regex.finditer(text)
             cursor, number = 0, 0
-            new_html = ''
+            new_html = ""
             zipper = list(zip(self.patterns[slug], matches))
-            for (pattern, match) in zipper:
+            for pattern, match in zipper:
                 # assert int(match.group(1)) == number  # <-- Sanity
-                new_html += text[cursor:match.start()]
+                new_html += text[cursor : match.start()]
                 new_html += decorator(pattern, slug)  # <-- Numbers lookup
                 cursor = match.end()
                 number += 1
@@ -158,16 +153,17 @@ class Placeholders(object):
 
         return new_html_parts
 
+
 def is_placeholder(text):
     """
     Identify if this text contains ONLY a placeholder.
     """
-    pattern = r"^\s*%s\w+:\d+%s\s*$" % (re.escape(DELIMITER),
-                                         re.escape(DELIMITER))
+    pattern = r"^\s*%s\w+:\d+%s\s*$" % (re.escape(DELIMITER), re.escape(DELIMITER))
     return bool(re.match(pattern, text))
+
 
 def strip_placeholder_delimiters(text):
     """
     At the start of processing, strip out any delimiter characters.
     """
-    return text.replace(DELIMITER, '')
+    return text.replace(DELIMITER, "")

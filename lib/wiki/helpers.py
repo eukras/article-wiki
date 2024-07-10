@@ -4,11 +4,14 @@ from jinja2 import Environment
 
 from lib.wiki.utils import trim
 
+
 def web_buttons(user_slug: str, doc_slug: str) -> str:
     if doc_slug is None:
         return ""
     env = Environment(autoescape=True)
-    tpl = env.from_string(trim("""
+    tpl = env.from_string(
+        trim(
+            """
     <div class="button-menu web-only text-center no-print">
         <table>
             <tbody>
@@ -33,8 +36,10 @@ def web_buttons(user_slug: str, doc_slug: str) -> str:
             </tbody>
         </table>
     </div>
-    """))
-    return tpl.render(
-         user_slug=user_slug,
-         doc_slug=doc_slug,
+    """
         )
+    )
+    return tpl.render(
+        user_slug=user_slug,
+        doc_slug=doc_slug,
+    )

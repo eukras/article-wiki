@@ -4,7 +4,6 @@ from lib.wiki.config import Config
 
 
 class Icons(object):
-
     """
     Map :name: to <i class="fa fa-{{ name }}"></i>
     Use a dictionary of abbreviations to allow shorthand.
@@ -20,7 +19,7 @@ class Icons(object):
         else:
             self.aliases = Config.fontawesome_icon_aliases
 
-        unique_chars = "".join(set(''.join(list(self.aliases.keys()))))
+        unique_chars = "".join(set("".join(list(self.aliases.keys()))))
         title_chars = r"-a-z0-9"
         extra_chars = re.sub(title_chars, "", unique_chars)
         escaped = re.escape(extra_chars)
@@ -28,7 +27,7 @@ class Icons(object):
         patterns = [
             r"^:([-" + escaped + r"a-z0-9]+)",
             r"(?<=[\W]):([-" + escaped + r"a-z0-9]+)",
-            ]
+        ]
 
         self.regexes = []
         for pattern in patterns:
@@ -57,6 +56,7 @@ class Icons(object):
 
 # Utility functions
 
+
 def expand_shorthand(name):
     """
     Not used in this function, but elsewhere where we can default to the
@@ -70,4 +70,4 @@ def expand_shorthand(name):
 
 def icon_tag(name):
     "Create font-awesome tag"
-    return "<i class=\"fa fa-%s\"></i>" % name
+    return '<i class="fa fa-%s"></i>' % name

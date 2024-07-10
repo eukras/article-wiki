@@ -2,6 +2,7 @@ import re
 
 from lib.wiki.config import Config
 
+
 class Shorthand(object):
     """
     Shorthand markup means using _underline_ instead of its bracket markup
@@ -41,10 +42,10 @@ class Shorthand(object):
         """
         delimiter = re.escape(symbol)
         regex_parts = [
-            [r'^',             r'([^%s]+)' % delimiter, r'(?=[\W])'],
-            [r'(?<=[\s\(\[])', r'([^%s]+)' % delimiter, r'(?=[\W])'],
-            [r'(?<=[\s\(\[])', r'([^%s]+)' % delimiter, r'$'       ],
-            [r'^',             r'([^%s]+)' % delimiter, r'$'       ],
+            [r"^", r"([^%s]+)" % delimiter, r"(?=[\W])"],
+            [r"(?<=[\s\(\[])", r"([^%s]+)" % delimiter, r"(?=[\W])"],
+            [r"(?<=[\s\(\[])", r"([^%s]+)" % delimiter, r"$"],
+            [r"^", r"([^%s]+)" % delimiter, r"$"],
         ]
         for lookbehind, match, lookahead in regex_parts:
             pattern = lookbehind + delimiter + match + delimiter + lookahead

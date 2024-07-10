@@ -18,7 +18,7 @@ class Backslashes(object):
 
     def __init__(self):
         "This is a thin wrapper for Placeholders"
-        self.placeholders = Placeholders(r'\\.', 'bs')
+        self.placeholders = Placeholders(r"\\.", "bs")
 
     def insert(self, parts):
         "Add placeholders."
