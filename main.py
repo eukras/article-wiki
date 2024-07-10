@@ -141,6 +141,7 @@ if not data.user_exists(CONFIG["ADMIN_USER"]):
 # -------------------------------------------------------------
 
 LoginDependency = Annotated[Login, Depends(use_cache=False)]
+FormDependency = Annotated[str | None, Form()]
 
 
 # ----------------------------------------------------------
@@ -150,7 +151,8 @@ LoginDependency = Annotated[Login, Depends(use_cache=False)]
 
 def domain_name(request: Request):
     """
-    Prepend scheme/port/host to URI.
+    Get the scheme ('https') and domain name ('chapman.wiki'),
+    ready to add the URI ('/').
     """
     return f"{request.url.scheme}://{request.url.netloc}"
 
@@ -268,7 +270,8 @@ async def login_form():
 
 @app.post("/login")
 async def do_login(
-    username: Annotated[str, Form()] = None, password: Annotated[str, Form()] = None
+    username: FormDependency,
+    password: FormDependency,
 ):
     """
     Create redis record and cookie for admin user.
@@ -531,7 +534,9 @@ async def edit_part(
             - Part One
             - - Section A
             - Part Two
-        """.replace("PUBLICATION_DATE", today)
+        """.replace(
+                "PUBLICATION_DATE", today
+            )
         )
 
         html = show_editor(
@@ -594,9 +599,9 @@ async def post_edit_part(
     doc_slug: str,
     part_slug: str,
     login: LoginDependency,
-    content: Annotated[str, Form()] = None,
-    they_selected_save: Annotated[str, Form()] = None,
-    they_selected_preview: Annotated[str, Form()] = None,
+    content: FormDependency,
+    they_selected_save: FormDependency = None,
+    they_selected_preview: FormDependency = None,
     request: Request = None,
 ):
     """
@@ -732,8 +737,8 @@ de Saint Exupéry, Antoine. 1939. Terre des Hommes. Paris: Éditions Gallimard.
 @app.post("/playground")
 def editor_post(
     request: Request,
-    content: Annotated[str, Form()] = None,
-    they_selected_preview: Annotated[str, Form()] = None,
+    content: FormDependency = None,
+    they_selected_preview: FormDependency = None,
 ):
     """
     The `/editor` will only preview wiki formatting, never save it.
