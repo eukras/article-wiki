@@ -20,6 +20,10 @@ def make_background(dimensions, color):
 
 
 def makeBokehSvg(backgroundColor, width, height):
+    """
+    Generate an SVG containing fuzzy and sharp circles, in a slightly angled
+    lone.
+    """
     fuzzy_circles = drawCircles(
         randint(30, 40),
         sizes=[3, 3, 3, 4, 5]
@@ -105,7 +109,7 @@ def drawOneCircle(x, y, radius, h, s, v, opacity):
 
 
 def diagonalPoints(num_points, y_height):
-    # Height is how far the diagonal reaches above or below the horizontal.
+    # y_height is how far the diagonal reaches above or below the horizontal.
     x_delta = 100.0 / num_points
     y_delta = ((y_height * 2) / num_points)
     x, y = 0, 35 + y_height
