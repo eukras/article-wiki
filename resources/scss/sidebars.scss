@@ -1,3 +1,6 @@
+@use "vars/fonts";
+
+
 html.navigation-buttons {
     #site-menu, #page-outline {
         display: none;
@@ -18,9 +21,9 @@ html.navigation-sidebars {
         top: 0;
         max-height: 100vh;
         overflow: hidden;
-        font-family: $fontFamilySansSerif;
+        font-family: fonts.$fontFamilySansSerif;
         color: var(--desk-text);
-        font-size: $fontSizeMinus2;
+        font-size: fonts.$fontSizeMinus2;
         a {
             color: inherit;
         }

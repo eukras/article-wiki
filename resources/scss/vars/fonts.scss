@@ -1,0 +1,19 @@
+@use 'sass:math';
+
+$fontFamilySerif: ('IBM Plex Serif', 'GFS Didot', serif); 
+$fontFamilySansSerif: ('IBM Plex Sans Condensed', Helvetica, sans-serif);
+$fontFamilyMonospace: ('Fira Mono', 'Andale Mono', monospace);
+
+$baseFontSize: 1.05;
+$stepUp: 1.12;
+$stepDown: 0.88;
+
+$fontSizePlus5: math.percentage($baseFontSize * $stepUp * $stepUp * $stepUp * $stepUp * $stepUp);
+$fontSizePlus4: math.percentage($baseFontSize * $stepUp * $stepUp * $stepUp * $stepUp);
+$fontSizePlus3: math.percentage($baseFontSize * $stepUp * $stepUp * $stepUp);
+$fontSizePlus2: math.percentage($baseFontSize * $stepUp * $stepUp);
+$fontSizePlus1: math.percentage($baseFontSize * $stepUp);
+$fontSize: math.percentage($baseFontSize);
+$fontSizeMinus1: math.percentage($baseFontSize * $stepDown);
+$fontSizeMinus2: math.percentage($baseFontSize * $stepDown * $stepDown);
+$fontSizeMinus3: math.percentage($baseFontSize * $stepDown * $stepDown * $stepDown);

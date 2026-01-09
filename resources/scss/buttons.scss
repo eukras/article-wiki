@@ -1,3 +1,6 @@
+@use "vars/fonts";
+@use "vars/geometry";
+
 /**
  * An icon-button contains two elements, icon and text
  */
@@ -40,9 +43,9 @@
 }
 
 a.button, input[type="submit"], button {
-    font-family: $fontFamilySansSerif;
-    font-size: $fontSizeMinus1;
-    border-radius: $borderRadius;
+    font-family: fonts.$fontFamilySansSerif;
+    font-size: fonts.$fontSizeMinus1;
+    border-radius: geometry.$borderRadius;
     background-color: var(--page-background);
     border: 2px solid var(--page-text-link);
     color: var(--page-text-link);

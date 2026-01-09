@@ -1,6 +1,8 @@
+@use "vars/colors";
+
 html {
-    color: $gray03;
-    background-color: $gray97;
+    color: colors.$gray03;
+    background-color: colors.$gray97;
 }
 
 .no-print {

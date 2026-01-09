@@ -1,3 +1,7 @@
+@use "vars/geometry";
+@use "vars/fonts";
+@use "vars/breakpoints";
+
 /**
  * Article Wiki; page layout.
  * 
@@ -58,14 +62,20 @@ div#background {
     max-width: var(--page-width);
     margin: 2rem auto;
     padding: 0;
-    @include box-shadow(0, 0, 2.5rem, rgba(30, 60, 30, 0.25));
+    box-shadow: 0, 0, 2.5rem, rgba(30, 60, 30, 0.25);
 }
 
 header {
+    font-size: fonts.$fontSizeMinus2;
+}
+
+header.titles {
+    font-size: fonts.$fontSize;
     text-align: center;
-    margin: 6em 0 5em 0;
+    padding: 6rem 2rem 0 2rem;
     h1, h2 {
-        text-align: center;
+      text-align: center;
+      text-align: center;
     }
 }
 
@@ -85,7 +95,7 @@ header {
     width: var(--side-width-right);
 }
 
-@include isLaptopOrLarger {
+@include breakpoints.isLaptopOrLarger {
 
     html {
         --page-width: 65vw;
@@ -96,7 +106,7 @@ header {
     }
 }
 
-@include isTabletOrSmaller {
+@include breakpoints.isTabletOrSmaller {
     html {
         --page-width: 100vw;
         --side-width-left: 39vw;
@@ -104,21 +114,21 @@ header {
     }
 }
 
-@include isTablet {
+@include breakpoints.isTablet {
     html {
         --side-padding: 2em;
         --page-margin: 4em;
     }
 }
 
-@include isMobile {
+@include breakpoints.isMobile {
     html {
         --side-padding: 1em;
         --page-margin: 3em;
     }
 }
 
-@include isTabletOrSmaller {
+@include breakpoints.isTabletOrSmaller {
     .show-inline-if-laptop-or-larger {
         display: none;
     }
@@ -142,7 +152,7 @@ header {
     }
 }
 
-@include isLaptopOrLarger {
+@include breakpoints.isLaptopOrLarger {
     .show-inline-if-tablet-or-smaller {
         display: none;
     }
@@ -174,7 +184,7 @@ form {
 }
 
 body { 
-    font-size: $fontSize;
+    font-size: fonts.$fontSize;
     padding: 0;
     margin: 0;
 }
@@ -198,10 +208,10 @@ body {
 
     input {
         width: 100%;
-        font-family: $fontFamilySansSerif;
-        font-size: $fontSizePlus1;
+        font-family: fonts.$fontFamilySansSerif;
+        font-size: fonts.$fontSizePlus1;
         border: 1px solid rgba(128, 128, 128, 0.5);
-        border-radius: $borderRadius;
+        border-radius: geometry.$borderRadius;
         padding: 0.3rem 0.6rem;
         margin: 1em 0;
     }

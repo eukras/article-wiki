@@ -1,3 +1,6 @@
+@use "vars/breakpoints";
+@use "vars/fonts";
+
 /**
  * -------------------------------------------------------------------------
  * CSS specific to wiki format elements.
@@ -10,8 +13,8 @@
 }
 
 html {
-    font-family: $fontFamilySerif;
-    font-size: $fontSize;
+    font-family: fonts.$fontFamilySerif;
+    font-size: fonts.$fontSize;
     line-height: 150%;
 }
 
@@ -77,8 +80,8 @@ article {
         border: 1px solid var(--page-outline);
         width: 3rem;
         text-align: center;
-        font-family: $fontFamilySansSerif;
-        font-size: $fontSizeMinus3;
+        font-family: fonts.$fontFamilySansSerif;
+        font-size: fonts.$fontSizeMinus3;
         cursor: pointer;
         color: var(--desk-text);
         &:active {
@@ -118,7 +121,7 @@ article {
     }
 }
 
-@media isPrint {
+@include breakpoints.isPrint {
     .left-margin, 
     .right-margin {
         display: none;
@@ -153,13 +156,11 @@ article {
 
 header {
 
-    margin-bottom: 5rem;
-
     hgroup h1 {
         padding: 0;
         margin: 1rem 0 0 0;
         font-weight: bold;
-        font-size: $fontSizePlus5;
+        font-size: fonts.$fontSizePlus5;
     }
 
     hgroup h2 {
@@ -167,18 +168,18 @@ header {
         margin: 1rem 0 1rem 0;
         font-style: italic;
         font-weight: normal;
-        font-size: $fontSizePlus3;
+        font-size: fonts.$fontSizePlus3;
     }
 
     address {
         margin: 4rem 0 3rem 0;
         font-style: normal;
         div:first-child {
-            font-size: $fontSizePlus1;
+            font-size: fonts.$fontSizePlus1;
             font-weight: bold;
         }
         a[href^="mailto:"] {
-            font-size: $fontSizeMinus1;
+            font-size: fonts.$fontSizeMinus1;
             font-color: inherit;
             text-decoration: none;
         }
@@ -209,37 +210,37 @@ section {
 
 section.depth-1 {
     h1 {
-        font-size: $fontSizePlus3;
+        font-size: fonts.$fontSizePlus3;
     }
 }
 
 section.depth-2 {
     h1 {
-        font-size: $fontSizePlus2;
+        font-size: fonts.$fontSizePlus2;
     }
 }
 
 section.depth-3 {
     h1 {
-        font-size: $fontSizePlus1;
+        font-size: fonts.$fontSizePlus1;
     }
 }
 
 section.depth-4 h1,
 footer h1 {
-    font-size: $fontSize
+    font-size: fonts.$fontSize
 }
 
 section.depth-5 h1 {
-    font-size: $fontSizeMinus1;
+    font-size: fonts.$fontSizeMinus1;
 }
 
 section.depth-6 h1 {
-    font-size: $fontSizeMinus1;
+    font-size: fonts.$fontSizeMinus1;
 }
 
 footer {
-    font-size: $fontSizeMinus2;
+    font-size: fonts.$fontSizeMinus2;
 }
 
 
@@ -274,7 +275,7 @@ div.headline-title {
     flex-grow: 1;
     gap: 2rem;
 
-    @include isTablet {
+    @include breakpoints.isTablet {
         flex-direction: column;
     }
 }
@@ -298,11 +299,11 @@ div.headline-title {
 }
 
 .wiki-demo-input pre {
-    font-size: $fontSizeMinus3;
+    font-size: fonts.$fontSizeMinus3;
 }
 
 .wiki-demo-output {
-    font-size: $fontSizeMinus1; 
+    font-size: fonts.$fontSizeMinus1; 
 }
 
 .wiki-demo-output article,
@@ -331,24 +332,24 @@ div.headline-title {
     margin-bottom: 2rem;
 }
 .article-card-title {
-    font-size: $fontSizePlus2;
+    font-size: fonts.$fontSizePlus2;
     font-weight: bold;
 }
 .article-card-summary {
-    font-size: $fontSizePlus1;
+    font-size: fonts.$fontSizePlus1;
     font-style: italic;
     margin-bottom: 0.75rem;
 }
 .article-card-details {
-    font-size: $fontSize;
+    font-size: fonts.$fontSize;
     margin-bottom: 0.75rem;
 }
 .article-card-download {
-    font-size: $fontSizeMinus1;
+    font-size: fonts.$fontSizeMinus1;
     font-weight: bold;
 }
 
-@include isTabletOrSmaller {
+@include breakpoints.isTabletOrSmaller {
 
     .article-list {
         grid-template-columns: 100%
@@ -418,9 +419,9 @@ table.table-of-contents {
     }
     td.word-count { 
         text-align: right;
-        font-size: $fontSizeMinus2;
+        font-size: fonts.$fontSizeMinus2;
         white-space: nowrap;
-        @include isMobile {
+        @include breakpoints.isMobile {
             display: none;
         }
     }
@@ -435,5 +436,5 @@ td {
 }
 
 .bibliography {
-    font-size: $fontSizeMinus1;
+    font-size: fonts.$fontSizeMinus1;
 }

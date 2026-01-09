@@ -244,9 +244,8 @@ td {
   vertical-align: baseline;
 }
 
-/* Basics */
-html.theme-light {
-  --desk-background: hsl(120, 14%, 67%);
+:root {
+  --desk-background: colors.$seaGreen;
   --desk-svg-blend-mode: hard-light;
   --desk-svg-opacity: 1;
   --desk-text: hsl(120, 46%, 29%);
@@ -267,6 +266,29 @@ html.theme-light {
   --completion-bar-svg: url("/static/completion-bar-green.svg");
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --desk-background: hsl(248, 90%, 5%);
+    --desk-svg-blend-mode: hard-light;
+    --desk-svg-opacity: 0.33;
+    --desk-text: hsl(218, 21%, 37%);
+    --desk-text-active: hsl(210, 67%, 78%);
+    --desk-text-secondary: hsl(240, 22%, 51%);
+    --side-background-left: hsla(0, 0%, 3%, 0.9);
+    --side-background-right: hsl(248, 90%, 5%);
+    --page-background: hsl(0, 0%, 3%);
+    --page-outline: hsl(0, 0%, 25%);
+    --page-text: hsl(0, 0%, 50%);
+    --page-text-secondary: hsl(240, 22%, 51%);
+    --page-text-tertiary: hsl(210, 67%, 78%);
+    --page-text-link: hsl(0, 0%, 90%);
+    --page-text-link-background: hsl(0, 0%, 3%);
+    --page-text-selection: hsl(210, 67%, 78%);
+    --page-icon-background: hsl(0, 0%, 10%);
+    --page-icon-text: hsl(0, 0%, 25%);
+    --completion-bar-svg: url("/static/completion-bar-blue.svg");
+  }
+}
 html.theme-dark {
   --desk-background: hsl(248, 90%, 5%);
   --desk-svg-blend-mode: hard-light;
@@ -287,6 +309,28 @@ html.theme-dark {
   --page-icon-background: hsl(0, 0%, 10%);
   --page-icon-text: hsl(0, 0%, 25%);
   --completion-bar-svg: url("/static/completion-bar-blue.svg");
+}
+
+html.theme-light {
+  --desk-background: hsl(120, 14%, 67%);
+  --desk-svg-blend-mode: hard-light;
+  --desk-svg-opacity: 1;
+  --desk-text: hsl(120, 46%, 29%);
+  --desk-text-active: hsl(0, 0%, 97%);
+  --desk-text-secondary: hsl(0, 0%, 3%);
+  --side-background-left: hsla(0, 0%, 97%, 0.9);
+  --side-background-right: hsl(120, 14%, 67%);
+  --page-background: hsl(0, 0%, 97%);
+  --page-outline: hsl(0, 0%, 75%);
+  --page-text: hsl(0, 0%, 3%);
+  --page-text-secondary: hsl(0, 0%, 3%);
+  --page-text-tertiary: hsl(0, 0%, 3%);
+  --page-text-link: hsl(0, 0%, 3%);
+  --page-text-link-background: hsl(120, 44%, 93%);
+  --page-text-selection: hsl(83, 84%, 75%);
+  --page-icon-background: hsl(0, 0%, 90%);
+  --page-icon-text: hsl(120, 14%, 67%);
+  --completion-bar-svg: url("/static/completion-bar-green.svg");
 }
 
 @media print {
@@ -369,16 +413,20 @@ div#background {
   max-width: var(--page-width);
   margin: 2rem auto;
   padding: 0;
-  -webkit-box-shadow: 0 0 2.5rem rgba(30, 60, 30, 0.25);
-  -moz-box-shadow: 0 0 2.5rem rgba(30, 60, 30, 0.25);
-  box-shadow: 0 0 2.5rem rgba(30, 60, 30, 0.25);
+  box-shadow: 0, 0, 2.5rem, rgba(30, 60, 30, 0.25);
 }
 
 header {
-  text-align: center;
-  margin: 6em 0 5em 0;
+  font-size: 81.312%;
 }
-header h1, header h2 {
+
+header.titles {
+  font-size: 105%;
+  text-align: center;
+  padding: 6rem 2rem 0 2rem;
+}
+header.titles h1, header.titles h2 {
+  text-align: center;
   text-align: center;
 }
 
@@ -593,6 +641,16 @@ a {
   text-decoration: none;
 }
 
+a.reference {
+  color: #808080;
+  font-size: 71.55456%;
+}
+
+@media print {
+  a.reference {
+    color: var(--page-text-link);
+  }
+}
 a:hover {
   text-decoration: none;
 }
@@ -667,8 +725,8 @@ ul, ol, dl {
   font-size: 81.312%;
   border: dotted 1px var(--page-text);
   border-radius: 0.5rem;
-  margin: 1rem 0;
-  padding: 1rem;
+  margin: 0 0 1rem 1rem;
+  padding: 0.5rem 1rem;
   line-height: 1rem;
 }
 
@@ -683,14 +741,16 @@ ul, ol, dl {
 }
 
 aside {
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
-  font-size: 81.312%;
-  float: right;
-  width: 30%;
-  border-left: dotted 1px var(--page-text);
-  padding-left: 1rem;
-  margin-left: 1rem;
-  margin-bottom: 0.5rem;
+  font-size: 71.55456%;
+  text-align: right;
+  margin: 1rem 0 1rem 4.8em;
+  padding: 0 1rem;
+  line-height: 1rem;
+  text-wrap: balance;
+}
+
+a.reference {
+  font-size: 92.4%;
 }
 
 .box-dotted {
@@ -895,8 +955,6 @@ blockquote + blockquote {
 }
 
 p.subhead {
-  text-align: center;
-  color: var(--page-text-tertiary);
   font-weight: bold;
   margin: 0;
   padding: 0.5rem 0 0.5rem 0;
@@ -1204,10 +1262,6 @@ div.quiz ol.answers {
   transform: rotate(180deg);
 }
 
-/**
- * Mixins
- *
- */
 .no-widows {
   widows: 2;
 }
@@ -1357,31 +1411,31 @@ article {
   fill: var(--desk-text);
 }
 
+.left-margin a.button-unit:hover,
+.left-margin button.button-unit:hover {
+  border: 1px solid var(--desk-text);
+  border-left: none;
+}
 .left-margin a.button-unit,
 .left-margin button.button-unit {
   padding: 0.5rem 0.75rem 0.5rem 0.5rem;
   border-left: none;
   border-radius: 0 1rem 1rem 0;
 }
-.left-margin a.button-unit:hover,
-.left-margin button.button-unit:hover {
-  border: 1px solid var(--desk-text);
-  border-left: none;
-}
 
+.right-margin a.button-unit:hover,
+.right-margin button.button-unit:hover {
+  border: 1px solid var(--desk-text);
+  border-right: none;
+}
 .right-margin a.button-unit,
 .right-margin button.button-unit {
   padding: 0.5rem 0.5rem 0.5rem 0.75rem;
   border-right: none;
   border-radius: 1rem 0 0 1rem;
 }
-.right-margin a.button-unit:hover,
-.right-margin button.button-unit:hover {
-  border: 1px solid var(--desk-text);
-  border-right: none;
-}
 
-@media isPrint {
+@media print {
   .left-margin,
   .right-margin {
     display: none;
@@ -1408,9 +1462,6 @@ article {
   opacity: 1;
 }
 
-header {
-  margin-bottom: 5rem;
-}
 header hgroup h1 {
   padding: 0;
   margin: 1rem 0 0 0;
@@ -1692,10 +1743,6 @@ html.navigation-sidebars #site-menu, html.navigation-sidebars #page-outline {
   font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
   color: var(--desk-text);
   font-size: 81.312%;
-  /* No scrollbars */
-  overflow-y: scroll;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
 html.navigation-sidebars #site-menu a, html.navigation-sidebars #page-outline a {
   color: inherit;
@@ -1703,6 +1750,12 @@ html.navigation-sidebars #site-menu a, html.navigation-sidebars #page-outline a 
 html.navigation-sidebars #site-menu .space, html.navigation-sidebars #page-outline .space {
   margin-top: 1rem;
   margin-bottom: 1rem;
+}
+html.navigation-sidebars #site-menu, html.navigation-sidebars #page-outline {
+  /* No scrollbars */
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
 html.navigation-sidebars #site-menu ::-webkit-scrollbar, html.navigation-sidebars #page-outline ::-webkit-scrollbar { /* WebKit */
   width: 0;
@@ -1712,23 +1765,6 @@ html.navigation-sidebars #page-outline {
   /**
    * Completion visualisation, colourised by .visible
    */
-  /**
-   * Colourisation:
-   */
-  /* Visible elements */
-  /* Children of visible elements */
-  /* Subtree containing visible elements */
-  /**
-   * Document outline; colorised and displayed by .visible
-   */
-  /*
-   * Visibility: Hide unless top-level or in the context of .visible
-   */
-  /* Colorize/display visible elements */
-  /* ... but not their descendants */
-  /* Colorize/display parents of visible elements */
-  /* Display siblings of visible elements */
-  /* Display immediate children of visible elements */
 }
 html.navigation-sidebars #page-outline #completion {
   line-height: 1em;
@@ -1763,20 +1799,37 @@ html.navigation-sidebars #page-outline #completion .completion-unit {
 html.navigation-sidebars #page-outline .completion-unit {
   background-image: var(--completion-bar-svg);
 }
+html.navigation-sidebars #page-outline {
+  /**
+   * Colourisation:
+   */
+  /* Visible elements */
+}
 html.navigation-sidebars #page-outline div#completion ol li.visible div.completion-unit {
   background-color: var(--desk-text-active);
   border: solid 1px var(--desk-text-active);
   background-image: none;
+}
+html.navigation-sidebars #page-outline {
+  /* Children of visible elements */
 }
 html.navigation-sidebars #page-outline #completion li.visible li:not(.visible) .completion-unit {
   background-color: var(--desk-text-secondary);
   border: solid 1px var(--desk-text-secondary);
   background-image: none;
 }
+html.navigation-sidebars #page-outline {
+  /* Subtree containing visible elements */
+}
 html.navigation-sidebars #page-outline #completion li:has(ol > li.visible) .completion-unit {
   background-color: var(--desk-text-secondary);
   border: solid 1px var(--desk-text-secondary);
   background-image: none;
+}
+html.navigation-sidebars #page-outline {
+  /**
+   * Document outline; colorised and displayed by .visible
+   */
 }
 html.navigation-sidebars #page-outline #outline ol {
   margin-top: 0;
@@ -1788,25 +1841,45 @@ html.navigation-sidebars #page-outline #outline ol {
 html.navigation-sidebars #page-outline #outline > ol {
   padding-left: 0;
 }
+html.navigation-sidebars #page-outline {
+  /*
+   * Visibility: Hide unless top-level or in the context of .visible
+   */
+}
 html.navigation-sidebars #page-outline #outline li {
   display: none;
 }
 html.navigation-sidebars #page-outline #outline > ol > li {
   display: block;
 }
+html.navigation-sidebars #page-outline {
+  /* Colorize/display visible elements */
+}
 html.navigation-sidebars #page-outline #outline li.visible {
   color: var(--desk-text-active);
   display: block;
 }
+html.navigation-sidebars #page-outline {
+  /* ... but not their descendants */
+}
 html.navigation-sidebars #page-outline #outline li.visible li:not(.visible) {
   color: var(--desk-text-secondary);
+}
+html.navigation-sidebars #page-outline {
+  /* Colorize/display parents of visible elements */
 }
 html.navigation-sidebars #page-outline #outline li:has(ol > li.visible) {
   color: var(--desk-text-secondary);
   display: block;
 }
+html.navigation-sidebars #page-outline {
+  /* Display siblings of visible elements */
+}
 html.navigation-sidebars #page-outline #outline ol:has(> li.visible) > li {
   display: block;
+}
+html.navigation-sidebars #page-outline {
+  /* Display immediate children of visible elements */
 }
 html.navigation-sidebars #page-outline #outline li.visible > ol > li {
   display: block;
@@ -1987,7 +2060,6 @@ button[disabled=DISABLED] {
   }
   #editor.mode-edit {
     /* Small-screen: Only four buttons */
-    /* Only one page area */
   }
   #editor.mode-edit #btn-back {
     display: inline;
@@ -2016,6 +2088,9 @@ button[disabled=DISABLED] {
   #editor.mode-edit #btn-save {
     display: none;
   }
+  #editor.mode-edit {
+    /* Only one page area */
+  }
   #editor.mode-edit textarea {
     display: block;
   }
@@ -2024,7 +2099,6 @@ button[disabled=DISABLED] {
   }
   #editor.mode-preview {
     /* Small-screen: Only four buttons */
-    /* Only one page area */
   }
   #editor.mode-preview #btn-back {
     display: none;
@@ -2052,6 +2126,9 @@ button[disabled=DISABLED] {
   }
   #editor.mode-preview #btn-save {
     display: inline;
+  }
+  #editor.mode-preview {
+    /* Only one page area */
   }
   #editor.mode-preview textarea {
     display: none;

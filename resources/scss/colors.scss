@@ -1,0 +1,131 @@
+@use "vars/colors";
+
+//  Desk:
+//  +---------------------------------+
+//  | Side:   Page:          Side     |
+//  | +-----+ +------------+ +------+ |
+//  | +     | |            | |      | |
+//  | +-----+ +------------+ +------+ |
+//  +---------------------------------+
+//
+//  Side panels are transparent on large screens.
+
+//  -----------------------------
+//  Color themes:
+//  - Light (re in sunlight; default)
+//  - Dark (reading at night with no other light sources)
+//  - Print (black and white).
+
+:root {
+    --desk-background: colors.$seaGreen;
+    --desk-svg-blend-mode: hard-light;
+    --desk-svg-opacity: 1;
+    --desk-text: #{colors.$midGreen};
+    --desk-text-active: #{colors.$gray97};
+    --desk-text-secondary: #{colors.$gray03};
+    --side-background-left: #{colors.$gray97-translucent};
+    --side-background-right: #{colors.$seaGreen};
+    --page-background: #{colors.$gray97};
+    --page-outline: #{colors.$gray75};
+    --page-text: #{colors.$gray03};
+    --page-text-secondary: #{colors.$gray03};
+    --page-text-tertiary: #{colors.$gray03};
+    --page-text-link: #{colors.$gray03};
+    --page-text-link-background: #{colors.$mintGreen};
+    --page-text-selection: #{colors.$limeGreen};
+    --page-icon-background: #{colors.$gray90};
+    --page-icon-text: #{colors.$seaGreen};
+    --completion-bar-svg: url("/static/completion-bar-green.svg");
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --desk-background: #{colors.$nightBlue};
+    --desk-svg-blend-mode: hard-light;
+    --desk-svg-opacity: 0.33;
+    --desk-text: #{colors.$busterBlue};
+    --desk-text-active: #{colors.$bostonBlue};
+    --desk-text-secondary: #{colors.$indigoBlue};
+    --side-background-left: #{colors.$gray03-translucent};
+    --side-background-right: #{colors.$nightBlue};
+    --page-background: #{colors.$gray03};
+    --page-outline: #{colors.$gray25};
+    --page-text: #{colors.$gray50};
+    --page-text-secondary: #{colors.$indigoBlue};
+    --page-text-tertiary: #{colors.$bostonBlue};
+    --page-text-link: #{colors.$gray90};
+    --page-text-link-background: #{colors.$gray03};
+    --page-text-selection: #{colors.$bostonBlue};
+    --page-icon-background: #{colors.$gray10};
+    --page-icon-text: #{colors.$gray25};
+    --completion-bar-svg: url("/static/completion-bar-blue.svg");
+  }
+}
+
+html.theme-dark {
+    --desk-background: #{colors.$nightBlue};
+    --desk-svg-blend-mode: hard-light;
+    --desk-svg-opacity: 0.33;
+    --desk-text: #{colors.$busterBlue};
+    --desk-text-active: #{colors.$bostonBlue};
+    --desk-text-secondary: #{colors.$indigoBlue};
+    --side-background-left: #{colors.$gray03-translucent};
+    --side-background-right: #{colors.$nightBlue};
+    --page-background: #{colors.$gray03};
+    --page-outline: #{colors.$gray25};
+    --page-text: #{colors.$gray50};
+    --page-text-secondary: #{colors.$indigoBlue};
+    --page-text-tertiary: #{colors.$bostonBlue};
+    --page-text-link: #{colors.$gray90};
+    --page-text-link-background: #{colors.$gray03};
+    --page-text-selection: #{colors.$bostonBlue};
+    --page-icon-background: #{colors.$gray10};
+    --page-icon-text: #{colors.$gray25};
+    --completion-bar-svg: url("/static/completion-bar-blue.svg");
+}
+
+html.theme-light {
+    --desk-background: #{colors.$seaGreen};
+    --desk-svg-blend-mode: hard-light;
+    --desk-svg-opacity: 1;
+    --desk-text: #{colors.$midGreen};
+    --desk-text-active: #{colors.$gray97};
+    --desk-text-secondary: #{colors.$gray03};
+    --side-background-left: #{colors.$gray97-translucent};
+    --side-background-right: #{colors.$seaGreen};
+    --page-background: #{colors.$gray97};
+    --page-outline: #{colors.$gray75};
+    --page-text: #{colors.$gray03};
+    --page-text-secondary: #{colors.$gray03};
+    --page-text-tertiary: #{colors.$gray03};
+    --page-text-link: #{colors.$gray03};
+    --page-text-link-background: #{colors.$mintGreen};
+    --page-text-selection: #{colors.$limeGreen};
+    --page-icon-background: #{colors.$gray90};
+    --page-icon-text: #{colors.$seaGreen};
+    --completion-bar-svg: url("/static/completion-bar-green.svg");
+}
+
+@media print {
+
+    html {
+        --desk-background: #{colors.$white};
+        --desk-svg-blend-mode: normal;
+        --desk-svg-opacity: 0;
+        --desk-text: #{colors.$black};
+        --desk-text-active: #{colors.$black};
+        --desk-text-secondary: #{colors.$black};
+        --side-background-left: #{colors.$white};
+        --side-background-right: #{colors.$white};
+        --page-background: #{colors.$white};
+        --page-text: #{colors.$black};
+        --page-text-secondary: #{colors.$black};
+        --page-text-link: #{colors.$black};
+        --page-text-selection: none;
+        --page-icon-background: #{colors.$white};
+        --page-icon-text: #{colors.$black};
+        --completion-bar-svg: none;
+    }
+
+}
+

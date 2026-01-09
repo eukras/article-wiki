@@ -1,12 +1,9 @@
 /* Basics. */
-@import "_breakpoints.scss";
-@import "_variables.scss";
-@import "_reset.scss";
-@import "_fonts.scss";
+@use "reset";
 
 /* Typography: Same for book/print/ebook. */
-@import "_wiki.scss";
-@import "_typography.scss";
+@use "wiki";
+@use "typography";
 
 /* main.css and epub.css are two separate builds.*/
-@import "_ebook.scss";
+@use "ebook";

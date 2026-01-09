@@ -1,21 +1,17 @@
 /* Consistency */
-@import "_reset.scss";
-
-/* Basics */
-@import "_breakpoints.scss";
-@import "_mixins.scss";
-@import "_variables.scss";
+@use "reset";
+@use "colors";
 
 /* Documents */
-@import "_layout.scss";
-@import "_typography.scss";
+@use "layout";
+@use "typography";
 
 /* Application */
-@import "_wiki.scss";
-@import "_sidebars.scss";
-@import "_buttons.scss";
-@import "_editor.scss";
-@import "_unsupported.scss";
+@use "wiki";
+@use "sidebars";
+@use "buttons";
+@use "editor";
+@use "unsupported";
 
 /* Printing */
-@import "_print.scss";
+@use "print";

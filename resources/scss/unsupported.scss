@@ -1,3 +1,5 @@
+@use "vars/geometry";
+
 /**
  * We show a please-upgrade-your-browser notice if missing:
  * - CSS grid display
@@ -25,7 +27,7 @@
         z-index: 100;
         top: 2em;
         left: 10em;
-        border-radius: $borderRadius;
+        border-r: geometry.$borderRadius;
         box-shadow: 1rem 1rem 2rem #444;
         text-align: center;
         background-color: var(--page-background);
