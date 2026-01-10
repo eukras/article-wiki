@@ -22,7 +22,6 @@ COLOR_BACKGROUND = (160, 184, 160)  # <-- Norway, Summer Green, Pewter
 
 
 def write_epub(user_slug, doc_slug, file_path):
-
     # Get all the data
     config = load_env_config()
     data = Data(config)

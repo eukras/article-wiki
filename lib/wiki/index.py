@@ -63,14 +63,11 @@ class Index(object):
         if number not in self.tags[tag][subtag]:
             self.tags[tag][subtag][number] = []
 
-        link = (
-            trim(
-                """
+        link = trim(
+            """
                 <a id=\"%s\" href=\"#ref_%s\">%s%s<sup>%s</sup></a>
             """
-            )
-            % (nav_id, nav_id, alias, punctuation, count)
-        )
+        ) % (nav_id, nav_id, alias, punctuation, count)
 
         ref_link = '<a id="ref_%s" href="#%s">%s</a>' % (nav_id, nav_id, count)
 

@@ -15,6 +15,7 @@ Each Block must:
 """
 
 import re
+from typing import List, Optional, Self, Tuple
 
 from airium import Airium
 from textwrap import shorten
@@ -24,6 +25,7 @@ from jinja2 import Environment
 
 from lib.slugs import slug
 
+from lib.wiki.bible_references import BibleReferences
 from lib.wiki.functions.base import (
     Articles,
     Box,
@@ -31,10 +33,8 @@ from lib.wiki.functions.base import (
     Compact,
     Indent,
     Feature,
-    Footer,
     Function,
     Float,
-    Header,
     Left,
     Print,
     Quote,
@@ -52,6 +52,7 @@ from lib.wiki.geometry import (
     split_to_dictionary,
     split_to_recursive_array,
 )
+from lib.wiki.plugins.references import References
 from lib.wiki.renderer import (
     alert,
     generate_table,
@@ -63,8 +64,6 @@ from lib.wiki.renderer import (
     tag,
 )
 
-# from lib.wiki.icons import \
-# expand_shorthand
 from lib.wiki.placeholders import is_placeholder
 from lib.wiki.inline import Inline
 from lib.wiki.utils import clean_text, one_line, random_slug, split_options, trim
@@ -80,12 +79,19 @@ class BlockList(object):
     > new_html = blocks.html()
     """
 
-    def __init__(self, text: str):
+    def __init__(self, text: Optional[str] = None):
         """
         Process a wiki text into a list of blocks.
         """
         self.blocks = []
-        self.process(text)
+        if text:
+            self.process(text)
+
+    @classmethod
+    def from_blocks(cls, blocks: List[Self]) -> Self:
+        obj = cls()
+        obj.blocks = blocks
+        return obj
 
     def __iter__(self):
         "Loop through the blocks..."
@@ -120,9 +126,7 @@ class BlockList(object):
                 Compact,
                 Feature,
                 Float,
-                Footer,
                 Indent,
-                Header,
                 Left,
                 Print,
                 Quote,
@@ -148,7 +152,6 @@ class BlockList(object):
         self.blocks = []
 
         while cursor < length:
-
             cursor = start_of_block(text, cursor)
 
             # FUNCTION (options) ---
@@ -181,7 +184,11 @@ class BlockList(object):
                 cursor = next_blank_line
 
             if len(_) > 0:
-                if _ in Config.dividers:
+                if _ == Config.header:
+                    self.blocks += [Header(_)]
+                elif _ == Config.footer:
+                    self.blocks += [Footer(_)]
+                elif _ in Config.dividers:
                     self.blocks += [Divider(_)]
                 elif len(_) > 1:
                     if _[0] in Config.all_control_chars and _[1] == " ":
@@ -197,12 +204,12 @@ class BlockList(object):
         """
         return "\n".join(
             [
-                "%s: %s" % (block.__class__.__name__, block.content)
-                for block in self.blocks
+                "%d | %s: %s" % (i, block.__class__.__name__, block.content)
+                for i, block in enumerate(self.blocks)
             ]
         )
 
-    def find(self, class_name, control_characters: str = None) -> list:
+    def find(self, class_name, control_characters: Optional[str] = None) -> list:
         """
         A quick way to filter for block types (more than one, e.g. "+-").
         """
@@ -218,6 +225,27 @@ class BlockList(object):
                 else:
                     found += [_]
         return found
+
+    def split_by_class(self, cls, backwards=False) -> List[Self]:
+        """Return two blocklists, if any class exists.
+
+        Args:
+            backwards: if no split, then the first is None
+
+        (Used for Header and Footer).
+        """
+        first, second, found = [], [], False
+        for block in self.blocks:
+            if isinstance(block, cls):
+                found = True
+            else:
+                if not found:
+                    first.append(block)
+                else:
+                    second.append(block)
+        if backwards and len(second) == 0:
+            first, second = second, first
+        return [self.from_blocks(first), self.from_blocks(second)]
 
     def text(self):
         """ "
@@ -274,24 +302,67 @@ class BlockList(object):
                 if _.control_character == Config.caption:
                     summary = _.content[2:]
                     self.blocks.pop(0)
+        # TODO: Move shorten to presentaion functions.
         return (
             str(shorten(title, 128, placeholder="...")),
             str(shorten(summary, 128, placeholder="...")),
         )
 
-    def html(self, numbering, slug, settings, fragment=False, preview=False):
+    def split_body(self) -> Tuple[Self | None, Self, Self | None]:
+        """
+        Return separate blocklists for [header, body, footer], split on
+        `config.header` and `config.footer`.
+
+        The header and footer are optional auxiliary information formatted in
+        compact text and visually separated from the body text.
+
+        Note:
+            Usually, pop_titles() will be used to remove the title and summary
+            before identifying the header and footer. This can happen afterward,
+            but will need to be performed on the body is head is None.
+
+        Example:
+            ```
+            Title
+
+            = Summary
+
+            Header text
+
+            < < <
+
+            Body text
+
+            > > >
+
+            Footer text
+            ```
+        """
+        header, body = self.split_by_class(Header, backwards=True)
+        body, footer = body.split_by_class(Footer)
+        return (header, body, footer)
+
+    def html(
+        self, numbering, slug, settings, fragment=False, preview=False, plugins=None
+    ):
         """
         Produce HTML, passing along any settings that were updated while
         processing any block.
 
-        - A fragment has no title lines (rename: no_titles?).
-          (Used in demo blocks.)
-        - A preview has no section numbering in its title.
-          (Used in the editor.)
+        Separate header and footer areas.
+
+        Args:
+            fragment: Show no title lines if this is a fragment of wiki text.
+                (Used in demo blocks.)
+            preview: Show no section numbering if this is only a preview.
+                (Used in the editor.)
         """
-        renderer = Html({})
+        renderer = Html()
         renderer.settings = copy(settings)
-        out = []
+        local_settings = copy(settings)
+        plugin_list = plugins if plugins else []
+        html = ""
+
         if not fragment and slug != "index":
             title, summary = self.pop_titles()
             nav_id = get_section_nav_id(numbering, slug)
@@ -300,16 +371,54 @@ class BlockList(object):
                 subtitle = renderer.inline.process(summary)
             else:
                 subtitle = None
-            out += [str(section_heading(nav_id, number, title, subtitle))]
-        # Assemble
-        local_settings = copy(settings)
-        for _ in self.blocks:
+            html += str(
+                section_heading(
+                    nav_id, number, renderer.inline.process(title), subtitle
+                )
+            )
+
+        header_parts = []
+        footer_parts = []
+
+        header, body, footer = self.split_body()
+        if header and header.blocks:
+            for _ in header.blocks:
+                block_html, local_settings = _.html(renderer, local_settings)
+                header_parts += block_html
+
+        if not fragment:
+            for plugin in plugin_list:
+                title, content = plugin.hook_before_section_body(slug)
+                if content:
+                    header_parts += (
+                        f'<ul type="disc"><li><b>{title}</b> &nbsp; {content}</li></ul>'
+                    )
+            if footer and footer.blocks:
+                for _ in footer.blocks:
+                    block_html, local_settings = _.html(renderer, local_settings)
+                    footer_parts += block_html
+
+        if len(header_parts) > 0:
+            html += "<header>"
+            for part in header_parts:
+                html += part
+            html += '<hr class="div-left div-solid div-10em" />'
+            html += "</header>"
+
+        for _ in body.blocks:
             block_html, local_settings = _.html(renderer, local_settings)
-            out += [block_html]
-        return "\n\n".join(out)
+            html += block_html
+
+        if len(footer_parts) > 0:
+            html += "<footer>"
+            html += '<hr class="div-left div-solid div-10em" />'
+            for part in footer_parts:
+                html += part
+            html += "</footer>"
+        return html
 
 
-def get_title_data(text: str, part_slug: str) -> (str, str, str, str):
+def get_title_data(text: str, part_slug: str) -> Tuple[str, str, str, str]:
     """
     Return titles info from any text section, allowing for the SLUG setting.
 
@@ -338,13 +447,8 @@ def get_title_data(text: str, part_slug: str) -> (str, str, str, str):
     return part_slug, title, title_slug, summary
 
 
-class Block(object):
-    """
-    A superclass, with methods common to all blocks.
-    """
-
+class Block:
     def html_only(self, renderer, settings):
-        "For when only the html is needed..."
         (html, settings) = self.html(renderer, settings)
         return html
 
@@ -370,6 +474,32 @@ class Paragraph(Block):
         else:
             html = tag("p", settings.replace(self.content))
         return (html, settings)
+
+
+class Separator(Block):
+    """
+    Indicate a division in the document; show no HTML. This is only used
+    by the BlockList itself to ditinguish different document parts.
+    """
+
+    def __init__(self, text: str) -> None:
+        self.content = text
+
+    def text(self):
+        return self.content
+
+    def html(self, renderer, settings):
+        pass
+
+
+class Header(Separator):
+    def html(self, renderer, settings):
+        return ("", settings)
+
+
+class Footer(Separator):
+    def html(self, renderer, settings):
+        return ("", settings)
 
 
 class Divider(Block):
@@ -669,7 +799,9 @@ def note_block(content, settings):
 
     def note_line(part):
         char, text = part
-        if char == '"':
+        if char == "&":
+            return tag("aside", text)
+        elif char == '"':
             return tag("p", text, "note")
         else:
             return alert(content)

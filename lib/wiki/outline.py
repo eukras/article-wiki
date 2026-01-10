@@ -102,7 +102,7 @@ class Outline(object):
 
     def find_slug(self, match_numbering, default=None):
         """
-        Return the numbering for a part, by slug.
+        Return the slug for a part, by numbering.
         """
         for numbering, slug, _, _, _ in self.elements:
             if numbering == match_numbering:

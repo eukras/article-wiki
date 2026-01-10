@@ -8,13 +8,12 @@ in directories.
 """
 
 import re
-
-from html import escape
 from datetime import date, datetime
-from dateutil.parser import parse
+from html import escape
 from pprint import pformat
 
 from airium import Airium
+from dateutil.parser import parse
 
 from lib.slugs import slug
 from lib.wiki.backslashes import Backslashes
@@ -25,20 +24,17 @@ from lib.wiki.config import Config
 from lib.wiki.cross_references import CrossReferences
 from lib.wiki.entities import Entities
 from lib.wiki.footnotes import Footnotes
-
-# from lib.wiki.index import Index
 from lib.wiki.inline import Inline
 from lib.wiki.links import Links
 from lib.wiki.outline import Outline, default_counters
 from lib.wiki.placeholders import Placeholders
-from lib.wiki.renderer import Html, side_button
+from lib.wiki.bible_references import BibleReferences
+from lib.wiki.renderer import Html, section_heading, side_button
 from lib.wiki.settings import Settings
-
-# from lib.wiki.tags import Tags
 from lib.wiki.utils import (
+    DATE_FORMAT_ISO8601,
     clean_document,
     clean_text,
-    DATE_FORMAT_ISO8601,
     format_date,
     parse_date,
     pipe,
@@ -55,7 +51,7 @@ class Wiki(object):
 
     __version__ = "0.1"
 
-    def __init__(self, settings=None):
+    def __init__(self, settings: Settings):
         """
         Settings hold all necessary context information.
         """
@@ -65,7 +61,8 @@ class Wiki(object):
         self.html = Html(self.settings)
 
         self.id_prefix = self.settings.get(
-            "config:document", random_slug("wiki_")  # <-- else
+            "config:document",
+            random_slug("wiki_"),  # <-- else
         )
 
         self.outline = None
@@ -106,7 +103,14 @@ class Wiki(object):
 
         # Demo is first:
         parts = pipe(
-            [self.entities, self.backslashes, self.verbatim, self.demo], "insert", parts
+            [
+                self.entities,
+                self.backslashes,
+                self.verbatim,
+                self.demo,
+            ],
+            "insert",
+            parts,
         )
 
         self.settings.extract(parts)
@@ -117,6 +121,9 @@ class Wiki(object):
         # @[Cross Reference]
         self.outline = Outline(parts, default_counters())
         self.cross_references = CrossReferences(parts, self.outline)
+
+        # No syntax, detected with refspy; How to have plugins modify the outline?
+        self.bible_references = BibleReferences(self.outline)
 
         # ^[marker]
         # ^ Reference
@@ -134,6 +141,7 @@ class Wiki(object):
         parts = pipe(
             [
                 self.cross_references,  # <-- call 'insert(parts)'
+                self.bible_references,
                 self.links,
                 # self.tags,
                 self.citations,
@@ -141,6 +149,11 @@ class Wiki(object):
             "insert",
             parts,
         )
+
+        # Plugins should involve footnotes and bibliographies, as well as
+        # figures in future; these should add sections that appear in the
+        # outline.
+        self.plugins = [self.bible_references]
 
         # -------------
         # Generate HTML
@@ -168,7 +181,9 @@ class Wiki(object):
         # -------------------------------------
 
         html_parts = pipe(
-            [self.cross_references, self.links, self.citations], "replace", html_parts
+            [self.cross_references, self.bible_references, self.links, self.citations],
+            "replace",
+            html_parts,
         )
 
         html_parts = pipe(
@@ -186,8 +201,7 @@ class Wiki(object):
             footnotes = footnote_html.get(_slug)
             if footnotes:
                 __ = Airium()
-                with __.footer():
-                    __.hr(klass="div-left div-solid")
+                with __.footer(klass="footnotes"):
                     __(footnotes)
                 html_parts[_slug] += str(__)
 
@@ -196,6 +210,9 @@ class Wiki(object):
             if not fragment:
                 __(self.make_header(fragment, preview))
             __(self.make_sections(html_parts, fragment, preview))
+            if not fragment and not preview:
+                for plugin in self.plugins:
+                    __(self.make_plugin_footer(plugin))
         return str(__)
 
     def make_header(self, fragment, preview) -> Airium:
@@ -298,11 +315,27 @@ class Wiki(object):
 
         return __
 
+    def make_plugin_footer(self, plugin):
+        __ = Airium()
+        title, html = plugin.hook_add_end_section()
+        if html != "":
+            with __.section(klass="body depth-1"):
+                with __.div(klass="section-group"):
+                    __.div(klass="left-margin")
+                    with __.div(klass="section-list"):
+                        with __.div(klass="section-item"):
+                            with __.div(klass="section-content"):
+                                __(section_heading(title, None, title))
+                                with __.div(klass="columns-x2 compact"):
+                                    __(html)
+                            __.div(klass="right-margin")
+        return __
+
     def make_title_card(self) -> Airium:
         """
         Format the document header.
 
-        <header>
+        <header class="titles">
             <hgroup>
                 <h1>
                 <h2>
@@ -323,7 +356,7 @@ class Wiki(object):
             date_yyyymmdd = None
 
         __ = Airium()
-        with __.header():
+        with __.header(klass="titles"):
             inline = Inline()
             with __.hgroup():
                 if title != "":
@@ -367,6 +400,7 @@ class Wiki(object):
         data["summary"] = self.settings.get("SUMMARY", "")
         data["license"] = self.settings.get("LICENSE", "")
         data["publish"] = self.settings.get("PUBLISH", "YES")  # <-- Default
+        data["shortcut"] = self.settings.get("SHORTCUT", "")
 
         data["author"] = self.settings.get("AUTHOR", "")
         data["email"] = self.settings.get("EMAIL", "")
@@ -409,7 +443,9 @@ class Wiki(object):
         content, _ = split_bibliography(text)
 
         blocks = BlockList(content)
-        content_html = blocks.html(numbering, slug, self.settings, fragment, preview)
+        content_html = blocks.html(
+            numbering, slug, self.settings, fragment, preview, self.plugins
+        )
 
         __ = Airium()
         with __.section(

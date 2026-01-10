@@ -6,6 +6,7 @@ repeating that everywhere, so we'll initialise once as a singleton.
 """
 
 import re
+from typing import Dict, Optional
 
 from airium import Airium
 
@@ -18,7 +19,7 @@ from lib.wiki.inline import Inline
 from lib.wiki.utils import get_option, trim
 
 
-class Html(object):
+class Html:
     """
     Provide all repeatable higher-level HTML structures.
     """
@@ -119,13 +120,16 @@ def section_heading(nav_id, number, title_html, subtitle_html=None) -> Airium:
     """
     Format a section heading.
     """
-    hx = "h" + str(min(len(number.split(".")), 6))  # h1..h6
+    if number:
+        hx = "h" + str(min(len(number.split(".")), 6))  # h1..h6
+    else:
+        hx = "h1"
     __ = Airium()
     with __.hgroup(klass="section-heading"):
         with __.a(href="#" + nav_id):
             with __.div(klass="headline"):
                 with __.div(klass="headline-number"):
-                    getattr(__, hx)(id=nav_id, _t="§" + number + ".")
+                    getattr(__, hx)(id=nav_id, _t="§" + (number or "A") + ".")
                 with __.div(klass="headline-title"):
                     getattr(__, hx)(klass="balance-text", _t=title_html)
             if subtitle_html:
@@ -260,24 +264,21 @@ def tag(tag_name, text, class_name=""):
         return tpl % (tag_name, html, tag_name)
 
 
-def wrap(alignment_name, html, options):
+def wrap(alignment_name: str, html: str, options: Optional[Dict] = None) -> str:
     """
     Shortcut for wrapping html with alignment and width; see Wrapper and
     subclasses. Handles css_dimensions in options.
     """
-    dimension = get_option(options, 1, "dimension", None)
-    if dimension == "":
-        dimension = "auto"
+    dimension = "auto"
+    if options:
+        dimension = get_option(options, 1, "dimension", dimension)
     if alignment_name == "center":
         properties = ['style="width: %s; margin: auto;"' % dimension]
-        return (
-            trim(
-                """
+        return trim(
+            """
             <div %s>%s</div>
             """
-            )
-            % (" ".join(properties), html)
-        )
+        ) % (" ".join(properties), html)
     properties = ['style="width: %s;"' % dimension]
     class_property = {
         "left": "text-left",

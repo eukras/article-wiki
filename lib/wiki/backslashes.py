@@ -27,7 +27,7 @@ class Backslashes(object):
     def decorate(self, pattern, part_slug=None):
         """
         Strip the leading slash, and HTML encode.
-        This ensures that \< won't allow arbitrary script injection.
+        This ensures that \\< won't allow arbitrary script injection.
         """
         return escape(pattern[1:])
 

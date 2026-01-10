@@ -11,7 +11,9 @@ from lib.wiki.blocks import (
     BlockList,
     CharacterBlock,
     Divider,
+    Footer,
     FunctionBlock,
+    Header,
     get_title_data,
     list_block,
     Paragraph,
@@ -174,9 +176,6 @@ def test_blocklist():
 
 
 def test_find():
-    """
-    s
-    """
     text = trim(
         """
         Title
@@ -218,6 +217,58 @@ def test_pop_titles():
     assert title == "Title"
     assert summary == "Summary"
     assert blocks.text() == "Text"
+
+
+def test_split_by_class_name():
+    text = trim(
+        """
+        Title
+
+        = Summary
+
+        @ Heading 
+
+        OK
+
+        < < <
+
+        @ Heading
+
+        OK
+
+        > > >
+
+        * Hmmm!
+        * Yes!
+        """
+    )
+    blocks = BlockList(text)
+    assert class_list(blocks) == [
+        "Paragraph",
+        "CharacterBlock",
+        "CharacterBlock",
+        "Paragraph",
+        "Header",
+        "CharacterBlock",
+        "Paragraph",
+        "Footer",
+        "CharacterBlock",
+    ]
+    _, _ = blocks.pop_titles()
+    assert class_list(blocks) == [
+        "CharacterBlock",
+        "Paragraph",
+        "Header",
+        "CharacterBlock",
+        "Paragraph",
+        "Footer",
+        "CharacterBlock",
+    ]
+    header, body = blocks.split_by_class(Header)
+    body, footer = body.split_by_class(Footer)
+    assert class_list(header) == ["CharacterBlock", "Paragraph"]
+    assert class_list(body) == ["Paragraph", "CharacterBlock", "Paragraph"]
+    assert class_list(footer) == ["CharacterBlock"]
 
 
 def test_pop_titles_minimal():

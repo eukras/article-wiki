@@ -182,7 +182,6 @@ def make_font(opts: dict, image: ImageDraw) -> ImageFont:
 
 
 def make_overlay(image, layout):
-
     layout_opts = ChainMap(layout, DEFAULT_LAYOUT)
 
     margin_width_ratio = layout_opts.get("margin_width_ratio")
@@ -201,7 +200,6 @@ def make_overlay(image, layout):
 
     byline = layout_opts.get("byline")
     if byline:
-
         font_dir = layout_opts.get("font_dir")
         font_file = layout_opts.get("font_file")
         font_base_size = layout_opts.get("font_base_size")
@@ -218,7 +216,6 @@ def make_overlay(image, layout):
         make_byline(image, font, byline, text_color)
 
     for frame in layout["frames"]:
-
         frame_opts = ChainMap(frame, layout, DEFAULT_FRAME, DEFAULT_LAYOUT)
         height_ratio = frame_opts.get("height_ratio")
         alignment = frame_opts.get("alignment")
@@ -231,7 +228,6 @@ def make_overlay(image, layout):
         store_lines = {}
 
         for number, text in enumerate(frame["texts"]):
-
             text_opts = ChainMap(
                 text, frame, layout, DEFAULT_TEXT, DEFAULT_FRAME, DEFAULT_LAYOUT
             )
@@ -262,7 +258,6 @@ def make_overlay(image, layout):
         }.get(alignment)
 
         for number, text in enumerate(frame["texts"]):
-
             text_opts = ChainMap(
                 text, frame, layout, DEFAULT_TEXT, DEFAULT_FRAME, DEFAULT_LAYOUT
             )
@@ -280,7 +275,6 @@ def make_overlay(image, layout):
             lines = store_lines[number]
 
             for line in lines:
-
                 text = " ".join(line)
                 line_width = font.getlength(text)
                 x = text_center - int(round(line_width / 2))

@@ -92,7 +92,6 @@ class Placeholders(object):
         self.patterns = {}
 
         for slug, text in parts.items():
-
             self.patterns[slug] = []
             cursor, counter = 0, 1
             new_text = ""

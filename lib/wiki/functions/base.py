@@ -107,7 +107,6 @@ class Articles(Function):
     ]
 
     def html(self, renderer):
-
         config = load_env_config()
         data = Data(config)
         inline = Inline()
@@ -262,50 +261,6 @@ class Float(Wrapper):
         return wrap("float", html, self.options)
 
 
-class Footer(Wrapper):
-    """
-    Format compact end section, with a divider above
-    """
-
-    examples = [
-        trim(
-            """
-            FOOTER ---
-            Questions and answers
-            ---
-        """
-        ),
-    ]
-
-    option_list = {}
-
-    def wrap(self, html):
-        div = '<hr class="div-left div-solid div-10em" />\n\n'
-        return wrap("footer", div + html, self.options)
-
-
-class Header(Wrapper):
-    """
-    Format compact end section, with a divider above
-    """
-
-    examples = [
-        trim(
-            """
-            HEADER ---
-            Introductory comments...
-            ---
-        """
-        ),
-    ]
-
-    option_list = {}
-
-    def wrap(self, html):
-        div = '\n\n<hr class="div-left div-solid div-10em" />'
-        return wrap("header", html + div, self.options)
-
-
 class Indent(Wrapper):
     """
     Indent a section of text, optionally setting widths. Indents
@@ -412,16 +367,13 @@ class Feature(Function):
         message = bytes(self.text, "utf-8")
         checksum = hmac.new(key, message, "sha224").hexdigest()[:16]
         encoded = urllib.parse.quote_plus(message)
-        return (
-            trim(
-                """
+        return trim(
+            """
             <div class="wiki-feature no-print">
                 <img title="%s" src="/image/quote/%s/%s.jpg" />
             </div>
             """
-            )
-            % (escape(self.text), checksum, encoded)
-        )
+        ) % (escape(self.text), checksum, encoded)
 
 
 class Box(Wrapper):

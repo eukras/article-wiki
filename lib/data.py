@@ -604,7 +604,6 @@ class Data(object):
 
 
 class RedisTimer(object):
-
     def __init__(self, data, user_slug, doc_slug, label):
         self.data = data
         self.user_slug = user_slug

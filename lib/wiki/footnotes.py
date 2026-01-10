@@ -114,48 +114,40 @@ class Footnotes(object):
         self.backlinks[number][count] = (ref_link, ref_text)
 
         if footnote_text.startswith(tuple(["http:", "https:", "mailto:"])):
-
-            link = (
-                trim(
-                    """
+            link = trim(
+                """
                 <a class="web-link" title="%s" href="%s"%s
                    target="_blank">%s</a>%s<a class="web-marker"
                    id="%s_link_%s" href="#%s_footnote_%s"><sup>%s</sup></a>
                 """
-                )
-                % (
-                    strip_markup(ref_text),
-                    ref_text,
-                    rel_me,
-                    link_markup,
-                    punctuation,
-                    self.id_prefix,
-                    nav_id,
-                    self.id_prefix,
-                    nav_id,
-                    count,
-                )
+            ) % (
+                strip_markup(ref_text),
+                ref_text,
+                rel_me,
+                link_markup,
+                punctuation,
+                self.id_prefix,
+                nav_id,
+                self.id_prefix,
+                nav_id,
+                count,
             )
 
         else:
-
-            link = (
-                trim(
-                    """
+            link = trim(
+                """
                 %s%s<a class="web-marker" title="%s" id="%s_link_%s"
                     href="#%s_footnote_%s"><sup>%s</sup></a>
                 """
-                )
-                % (
-                    self.inline.process(link_markup),
-                    punctuation,
-                    strip_markup(footnote_text),
-                    self.id_prefix,
-                    nav_id,
-                    self.id_prefix,
-                    nav_id,
-                    count,
-                )
+            ) % (
+                self.inline.process(link_markup),
+                punctuation,
+                strip_markup(footnote_text),
+                self.id_prefix,
+                nav_id,
+                self.id_prefix,
+                nav_id,
+                count,
             )
 
         return link
@@ -188,7 +180,7 @@ class Footnotes(object):
         env = Environment(autoescape=True)
         tpl = env.from_string(
             """
-            <section id="{{ id_prefix }}-footnotes">
+            <footer id="{{ id_prefix }}-footnotes">
             {% if backlinks|length < 2 %}
                 {% for number, entries in backlinks %}
                     {% for count, (ref_link, ref_text) in entries %}
@@ -210,7 +202,7 @@ class Footnotes(object):
                 </div>
                 {% endfor %}
             {% endif %}
-            </section>
+            </footer>
             """
         )
 
@@ -229,7 +221,7 @@ class Footnotes(object):
             numbering = number.split(".")
             slug = self.outline.find_slug(numbering)
             parts[slug] = ""
-            for count, (ref_link, ref_text) in entries:
+            for _, (ref_link, ref_text) in entries:
                 pattern = '<div class="footnote-item"><sup>%s</sup> %s</div>'
                 parts[slug] += pattern % (ref_link, ref_text)
         return parts

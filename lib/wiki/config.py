@@ -14,7 +14,7 @@ class Config(object):
     nulls = "%^+-"  # Produce no output: comments, references, outlines
     setters = "$"  # Produce no output: settings
     quotes = ">"  # Block quotes
-    notes = '"'  # Aside (margin note), Inline (visible) comment
+    notes = '&"'  # Aside (margin note), Inline (visible) comment
     aligns = ".;,:~"  # Grouped aligment blocks
     lists = "*#_"  # Recursively nested lists, non-recursive icon lists
     tables = "!|"  # Tables, with format block, with format blocks
@@ -35,6 +35,9 @@ class Config(object):
         + glosses
         + caption
     )
+
+    header = "< < <"
+    footer = "> > >"
 
     dividers = [
         "*",
