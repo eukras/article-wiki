@@ -18,6 +18,7 @@ python-multipart
 pytest>=7.1.2
 pytz>=2022.1
 redis>=4.3.4
+refspy>=0.9.13
 roman>=3.3
 sortedcontainers>=2.4.0
 uvicorn
