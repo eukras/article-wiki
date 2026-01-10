@@ -175,12 +175,13 @@ ul, ol, dl {
 }
 
 aside {
-    font-size: fonts.$fontSizeMinus3;
-    text-align: right;
-    margin: 1rem 0 1rem 4.8em;
-    padding: 0 1rem;
-    line-height: 1rem;
-    text-wrap: balance;
+  font-family: fonts.$fontFamilySansSerif;
+  font-size: fonts.$fontSizeMinus3;
+  text-align: right;
+  margin: 1rem 0 1rem 4.8em;
+  padding: 0 1rem;
+  line-height: 1rem;
+  text-wrap: balance;
 }
 
 a.reference {
@@ -191,7 +192,7 @@ a.reference {
     border: dotted 1pt var(--page-text);
     border-radius: geometry.$borderRadius;
     padding: 0 1rem;
-    margin: 1rem 0;
+    margin: 2rem 0rem;
 }
 
 .vpad { 
@@ -395,8 +396,9 @@ blockquote + blockquote {
 
 p.subhead {
     font-weight: bold;
+    text-align: center;
     margin: 0;
-    padding: 0.5rem 0 0.5rem 0;
+    padding: 1.4rem 1rem 0.5rem 1rem;
 }
 
 p + p.subhead {

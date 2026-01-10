@@ -1,4 +1,5 @@
 @use "vars/breakpoints";
+@use "vars/colors";
 @use "vars/fonts";
 
 /**
@@ -153,6 +154,24 @@ article {
     }
 }
 
+section header {
+  font-family: fonts.$fontFamilySansSerif;
+  font-size: fonts.$fontSizeMinus2;
+  margin-bottom: 3rem;
+}
+
+section footer {
+  font-family: fonts.$fontFamilySansSerif;
+  font-size: fonts.$fontSizeMinus2;
+  margin-top: 3rem;
+}
+
+footer.footnotes {
+  font-family: fonts.$fontFamilySansSerif;
+  font-size: fonts.$fontSizeMinus2;
+  margin-top: 2rem;
+  overflow-wrap: break-word;
+}
 
 header {
 
@@ -238,11 +257,6 @@ section.depth-5 h1 {
 section.depth-6 h1 {
     font-size: fonts.$fontSizeMinus1;
 }
-
-footer {
-    font-size: fonts.$fontSizeMinus2;
-}
-
 
 
 div.headline {

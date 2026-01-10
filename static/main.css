@@ -741,6 +741,7 @@ ul, ol, dl {
 }
 
 aside {
+  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
   font-size: 71.55456%;
   text-align: right;
   margin: 1rem 0 1rem 4.8em;
@@ -757,7 +758,7 @@ a.reference {
   border: dotted 1pt var(--page-text);
   border-radius: 0.5rem;
   padding: 0 1rem;
-  margin: 1rem 0;
+  margin: 2rem 0rem;
 }
 
 .vpad {
@@ -956,8 +957,9 @@ blockquote + blockquote {
 
 p.subhead {
   font-weight: bold;
+  text-align: center;
   margin: 0;
-  padding: 0.5rem 0 0.5rem 0;
+  padding: 1.4rem 1rem 0.5rem 1rem;
 }
 
 p + p.subhead {
@@ -1462,6 +1464,25 @@ article {
   opacity: 1;
 }
 
+section header {
+  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-size: 81.312%;
+  margin-bottom: 3rem;
+}
+
+section footer {
+  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-size: 81.312%;
+  margin-top: 3rem;
+}
+
+footer.footnotes {
+  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-size: 81.312%;
+  margin-top: 2rem;
+  overflow-wrap: break-word;
+}
+
 header hgroup h1 {
   padding: 0;
   margin: 1rem 0 0 0;
@@ -1534,10 +1555,6 @@ section.depth-5 h1 {
 
 section.depth-6 h1 {
   font-size: 92.4%;
-}
-
-footer {
-  font-size: 81.312%;
 }
 
 div.headline {
@@ -2162,7 +2179,7 @@ button[disabled=DISABLED] {
   z-index: 100;
   top: 2em;
   left: 10em;
-  border-radius: 0.5rem;
+  border-r: 0.5rem;
   box-shadow: 1rem 1rem 2rem #444;
   text-align: center;
   background-color: var(--page-background);
