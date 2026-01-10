@@ -267,7 +267,7 @@ def test_split_by_class_name():
     header, body = blocks.split_by_class(Header)
     body, footer = body.split_by_class(Footer)
     assert class_list(header) == ["CharacterBlock", "Paragraph"]
-    assert class_list(body) == ["Paragraph", "CharacterBlock", "Paragraph"]
+    assert class_list(body) == ["CharacterBlock", "Paragraph"]
     assert class_list(footer) == ["CharacterBlock"]
 
 

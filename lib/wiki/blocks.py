@@ -25,7 +25,6 @@ from jinja2 import Environment
 
 from lib.slugs import slug
 
-from lib.wiki.bible_references import BibleReferences
 from lib.wiki.functions.base import (
     Articles,
     Box,
@@ -52,7 +51,6 @@ from lib.wiki.geometry import (
     split_to_dictionary,
     split_to_recursive_array,
 )
-from lib.wiki.plugins.references import References
 from lib.wiki.renderer import (
     alert,
     generate_table,
