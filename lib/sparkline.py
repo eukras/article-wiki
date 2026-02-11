@@ -20,6 +20,7 @@ class Sparkline(object):
     """
 
     def __init__(self, points: list):
+        self.max_y = max([y for _, y in points])
         self.points = scale_points(
             flip_vertically(fill_zeroes(points or DEFAULT_POINTS))
         )
@@ -34,6 +35,9 @@ class Sparkline(object):
             viewBox=get_view_box(),
             preserveAspectRatio="none",
         ):
+            __.text(
+                x=0.3, y=0.9, _t=self.max_y, **{"font-size": "0.75px", "fill": "#fff8"}
+            )
             __.path(
                 d=get_path(self.points, close=True), stroke="transparent", fill=fill
             )
