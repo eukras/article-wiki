@@ -23,11 +23,10 @@ Note that changes to `src/` and `resources/scss` will need to be rebuilt with
 
 FastAPI provides a generated set of API docs at `/docs`.
 
-
 ## Database
 
 You'll need a Redis server; customise the `localhost:6379` port in `ENV.dist`
-if needed. To run one in Docker with persistent storage, use the Makefile: 
+if needed. To run one in Docker with persistent storage, use the Makefile:
 
 ```bash
 make redis
@@ -42,12 +41,12 @@ python command.py initialize  # <-- Create admin user, load initial docs
 uvicorn main:app --reload  # <-- run, and reload to pickup changes
 ```
 
-Then view `http://localhost:8000`, and sign in with $ADMIN_USER and $ADMIN_PASSWORD 
+Then view `http://localhost:8000`, and sign in with $ADMIN_USER and $ADMIN_PASSWORD
 from ENV.dist (or as otherwise set in ENV vars).
 
 ## Testing
 
-To verify that things are working: 
+To verify that things are working:
 
 ```
 pytest
@@ -57,7 +56,7 @@ pytest -m integration   # <-- If there's a redis connection available
 
 ## Production
 
-This is a FastAPI app, for which there are many deployment solutions.  
+This is a FastAPI app, for which there are many deployment solutions.
 
-The `install/docker` directory copntains a `Dockerfile` that can be used to build a 
+The `install/docker` directory contains a `Dockerfile` that can be used to build a
 Linux container from python-slim.
