@@ -212,25 +212,24 @@
      *
      */
     function word_count(text) {
-        return (text.match(/\w+/g) || []).length;
+      return (text.match(/\w+/g) || []).length;
     }
 
-    function getOutline(selector)
-    {
-        const hgroups = document.querySelectorAll(selector);
-        const outline = [...hgroups].map(hgroup => {
-            const anchor = hgroup.querySelector('a');
-            const [number, title] = hgroup.querySelectorAll('h1,h2,h3,h4,h5,h6');
-            const section = hgroup.closest('section');
-            return [
-                number.tagName,
-                anchor.getAttribute('href'),
-                number.innerText, 
-                title.innerText,
-                word_count(section.innerText)
-            ];
-        });
-        return outline;
+    function getOutline(selector) {
+      const hgroups = document.querySelectorAll(selector);
+      const outline = [...hgroups].map(hgroup => {
+        const anchor = hgroup.querySelector('a');
+        const [number, title] = hgroup.querySelectorAll('h1,h2,h3,h4,h5,h6');
+        const section = hgroup.closest('section');
+        return [
+          number.tagName,
+          anchor.getAttribute('href'),
+          number.innerText,
+          title.innerText,
+          word_count(section.innerText)
+        ];
+      });
+      return outline;
     }
 
     /**
@@ -257,7 +256,7 @@
     }
 
     /**
-     * Modes:
+     * The navigator is a state machine. 
      * Starts in NAVIGATE at top of screen.
      *
      * - READ:
@@ -429,7 +428,7 @@
     }
 
     function calculateBackgroundOffset(time_visible, reading_time, word_count) {
-      const min_value = -1.0;
+      const min_value = -1;
       const bar_width = mapWordCountToBarWidth(word_count);
       const max_value = bar_width - 0.7;
       const difference = max_value - min_value;
@@ -549,23 +548,37 @@
                     <div id="option-click" class="option-button">Hide menu after clicking a navigation link <i id="click-icon" class="fa fa-fw fa-square-o"></i></div>
                 </div>
             </div>
-        `;
-      if (user_slug && doc_slug) {
-        html += `
             <div class="space">
-                <div><a class="icon-button" href="/epub/${user_slug}/${doc_slug}"><i class="fa fa-fw fa-book"></i> Download ePub</a></div>
-                <div><a class="icon-button" href="/download/${user_slug}/${doc_slug}"><i class="fa fa-fw fa-download"></i> Download Source</a></div>
-                <div><a class="icon-button" onclick="window.print();"><i class="fa fa-fw fa-print"></i> Print to PDF</a></div>
-            </div>
         `;
+      if (user_slug !== undefined) {
+        // ^ Fix hard coding
+        if (doc_slug !== undefined) {
+          html += `
+                <div><a class="icon-button" href="/download/${user_slug}/${doc_slug}.epub"><i class="fa fa-fw fa-book"></i> Download ePub</a></div>
+                <div><a class="icon-button" href="/download/${user_slug}/${doc_slug}.zip"><i class="fa fa-fw fa-download"></i> Download Zip</a></div>
+                <div><a class="icon-button" onclick="window.print();"><i class="fa fa-fw fa-print"></i> Print to PDF</a></div>
+        `;
+        } else {
+          html += `
+                <div><a class="icon-button" href="/download/${user_slug}.zip"><i class="fa fa-fw fa-download"></i> Download Zip</a></div>
+        `;
+        }
       }
+
       const login = api.get('token');
       if (login) {
         html += `
                 <div class="space">
                     <div><a class="icon-button" href="/admin"><i class="fa fa-fw fa-wrench"></i> Site Admin</a></div>
+    `;
+        if (user_slug && doc_slug) {
+          html += `
+                    <div><a class="icon-button" href="/files/${user_slug}/${doc_slug}"><i class="fa fa-fw fa-file"></i> Article Files</a></div>
+                    <div><a class="icon-button" href="/upload/${user_slug}/${doc_slug}"><i class="fa fa-fw fa-upload"></i> Upload Zip</a></div>
+    `;
+        }
+        html += `
                     <div><a class="icon-button" href="/new-article"><i class="fa fa-fw fa-plus"></i> New Article</a></div>
-                    <div><a class="icon-button" href="/upload/${user_slug}/${doc_slug}"><i class="fa fa-fw fa-upload"></i> Upload Source</a></div>
                     <div><a class="icon-button" href="/logout"><i class="fa fa-fw fa-sign-out"></i> User Logout</a></div>
                 </div>
             </div>
@@ -598,9 +611,16 @@
             <div class="space">
                 <a class="icon-button" href="#"><i class="fa fa-fw fa-arrow-up"></i> <span>Top of Page</span> <span id="progress-meter">0%</span></a>
            `;
+
       html += createLastReadingBookmarks();
-      html += `
+
+      const tableOfContents = document.querySelector('#table-of-contents');
+      if (tableOfContents) {
+        html += `
                 <a class="icon-button" href="#table-of-contents"><i class="fa fa-fw fa-list-ol"></i> <span>Table of Contents</span></a>
+          `;
+      }
+      html += `
             </div>
            `;
 
@@ -651,6 +671,7 @@
               image.setAttribute('width', '140px');
               image.setAttribute('height', '30px');
               image.innerHtml = 'No Data';
+              div1.classList.add('sparkline');
               div1.append(image);
               const div2 = document.createElement('div');
               const a = document.createElement('a');
@@ -888,7 +909,7 @@
     }
 
     function initKeystrokeHandling() {
-      document.addEventListener('keyup', function(event) {
+      document.addEventListener('keyup', function (event) {
         if (event.key == 'Escape') {
           handleEscapeKey();
         }
@@ -904,7 +925,7 @@
     }
 
     function initClickHandling() {
-      document.addEventListener('click', function(event) {
+      document.addEventListener('click', function (event) {
         const outline = event.target.closest('#page-outline');
         if (outline) {
           handleOutlineClick();
@@ -962,7 +983,7 @@
     }
 
     function initScrollHandling() {
-      document.addEventListener('scroll', function(event) {
+      document.addEventListener('scroll', function (event) {
         handleScroll$1();
       });
     }
@@ -1357,19 +1378,19 @@
 
     document.addEventListener("DOMContentLoaded", () => {
 
-        // Small IOS devices can't generally handle our background SVGs.
-        const not_ios = !/Mac OS/.test(window.navigator.userAgent);
-        const max_res = Math.max(window.screen.width, window.screen.height);
-        if (not_ios || max_res >= 1200) {
-            setSvgBackground('#background');
-        }
+      // Small IOS devices can't generally handle our background SVGs.
+      const not_ios = !/Mac OS/.test(window.navigator.userAgent);
+      const max_res = Math.max(window.screen.width, window.screen.height);
+      if (not_ios || max_res >= 1200) {
+        setSvgBackground('#background');
+      }
 
-        initSidebars();
-        initProgress('#progress-meter');
-        initThemes('.theme-button');
-        initFullScreen('.fullscreen-button');
-        initNavigation('.navigation-button', stopScrollDownIndicatorBlinking);
-        initEditor();
+      initSidebars();
+      initProgress('#progress-meter');
+      initThemes('.theme-button');
+      initFullScreen('.fullscreen-button');
+      initNavigation('.navigation-button', stopScrollDownIndicatorBlinking);
+      initEditor();
 
     });
 

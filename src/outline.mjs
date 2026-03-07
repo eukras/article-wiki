@@ -9,25 +9,24 @@
  *
  */
 function word_count(text) {
-    return (text.match(/\w+/g) || []).length;
+  return (text.match(/\w+/g) || []).length;
 }
 
-function getOutline(selector)
-{
-    const hgroups = document.querySelectorAll(selector);
-    const outline = [...hgroups].map(hgroup => {
-        const anchor = hgroup.querySelector('a');
-        const [number, title] = hgroup.querySelectorAll('h1,h2,h3,h4,h5,h6');
-        const section = hgroup.closest('section');
-        return [
-            number.tagName,
-            anchor.getAttribute('href'),
-            number.innerText, 
-            title.innerText,
-            word_count(section.innerText)
-        ];
-    });
-    return outline;
+function getOutline(selector) {
+  const hgroups = document.querySelectorAll(selector);
+  const outline = [...hgroups].map(hgroup => {
+    const anchor = hgroup.querySelector('a');
+    const [number, title] = hgroup.querySelectorAll('h1,h2,h3,h4,h5,h6');
+    const section = hgroup.closest('section');
+    return [
+      number.tagName,
+      anchor.getAttribute('href'),
+      number.innerText,
+      title.innerText,
+      word_count(section.innerText)
+    ];
+  });
+  return outline;
 }
 
-export {getOutline};
+export { getOutline };
