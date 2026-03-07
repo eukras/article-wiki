@@ -13,8 +13,6 @@ import re
 from html import escape
 from copy import deepcopy
 
-from icecream import ic
-
 from lib.wiki.blocks import BlockList
 from lib.wiki.geometry import split_to_dictionary
 

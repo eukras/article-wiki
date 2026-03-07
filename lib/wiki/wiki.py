@@ -14,7 +14,6 @@ from pprint import pformat
 
 from airium import Airium
 from dateutil.parser import parse
-from icecream import ic
 import segno  # QR codes
 
 from lib.slugs import slug
