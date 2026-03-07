@@ -2,7 +2,7 @@
   "name": "ArticleWiki",
   "dependencies": {
     "js-cookie": "^3.0.5",
-    "sass": "^1.69.3"
+    "sass": "^1.94.2"
   },
   "scripts": {
     "build": "sass resources/scss/main.scss static/main.css && rollup -c"
