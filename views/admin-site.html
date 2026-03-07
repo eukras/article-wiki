@@ -1,0 +1,104 @@
+{% extends "admin-template.html" %}
+
+{% block title %}
+
+            <header class="titles">
+              <h1>
+                <div class="article-title balance-text">Site Admin</div>
+              </h1>
+            </header>
+
+{% endblock %}
+
+{% block body %}
+
+            <div class="wiki">
+              <div class="wiki-stack">
+                <h4>Archiving <tt>{{ admin }}</tt></h4>
+                <div class="aw-grid">
+                  <div> 
+                    <a href="/download.zip" class="button">
+                      <i class="fa fa-download"></i> Download site
+                    </a>
+                  </div>
+                  <div>
+                    <a href="/upload" class="button">
+                      <i class="fa fa-download"></i> Upload site
+                    </a>
+                  </div>
+                  <div>
+                    <a href="/download/{{ config['ADMIN_USER'] }}.zip" class="button">
+                      <i class="fa fa-download"></i> Download {{ config['ADMIN_USER']}}
+                    </a>
+                  </div>
+                  <div>
+                    <a href="/upload/{{ config['ADMIN_USER'] }}" class="button">
+                      <i class="fa fa-upload"></i> Upload {{ config['ADMIN_USER']}}
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="wiki-stack">
+                <h4>Toolbox</h4>
+                <div class="aw-grid">
+                  <form method="post" action="/admin/refresh">
+                    <button type="submit">
+                      <i class="fa fa-wrench"></i> Refresh all pages
+                    </button>
+                  </form>
+                  <form method="post" action="/admin/expire-cache">
+                    <button type="submit">
+                      <i class="fa fa-wrench"></i> Expire cache
+                    </button>
+                  </form>
+                </div>
+              </div>
+              <form method="post" action="/admin/initialize">
+                <div class="wiki-stack">
+                  <h4>Initialise</h4>
+                  <div>
+                    <button type="button" class="button-unlock" for="initialise">
+                      <i class="fa fa-lock"></i>
+                    </button>
+                    <button type="submit" id="initialise" disabled="DISABLED">
+                      <i class="fa fa-exclamation-triangle"></i> Initialise
+                    </button>
+                  </div>
+                  <p><small>This should have happened automatically on startup.</small></p>
+                </div>
+              </form>
+            </div>
+
+<script>
+const initToggleButtons = () => {
+  const toggleButton = (btn) => {
+    console.log('btn', btn);
+    disabledAttr = btn.getAttribute('disabled')
+    console.log('disabledAttr', disabledAttr);
+    if (disabledAttr === 'DISABLED') {
+      btn.removeAttribute('disabled');
+    } else {
+      btn.setAttribute('disabled', 'DISABLED');
+    }
+  };
+  const toggleTargetButton = (event) => {
+    console.log('toggleToggleButton', event);
+    const button = event.target;
+    const forAttr = button.getAttribute('for');
+    if (forAttr !== null) {
+      const targetButton = document.getElementById(forAttr);
+      toggleButton(targetButton);
+    }
+  };
+  const buttons = document.getElementsByClassName('button-unlock');
+  for (let i = 0; i < buttons.length; i++) {
+    console.log('initToggleButtons', i, buttons[i]);
+    buttons[i].addEventListener('click', toggleTargetButton);
+  }
+}
+document.addEventListener("DOMContentLoaded", function() {
+  initToggleButtons();
+});
+</script>
+
+{% endblock %}

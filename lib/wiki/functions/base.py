@@ -11,7 +11,8 @@ import urllib.parse
 
 from airium import Airium
 from html import escape
-from jinja2 import Environment
+
+from annotated_types import doc
 
 from lib.data import Data, load_env_config
 from lib.wiki.inline import Inline
@@ -129,9 +130,20 @@ class Articles(Function):
         with __.nav(klass="article-cards"):
             for a in articles:
                 word_count = int(a.get("word_count", 0))
-                details = f"{a.get('date')} &middot; {word_count:,} words"
+                word_count_rounded = round(word_count, -1 if word_count < 1000 else -2)
+                details = f"{a.get('date')} &middot; {word_count_rounded:,} words"
+                user_slug = a.get("user")
+                doc_slug = a.get("slug")
                 with __.div(klass="article-card"):
-                    with __.a(href=f"/read/{a.get('user')}/{a.get('slug')}"):
+                    with __.a(href=f"/read/{user_slug}/{doc_slug}"):
+                        if data.userDocumentImage_exists(
+                            user_slug, doc_slug, "title.png"
+                        ):
+                            with __.div(klass="text-center"):
+                                __.img(
+                                    klass="article-card-image",
+                                    src=f"/file/{user_slug}/{doc_slug}/title.png",
+                                )
                         __.div(
                             klass="article-card-title balance-text",
                             _t=inline.process(a.get("title")),
@@ -352,9 +364,37 @@ class Compact(Wrapper):
         return '<div class="compact%s">%s</div>' % (columns, html)
 
 
+class Meme(Function):
+    """
+    Generates an image meme (links to /user_slug/doc_slug/image/quote/...).
+    """
+
+    def html(self, renderer):
+        """
+        Use ../image/quote to render a string as an image overlay, suitable for
+        sharing on social media.
+        """
+        config = load_env_config()
+        key = bytes(config["APP_HASH"], "utf-8")
+        message = bytes(self.text, "utf-8")
+        checksum = hmac.new(key, message, "sha224").hexdigest()[:16]
+        encoded = urllib.parse.quote_plus(message)
+        user_slug = renderer.settings.get("config:user", "")
+        doc_slug = renderer.settings.get("config:document", "")
+        return trim(
+            """
+            <div class="wiki-feature no-print">
+                <img title="%s" src="/%s/%s/image/quote/%s/%s.jpg" />
+            </div>
+            """
+        ) % (escape(self.text), user_slug, doc_slug, checksum, encoded)
+
+
 class Feature(Function):
     """
-    Use /image/quote to render a string as an image overlay, suitable for
+    Feature quotes. Meme?
+
+    Use ../image/quote to render a string as an image overlay, suitable for
     sharing on social media.
     """
 
@@ -362,18 +402,34 @@ class Feature(Function):
         """
         Show an image/quote tag for the text.
         """
-        config = load_env_config()
-        key = bytes(config["APP_HASH"], "utf-8")
-        message = bytes(self.text, "utf-8")
-        checksum = hmac.new(key, message, "sha224").hexdigest()[:16]
-        encoded = urllib.parse.quote_plus(message)
-        return trim(
-            """
-            <div class="wiki-feature no-print">
-                <img title="%s" src="/image/quote/%s/%s.jpg" />
-            </div>
-            """
-        ) % (escape(self.text), checksum, encoded)
+        user_slug = renderer.settings.get("config:user", "")
+        doc_slug = renderer.settings.get("config:document", "")
+
+        image_src = f"/file/{user_slug}/{doc_slug}/quote.png"
+
+        base_url = renderer.settings.get("config:host", "")
+        shortcut = renderer.settings.get("SHORTCUT", "")
+
+        link_href = base_url + "?" + shortcut
+
+        site_url = base_url.replace("http:", "").replace("https:", "").replace("/", "")
+        link_title = site_url + "?" + shortcut
+
+        html = renderer.markup(self.text)
+
+        __ = Airium()
+        with __.div(klass="no-print"):
+            with __.div(klass="wiki-feature"):
+                __.div(
+                    klass="wiki-feature-image",
+                    style=f"background-image: url('{image_src}')",
+                )
+                with __.div(klass="wiki-feature-text"):
+                    with __.div(klass="wiki-feature-html balance-text"):
+                        __(html)
+                    with __.div(klass="wiki-feature-link"):
+                        __.a(href=link_href, _t=link_title)
+        return str(__)
 
 
 class Box(Wrapper):

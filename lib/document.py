@@ -1,17 +1,34 @@
-import datetime
-import re
+from typing import Union
 
-from typing import Union, Tuple
+from PIL.Image import Image as ImageType
+from slugify import slugify
 
-from lib.data import Data
+from lib.data import IMAGE_DIMENSIONS, Data
+from lib.typing import DocumentParts
 from lib.wiki.blocks import get_title_data
-from lib.wiki.outline import iterate_parts
+from lib.wiki.halftone import apply_halftone
 from lib.wiki.settings import Settings
 from lib.wiki.wiki import Wiki
 
 
 PROTECTED_DOC_SLUGS = ["index"]
 PROTECTED_PART_SLUGS = ["index", "biblio"]
+
+
+def text_parts(doc_parts: DocumentParts) -> DocumentParts:
+    return {
+        key: part
+        for key, part in doc_parts.items()
+        if key == slugify(key) and isinstance(part, str)
+    }
+
+
+def image_parts(doc_parts: DocumentParts) -> DocumentParts:
+    return {
+        key: part
+        for key, part in doc_parts.items()
+        if key in IMAGE_DIMENSIONS.keys() and isinstance(part, ImageType)
+    }
 
 
 class Document(object):
@@ -32,9 +49,6 @@ class Document(object):
     >>> doc.load(user_slug, doc_slug)  # <-- from database
     >>> doc.delete_part(part_slug)
     >>> doc.save()
-
-    >>> file_name, file_text = doc.export_txt_file(user_slug, doc_slug)
-    >>> doc.import_txt_file(txt_file)
     """
 
     def __init__(self, data: Data):
@@ -117,6 +131,8 @@ class Document(object):
 
     def save(self, pregenerate=True, update_doc_slug=None):
         """
+        TODO: Images
+
         Stores self.parts; compare with self.old to know how to update the
         metadata and cache.
         """
@@ -131,8 +147,7 @@ class Document(object):
             update_doc_slug = all(
                 [
                     # fixtures, templates
-                    old_doc_slug
-                    not in PROTECTED_DOC_SLUGS
+                    old_doc_slug not in PROTECTED_DOC_SLUGS
                 ]
             )
 
@@ -143,18 +158,22 @@ class Document(object):
                 if self.doc_slug != title_slug:
                     new_doc_slug = title_slug
 
-        with self.data as _:
-            _.userDocument_set(self.user_slug, new_doc_slug, self.parts)
-            if old_doc_slug not in PROTECTED_DOC_SLUGS:
-                _.userDocumentLastChanged_set(
-                    self.user_slug, old_doc_slug, new_doc_slug
-                )
-            _.userDocumentCache_delete(self.user_slug, old_doc_slug)
-            _.userDocumentMetadata_delete(self.user_slug, old_doc_slug)
+        self.data.userDocument_set(self.user_slug, new_doc_slug, text_parts(self.parts))
+        if old_doc_slug not in PROTECTED_DOC_SLUGS:
+            self.data.userDocumentLastChanged_set(
+                self.user_slug, old_doc_slug, new_doc_slug
+            )
+        self.data.userDocumentCache_delete(self.user_slug, old_doc_slug)
+        self.data.userDocumentMetadata_delete(self.user_slug, old_doc_slug)
 
         self.doc_slug = new_doc_slug
 
         if pregenerate:
+            for image_name, image in image_parts(self.parts).items():
+                if image_name in IMAGE_DIMENSIONS and isinstance(image, ImageType):
+                    self.data.userDocumentImage_set(
+                        self.user_slug, self.doc_slug, image_name, apply_halftone(image)
+                    )
 
             wiki = Wiki(
                 Settings(
@@ -166,13 +185,24 @@ class Document(object):
                     }
                 )
             )
-            html = wiki.process(self.user_slug, self.doc_slug, self.parts)
-            self.data.userDocumentCache_set(self.user_slug, self.doc_slug, html)
 
             metadata = wiki.compile_metadata(
                 self.data.time_zone, self.user_slug, self.doc_slug
             )
+            metadata["url"] = "/read/{:s}/{:s}".format(self.user_slug, self.doc_slug)
             self.data.userDocumentMetadata_set(self.user_slug, self.doc_slug, metadata)
+
+            html = wiki.process(
+                self.user_slug,
+                self.doc_slug,
+                self.parts,
+                fragment=False,
+                preview=False,
+                show_image=self.data.userDocumentImage_exists(
+                    self.user_slug or "", self.doc_slug or "", "title.png"
+                ),
+            )
+            self.data.userDocumentCache_set(self.user_slug, self.doc_slug, html)
 
         return self.doc_slug
 
@@ -238,7 +268,6 @@ class Document(object):
             ]
         )
         if okay_to_rename:
-
             if old_slug in self.parts:
                 del self.parts[old_slug]
 
@@ -246,12 +275,10 @@ class Document(object):
                 ["index" in self.parts, old_slug != "index", new_slug != "index"]
             )
             if okay_to_update_index:
-
                 lines = []
                 matched_yet = False
 
                 for old_line in self.parts["index"].splitlines():
-
                     okay_to_replace_line = all(
                         [
                             not matched_yet,
@@ -282,18 +309,15 @@ class Document(object):
             part_slug: The part to be deleted
         """
         if part_slug in self.parts:
-
             _, title, _, _ = get_title_data(self.parts[part_slug], part_slug)
             del self.parts[part_slug]
 
             okay_to_update_index = all(["index" in self.parts, part_slug != "index"])
             if okay_to_update_index:
-
                 lines = []
                 matched_yet = False
 
                 for old_line in self.parts["index"].splitlines():
-
                     okay_to_delete_line = all(
                         [
                             not matched_yet,
@@ -312,66 +336,67 @@ class Document(object):
     # Join document into an export file, and split back into a document
     # -----------------------------------------------------------------
 
-    def export_txt_file(self) -> Tuple[str, str]:
-        """
-        Create a file name and file contents. This will usually be accessed
-        through the web app.
-        """
-
-        def make_txt_name(user_slug: str, doc_slug: str) -> str:
-            """Formats a timestamped file_name for a combined download file."""
-            name = "article-wiki_{:s}_{:s}_{:04d}{:02d}{:02d}_{:02d}{:02d}.txt"
-            now = datetime.datetime.now()
-            return name.format(
-                user_slug, doc_slug, now.year, now.month, now.day, now.hour, now.minute
-            )
-
-        def make_txt_divider(number: str, part_slug: str) -> str:
-            """Formats a numbered text divider for document exports."""
-            divider = "\n\n\n\n..........  {:s} {:s}  ..........\n\n\n\n"
-            return divider.format(number, part_slug)
-
-        file_name = make_txt_name(self.user_slug, self.doc_slug)
-        file_text = self.parts["index"] if "index" in self.parts else ""
-        outline_list = ["index"]
-
-        for numbering, title, slug, text in iterate_parts(self.parts):
-            if slug != "index":
-                number = ".".join([str(_) for _ in numbering])
-                file_text += make_txt_divider(number, slug)
-                file_text += text
-                outline_list.append(slug)
-        for slug in sorted(list(self.parts.keys())):
-            if slug not in outline_list:
-                file_text += make_txt_divider("_", slug)
-                file_text += self.parts[slug]
-
-        return file_name, file_text
-
-    def import_txt_file(self, user_slug: str, doc_slug: str, file_text: str):
-        """
-        Takes an upload file and reconstructs its dictionary.
-
-        The initial regex split will return a list of 3n + 1 elements:
-        [
-            index_text,
-            part_num[1], part_name[1], part_text[1],
-            part_num[2], part_name[2], part_text[2],
-            ...
-        ]
-        """
-        pattern = "\n\n\n\n.......... +(\\S+) (\\S+) +..........\n\n\n\n"
-        matches = re.split(pattern, file_text)
-        assert len(matches) % 3 == 1
-        self.parts, pos = {}, 1
-        self.parts["index"] = matches[0]
-        while pos < len(matches):
-            triple = matches[pos : pos + 3]
-            if len(triple) == 3:
-                _, part_slug, part_text = triple
-                self.parts[part_slug] = part_text
-            else:
-                raise ValueError("Malformed import file.")
-            pos += 3
-        # If all OK...
-        self.set_slugs(user_slug, doc_slug)
+    # def export_txt_file(self) -> Tuple[str, str]:
+    #     """
+    #     UNUSED NOW
+    #     Create a file name and file contents. This will usually be accessed
+    #     through the web app.
+    #     """
+    #
+    #     def make_txt_name(user_slug: str, doc_slug: str) -> str:
+    #         """Formats a timestamped file_name for a combined download file."""
+    #         name = "article-wiki_{:s}_{:s}_{:04d}{:02d}{:02d}_{:02d}{:02d}.txt"
+    #         now = datetime.datetime.now()
+    #         return name.format(
+    #             user_slug, doc_slug, now.year, now.month, now.day, now.hour, now.minute
+    #         )
+    #
+    #     def make_txt_divider(number: str, part_slug: str) -> str:
+    #         """Formats a numbered text divider for document exports."""
+    #         divider = "\n\n\n\n..........  {:s} {:s}  ..........\n\n\n\n"
+    #         return divider.format(number, part_slug)
+    #
+    #     file_name = make_txt_name(self.user_slug, self.doc_slug)
+    #     file_text = self.parts["index"] if "index" in self.parts else ""
+    #     outline_list = ["index"]
+    #
+    #     for numbering, title, slug, text in iterate_parts(self.parts):
+    #         if slug != "index":
+    #             number = ".".join([str(_) for _ in numbering])
+    #             file_text += make_txt_divider(number, slug)
+    #             file_text += text
+    #             outline_list.append(slug)
+    #     for slug in sorted(list(self.parts.keys())):
+    #         if slug not in outline_list:
+    #             file_text += make_txt_divider("_", slug)
+    #             file_text += self.parts[slug]
+    #
+    #     return file_name, file_text
+    #
+    # def import_txt_file(self, user_slug: str, doc_slug: str, file_text: str):
+    #     """
+    #     Takes an upload file and reconstructs its dictionary.
+    #
+    #     The initial regex split will return a list of 3n + 1 elements:
+    #     [
+    #         index_text,
+    #         part_num[1], part_name[1], part_text[1],
+    #         part_num[2], part_name[2], part_text[2],
+    #         ...
+    #     ]
+    #     """
+    #     pattern = "\n\n\n\n.......... +(\\S+) (\\S+) +..........\n\n\n\n"
+    #     matches = re.split(pattern, file_text)
+    #     assert len(matches) % 3 == 1
+    #     self.parts, pos = {}, 1
+    #     self.parts["index"] = matches[0]
+    #     while pos < len(matches):
+    #         triple = matches[pos : pos + 3]
+    #         if len(triple) == 3:
+    #             _, part_slug, part_text = triple
+    #             self.parts[part_slug] = part_text
+    #         else:
+    #             raise ValueError("Malformed import file.")
+    #         pos += 3
+    #     # If all OK...
+    #     self.set_slugs(user_slug, doc_slug)

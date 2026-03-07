@@ -1,0 +1,78 @@
+{% extends "admin-template.html" %}
+
+{% block title %}
+
+            <header class="titles">
+              <h1>
+                <div class="article-title balance-text">Article Files</div>
+                <div class="article-subtitle balance-text">{{ doc_slug }}</div>
+              </h1>
+              <p class="space-above">
+                <a class="button feature" href="/read/{{ user_slug }}/{{ doc_slug }}">
+                  <i class="fa fa-arrow-left"></i> Return to page
+                </a>
+              </p>
+            </header>
+
+{% endblock %}
+
+{% macro upload(user_slug, doc_slug, file_name, width, height) %}
+
+                <h4>Upload <tt>{{ file_name }}</tt></h4>
+
+                <p>Requirements: RGB PNG, {{ width }}w, {{ height }}h</p>
+
+                <div class="aw-row">
+                  <img
+                      class="aw-img"
+                      src="/file/{{ user_slug }}/{{ doc_slug }}/{{ file_name }}"
+                      width="{{ width }}"
+                      height="{{ height }}"
+                      />
+                  <div class="aw-col">
+                    <form
+                        {% if doc_slug %}
+                        action="/file/{{ user_slug }}/{{ doc_slug }}/{{ file_name }}"
+                        {% endif %}
+                        method="post"
+                        enctype="multipart/form-data"
+                        >
+
+                        <div class="aw-col-stack">
+                          <button type="submit" class="feature">
+                            <i class="fa fa-upload"></i> Upload 
+                          </button>
+                          <input type="file" name="upload" />
+                        </div>
+                    </form>
+                    <form
+                        {% if doc_slug %}
+                        action="/file-delete/{{ user_slug }}/{{ doc_slug }}/{{ file_name }}"
+                        {% endif %}
+                        method="post"
+                        >
+                        <div>
+                          <button type="submit" class="feature">
+                            <i class="fa fa-eraser"></i> Delete
+                          </button>
+                        </div>
+                    </form>
+                  </div>
+                </div>
+{% endmacro %}
+
+{% block body %}
+
+            <div class="wiki">
+              <div class="wiki-stack">
+
+                {% for file_name in dimensions: %}
+                {{ upload(user_slug, doc_slug, file_name,
+                          dimensions[file_name][0],
+                          dimensions[file_name][1]) }}
+                {% endfor %} 
+
+              </div>
+            </div>
+
+{% endblock %}

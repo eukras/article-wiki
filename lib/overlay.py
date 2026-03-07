@@ -13,6 +13,9 @@
 # |                      Author (Italic, 96/130px)                            |
 # +---------------------------------------------------------------------------+
 
+# MEMO: Best approach to PIL Image and ImageDraw, is to keep the original image
+# and image_draw.save() to it.
+
 import os
 import re
 
@@ -132,29 +135,32 @@ def make_card(image: ImageDraw, strings: list, colors: list, byline: str):
     return image
 
 
-def make_quote(image: ImageDraw, strings: list, colors: list, byline: str):
+def make_quote(
+    bg_image: ImageDraw, fg_image: ImageDraw, strings: list, colors: list, byline: str
+):
     assert len(strings) == 1
     assert len(colors) == 2
+
+    make_thumbnail(bg_image, fg_image)
+
     layout = {
         "text_color": colors[0],
         "shadow_color": colors[1],
         "margin_height_ratio": 0.1,
-        "margin_width_ratio": 0.02,
+        "margin_width_ratio": 0.15,
         "font_base_size": 0.065,
-        "line_ratio": 0.95,
+        "line_ratio": 1.25,
         "frames": [
             {
                 "height_ratio": 1,
                 "alignment": ALIGN_MIDDLE,
-                "texts": [
-                    {"font_file": FONT_ITALIC, "font_size": 1, "text": strings[0]}
-                ],
+                "texts": [{"font_file": FONT_BOLD, "font_size": 1, "text": strings[0]}],
             },
         ],
         "byline": byline,
     }
-    make_overlay(image, layout)
-    return image
+    make_overlay(bg_image, layout)
+    return bg_image
 
 
 def make_font(opts: dict, image: ImageDraw) -> ImageFont:
@@ -165,7 +171,7 @@ def make_font(opts: dict, image: ImageDraw) -> ImageFont:
     font_base_size = opts.get("font_base_size")
     font_scaling = opts.get("font_scaling")
     font_size = opts.get("font_size")
-    font_ratio = font_scaling**font_size
+    font_ratio = pow(font_scaling, font_size)
 
     w, h = image.size
     image_length_px = max(w, h)
@@ -234,9 +240,10 @@ def make_overlay(image, layout):
 
             font = make_font(text_opts, image)
 
-            string = text_opts.get("text", "[placeholder]")
-            words = re.findall(r"\S+", string)
-            lines = best_wrap(font, words, text_width_px)
+            text_str = text_opts.get("text", "[placeholder]")
+            words = re.findall(r"\S+", text_str)
+            words_wrapped = best_wrap(font, words, text_width_px)
+            lines = [bytes(" ".join(words), "utf-8") for words in words_wrapped]
 
             store_font[number] = font
             store_lines[number] = lines
@@ -275,22 +282,28 @@ def make_overlay(image, layout):
             lines = store_lines[number]
 
             for line in lines:
-                text = " ".join(line)
-                line_width = font.getlength(text)
+                line_width = font.getlength(line)
                 x = text_center - int(round(line_width / 2))
-                draw.text(
-                    (x + shadow_size_px, y + shadow_size_px),
-                    text,
-                    font=font,
-                    fill=shadow_color,
-                )
-                draw.text((x, y), text, font=font, fill=text_color)
+                # draw.text(
+                #     (x + shadow_size_px, y + shadow_size_px),
+                #     line,
+                #     font=font,
+                #     fill=shadow_color,
+                # )
+                draw.text((x, y), line, font=font, fill=text_color)
 
                 y += line_height_px
 
             y += text_gap_px
 
         frame_offset_px += frame_height_px
+
+
+def make_thumbnail(image: Image, quote_image: Image):
+    """
+    Insert the quote image into the image as a sidebar.
+    """
+    image.paste(quote_image, (0, 0, 400, 750))
 
 
 def make_byline(image: Image, font: ImageFont, byline: str, color: tuple):

@@ -2,13 +2,18 @@
 <div class="article-list">
     {% for article in article_list %}
     <div class="article">
+        {% if article.image != "" %}
+          <div class="article-image">
+            <img src="{{ article.image }}" class="wiki-image" />
+          </div>
+        {% endif %}
         <h4 class="article-title">
             <a href="/read/{{ article.user }}/{{ article.slug }}" class="balance-text">
                 {% if article.title == "" %}
                     Untitled
-                {% else  %}
+                {% else %}
                     {{ article.title }}
-                {% endif  %}
+                {% endif %}
             </a>
         </h4>
         {% if article.summary != "" %}

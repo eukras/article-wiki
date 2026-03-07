@@ -32,15 +32,15 @@ class Html:
         self.inline = Inline()
         self.list_counter = 1
 
+    # ---------------
+    # BUILDING BLOCKS
+    # ---------------
+
     def markup(self, text):
         """
         Apply inline processing only.
         """
         return self.inline.process(text)
-
-    # ---------------
-    # BUILDING BLOCKS
-    # ---------------
 
     def strip_markup(self, content):
         """
@@ -86,7 +86,7 @@ def font_awesome(w: int, h: int, path: str) -> Airium:
         xmlns="http://www.w3.org/2000/svg",
         height=str(h),
         width=str(w),
-        viewBox=f"0 0 {w*36} {h*36}",
+        viewBox=f"0 0 {w * 36} {h * 36}",
     ):
         __.path(d=svg_path(path))
     return __
@@ -128,8 +128,9 @@ def section_heading(nav_id, number, title_html, subtitle_html=None) -> Airium:
     with __.hgroup(klass="section-heading"):
         with __.a(href="#" + nav_id):
             with __.div(klass="headline"):
-                with __.div(klass="headline-number"):
-                    getattr(__, hx)(id=nav_id, _t="§" + (number or "A") + ".")
+                if number != "":
+                    with __.div(klass="headline-number"):
+                        getattr(__, hx)(id=nav_id, _t="§" + (number or "A") + ".")
                 with __.div(klass="headline-title"):
                     getattr(__, hx)(klass="balance-text", _t=title_html)
             if subtitle_html:
@@ -160,7 +161,7 @@ def image(file_name, class_name=""):
     """
     Must be able to serve from redis repo.
     """
-    return ('<div class="text-center %s">' '<img src="/static/%s" />' "</div>") % (
+    return ('<div class="text-center %s"><img src="/static/%s" /></div>') % (
         class_name,
         file_name,
     )
@@ -285,8 +286,6 @@ def wrap(alignment_name: str, html: str, options: Optional[Dict] = None) -> str:
         "center": "text-center",
         "right": "pull-right",
         "indent": "text-indent",
-        "header": "text-header",
-        "footer": "text-footer",
     }.get(alignment_name, None)
     if class_property:
         properties += ['class="%s"' % class_property]

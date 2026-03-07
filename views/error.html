@@ -1,20 +1,25 @@
-{% extends "page.html" %}
+{% extends "admin-template.html" %}
 
-{% block page %}
+{% block title %}
 
-<div class="wiki">
+  <header class="titles">
+      <h1>
+          <div class="article-title balance-text">{{ title }}</div>
+      </h1>
+  </header>
 
-    <header>
-        <hgroup>
-            <h1>{{ title }}</h1>
-        </hgroup>
-        <p>{{ message }}</p>
-        <div class="space-above">
-            <a href="/" class="button">
-                <i class="fa fa-home"></i> Home Page
-            </a>
-        </div>
-    </header>
+{% endblock %}
+
+{% block body %}
+
+<div class="wiki text-center">
+
+      <p>{{ message }}</p>
+      <div class="space-above">
+          <a href="/" class="button">
+              <i class="fa fa-home"></i> Home Page
+          </a>
+      </div>
 
 </div>
 

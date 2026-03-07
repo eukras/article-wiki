@@ -13,6 +13,8 @@ import re
 from html import escape
 from copy import deepcopy
 
+from icecream import ic
+
 from lib.wiki.blocks import BlockList
 from lib.wiki.geometry import split_to_dictionary
 
@@ -29,8 +31,6 @@ class Settings(object):
         assert isinstance(defaults, dict) or defaults is None
 
         self._ = defaults if isinstance(defaults, dict) else {}
-
-        # pprint.pprint(('CREATED', self._))
 
     def copy(self):
         """
@@ -60,7 +60,7 @@ class Settings(object):
         vals = split_to_dictionary(text, prefix="$", delimiter="=")
         self._.update(vals)
 
-    def set(self, key, value):
+    def set(self, key: str, value: str):
         """
         Set a single value.
         """
@@ -75,7 +75,7 @@ class Settings(object):
         assert isinstance(values, dict)
         self._.update(values)
 
-    def get(self, key, default=None):
+    def get(self, key: str, default="") -> str:
         """
         Return a setting if it exists.
         """
@@ -87,8 +87,6 @@ class Settings(object):
 
         @see self.decorate()
         """
-
-        # @TODO: Implement patterns: $[tw:eukras]
 
         value = pattern[2:-1]
         if value[-2:] == "++":

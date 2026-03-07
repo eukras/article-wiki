@@ -9,44 +9,39 @@ import sys
 
 import click
 
-from lib.data import Data, load_env_config
+from lib.data import CONFIG, Data, RedisTimer
 from lib.ebook import write_epub
-from lib.document import Document
 from lib.fixtures import load_fixtures, save_fixtures
+from lib.html_document import HtmlDocument
+from lib.views import make_views
+from lib.wiki.settings import Settings
+from lib.wiki.wiki import Wiki
 
 
 def get_redis_client() -> Data:
     """
     Initialises a Redis client from environment variables.
     """
-    config = load_env_config()
     if "pytest" in sys.modules:
-        config['REDIS_DATABASE'] = '1'
-    return Data(config)
+        CONFIG["REDIS_DATABASE"] = "1"
+    return Data(CONFIG)
 
 
+# Redis, Jinja2
 data = get_redis_client()
+views = make_views()
 
 # -------------------------------------------------------------------
 #                               Commands
 # -------------------------------------------------------------------
 
 
-def show_config():
-    """
-    Prints actual ENV vars seen by program
-    """
-    config = load_env_config()
-    for key, val in config.items():
-        print(f'{key:>30}: {val}')
-
-
 def generate_epub():
     """
     Writes an .epub to the /tmp dir.
     """
-    file_path = '/tmp/eukras-how-should-christians-think-and-speak.epub'
-    write_epub('eukras', 'how-should-christians-think-and-speak', file_path)
+    file_path = "/tmp/eukras-how-should-christians-think-and-speak.epub"
+    write_epub(CONFIG["ADMIN_USER"], "how-should-christians-think-and-speak", file_path)
     print("Generated ebook: {:s}".format(file_path))
 
 
@@ -54,30 +49,13 @@ def create_admin_user(data):
     """
     Creates an $ADMIN_USER with $ADMIN_USER_PASSWORD.
     """
-    config = load_env_config()
     admin_user = {
-        'slug': config['ADMIN_USER'],
-        'password': config['ADMIN_USER_PASSWORD'],
-        'is_admin': 'YES',
+        "slug": CONFIG["ADMIN_USER"],
+        "password": CONFIG["ADMIN_USER_PASSWORD"],
+        "is_admin": "YES",
     }
-    data.user_set(config['ADMIN_USER'], admin_user)
-    print("Created user: {:s}".format(config['ADMIN_USER']))
-
-
-def refresh_metadata(data):
-    """
-    Cycle through all documents for all users and regenerate their cache and
-    metadata entries.
-    """
-    config = load_env_config()
-    host = config['WEB_HOST'] + ':' + config['WEB_HOST_PORT']
-    for user_slug in data.userSet_list():
-        for doc_slug in data.userDocumentSet_list(user_slug):
-            document = Document(data)
-            document.set_host(host)
-            document.load(user_slug, doc_slug)
-            document.save()
-            print(f'DATA: {user_slug}/{doc_slug}')
+    data.user_set(CONFIG["ADMIN_USER"], admin_user)
+    print("Created user: {:s}".format(CONFIG["ADMIN_USER"]))
 
 
 def initialize():
@@ -85,32 +63,71 @@ def initialize():
     Reset site to initial state.
     """
     data = get_redis_client()
+    data.delete_site()
     create_admin_user(data)
     load_fixtures(data)
-    refresh_metadata(data)
+    refresh_site(CONFIG["HOST"])
+
+
+def refresh_site(base_url: str):
+    """
+    Ensure admin is refeshed last
+    """
+    for user_slug in data.non_admin_users():
+        refresh_user(user_slug, base_url)
+    refresh_user(CONFIG["ADMIN_USER"], base_url)
+
+
+def refresh_user(user_slug: str, base_url: str):
+    """
+    Ensure index is refeshed last
+    """
+    for doc_slug in data.non_index_documents(user_slug):
+        refresh_document(user_slug, doc_slug, base_url)
+    refresh_document(user_slug, "index", base_url)
+
+
+def refresh_document(user_slug: str, doc_slug: str, base_url: str):
+    with RedisTimer(data, user_slug, doc_slug, "refresh"):
+        html_document = HtmlDocument(
+            data,
+            Wiki(
+                Settings(
+                    {
+                        "config:host": base_url,
+                        "config:user": user_slug,
+                        "config:document": doc_slug,
+                    }
+                )
+            ),
+            views,
+            CONFIG,
+        )
+        _ = html_document.generate(user_slug, doc_slug, base_url)
 
 
 # -------------------------------------------------------------------
 #                               Console
 # -------------------------------------------------------------------
 
+
 @click.command()
-@click.argument('command')
-@click.option('--title')
-def console(command, title):
+@click.argument("command")
+def console(command):
     """Processes console commands."""
-    if command == 'show-config':
-        show_config()
-    elif command == 'generate-epub':
+    if command == "show-config":
+        for key, val in CONFIG.items():
+            print(f"{key:>30}: {val}")
+    elif command == "generate-epub":
         generate_epub()
-    elif command == 'initialize':
-        initialize();
-    elif command == 'load-fixtures':
+    elif command == "initialize":
+        initialize()
+    elif command == "load-fixtures":
         load_fixtures(data)
-        refresh_metadata(data)
-    elif command == 'refresh-metadata':
-        refresh_metadata(data)
-    elif command == 'save-fixtures':
+        refresh_site(CONFIG["HOST"])
+    elif command == "refresh-metadata":
+        refresh_site(CONFIG["HOST"])
+    elif command == "save-fixtures":
         save_fixtures(data)
     else:
         print("Commands:")
@@ -122,5 +139,5 @@ def console(command, title):
         print("  - save-fixtures")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     console()

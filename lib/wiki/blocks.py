@@ -35,6 +35,7 @@ from lib.wiki.functions.base import (
     Function,
     Float,
     Left,
+    Meme,
     Print,
     Quote,
     Right,
@@ -122,7 +123,6 @@ class BlockList(object):
                 Box,
                 Center,
                 Compact,
-                Feature,
                 Float,
                 Indent,
                 Left,
@@ -137,7 +137,9 @@ class BlockList(object):
             _.__name__.upper(): _
             for _ in [
                 Articles,
+                Feature,
                 Grid,
+                Meme,
                 Table,
                 Text,
                 Verbatim,
@@ -364,7 +366,7 @@ class BlockList(object):
         if not fragment and slug != "index":
             title, summary = self.pop_titles()
             nav_id = get_section_nav_id(numbering, slug)
-            number = ".".join([str(_) for _ in numbering])
+            number = ".".join([str(_) for _ in numbering]) if not preview else ""
             if summary != "":
                 subtitle = renderer.inline.process(summary)
             else:
@@ -388,16 +390,14 @@ class BlockList(object):
             for plugin in plugin_list:
                 title, content = plugin.hook_before_section_body(slug)
                 if content:
-                    header_parts += (
-                        f'<ul type="disc"><li><b>{title}</b> &nbsp; {content}</li></ul>'
-                    )
+                    header_parts += f'<ul type="circle"><li><em>{title}</em> &nbsp; {content}</li></ul>'
             if footer and footer.blocks:
                 for _ in footer.blocks:
                     block_html, local_settings = _.html(renderer, local_settings)
                     footer_parts += block_html
 
         if len(header_parts) > 0:
-            html += "<header>"
+            html += '<header class="section-header">'
             for part in header_parts:
                 html += part
             html += '<hr class="div-left div-solid div-10em" />'
@@ -408,7 +408,7 @@ class BlockList(object):
             html += block_html
 
         if len(footer_parts) > 0:
-            html += "<footer>"
+            html += '<footer class="section-footer">'
             html += '<hr class="div-left div-solid div-10em" />'
             for part in footer_parts:
                 html += part
@@ -521,11 +521,11 @@ class Divider(Block):
         """
         html = {
             # Markers
-            "*": '<p class="text-center text-large space"><span>✻</span></p>',
+            "*": '<p class="text-center text-lg space"><span>✻</span></p>',
             "-": rule("div-solid div-center"),
             "* * *": trim(
                 """
-                <p class="text-center text-large big-space">
+                <p class="text-center text-lg big-space">
                     <span>✻ ✻ ✻</span>
                 </p>
                 """

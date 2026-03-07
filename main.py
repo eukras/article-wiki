@@ -38,16 +38,22 @@ table of contents.
 @app.get('/admin') -- Administrative options:
 @app.post('/admin/initialize') -- Load pages from install/articles directory
 @app.post('/admin/regenerate') -- Regenerate all pages/metadata, cache them
-@app.get('/admin/import-archive/{user_slug}') -- Show upload form
-@app.post('/admin/import-archive/{user_slug}') -- Install a zipfile
 @app.get('/admin/expire-cache') -- Deletes cached docs for users
 
-- Import/Export
+- Import/Export as zifile
 
-@app.get('/export-archive/{user_slug}') -- Download a zipfile
-@app.get('/download/{user_slug}/{doc_slug}') -- Download a text file
+@app.get('/download.zip') -- Download a zipfile
+@app.get('/download/{user_slug}.zip') -- Download a zipfile
+@app.get('/download/{user_slug}/{doc_slug}.zip') -- Download a text file
+
+@app.get('/upload') -- Show upload form
+@app.get('/upload/{user_slug}') -- Show upload form
 @app.get('/upload/{user_slug}/{doc_slug}') -- Show upload form
-@app.post('/upload/{user_slug}/{doc_slug}') -- Install a text file
+
+- Image handling
+
+@app.post('/file/{user_slug}/{doc_slug}/{image_name}') -- Upload file (Admin)
+@app.get('/file/{user_slug}/{doc_slug}/{image_name}') -- Display file
 
 - Generated content: ePubs, JPEGs, SVG
 
@@ -69,46 +75,74 @@ table of contents.
 
 import hmac
 import io
-import json
 import logging
 import os
 import shutil
 import sys
 import tempfile
+from annotated_types import doc
+from icecream import ic
+import uvicorn
+
 from copy import copy
 from datetime import datetime
 from typing import Annotated
-from urllib.parse import unquote_plus, urljoin
-
-import uvicorn
+from urllib.parse import unquote_plus
 from cachetools.func import ttl_cache
-from fastapi import Depends, FastAPI, Form, HTTPException, Request, UploadFile, status
+from fastapi import (
+    Depends,
+    FastAPI,
+    Form,
+    HTTPException,
+    Request,
+    UploadFile,
+    status,
+)
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response
+from fastapi.responses import (
+    FileResponse,
+    HTMLResponse,
+    RedirectResponse,
+    Response,
+)
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment as JinjaTemplates
 from jinja2 import PackageLoader
 from markupsafe import escape
-from PIL import Image, ImageDraw
+from PIL import Image
+from PIL.Image import Image as ImageType
 
-from command import initialize, refresh_metadata
-from lib.archive import make_zip_data
+from command import initialize
+from lib.archive import (
+    Archive,
+    user_document_zip_name,
+    user_zip_name,
+    zip_name,
+)
 from lib.bokeh import make_background
-from lib.data import Data, RedisTimer, load_env_config
+from lib.data import CONFIG, Data, IMAGE_DIMENSIONS, RedisTimer
 from lib.document import PROTECTED_DOC_SLUGS, Document
 from lib.ebook import write_epub
+from lib.html_document import HtmlDocument
+from lib.views import make_views
+from lib.wiki.functions import base
+from lib.wiki.halftone import apply_halftone
 from lib.login import Login
 from lib.overlay import make_card, make_cover, make_quote
 from lib.rss import rss_xml
 from lib.slugs import slug
 from lib.sparkline import svg_sparkline
-from lib.storage import make_zip_name, read_archive_dir, uncompress_archive_dir
+from lib.storage import (
+    read_document_dir,
+    read_user_dir,
+    read_site_dir,
+    uncompress_archive_dir,
+)
+from lib.typing import SiteUserDocuments, UserDocuments, DocumentParts
 from lib.wiki.blocks import get_title_data
 from lib.wiki.settings import Settings
 from lib.wiki.utils import trim
 from lib.wiki.wiki import Wiki, clean_text, is_index_part, reformat_part
-
-CONFIG = load_env_config()
 
 
 if "pytest" in sys.modules:
@@ -121,12 +155,7 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Redis, Jinja
 data = Data(CONFIG)
-views = JinjaTemplates(
-    loader=PackageLoader("main", "views"),
-    trim_blocks=True,
-    lstrip_blocks=True,
-    keep_trailing_newline=True,
-)
+views = make_views()
 
 # ----------------------------------------------------------
 #                       Initialise DB
@@ -166,6 +195,15 @@ def is_published(user_slug: str, doc_slug: str) -> bool:
     return False
 
 
+def require_zip(path: str):
+    _, ext = os.path.splitext(path)
+    if ext != ".zip":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The upload must be a .zip file.",
+        )
+
+
 def require_document(user_slug: str, doc_slug: str) -> dict:
     """Return document hash if possible, else abort 404."""
     document = data.userDocument_get(user_slug, doc_slug)  # or None
@@ -173,6 +211,47 @@ def require_document(user_slug: str, doc_slug: str) -> dict:
         msg = f"Document '{user_slug}/{doc_slug}' not found."
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=msg)
     return document
+
+
+def refresh_site(base_url: str):
+    """
+    Ensure admin is refeshed last
+    """
+    for user_slug in data.non_admin_users():
+        refresh_user(user_slug, base_url)
+    refresh_user(CONFIG["ADMIN_USER"], base_url)
+
+
+def refresh_user(user_slug: str, base_url: str):
+    """
+    Ensure index is refeshed last
+    """
+    for doc_slug in data.non_index_documents(user_slug):
+        refresh_document(user_slug, doc_slug, base_url)
+    refresh_document(user_slug, "index", base_url)
+
+
+def refresh_document(user_slug: str, doc_slug: str, base_url: str):
+
+    # Clear
+    # data.userDocumentCache_delete(user_slug, doc_slug)
+    # data.userDocumentMetadata_delete(user_slug, doc_slug)
+
+    html_document = HtmlDocument(
+        data,
+        Wiki(
+            Settings(
+                {
+                    "config:host": base_url,
+                    "config:user": user_slug,
+                    "config:document": doc_slug,
+                }
+            )
+        ),
+        views,
+        CONFIG,
+    )
+    _ = html_document.generate(user_slug, doc_slug, base_url)
 
 
 async def get_temp_dir():
@@ -186,6 +265,51 @@ async def get_temp_dir():
         yield tmp_dir.name
     finally:
         del tmp_dir
+
+
+def clear_caches():
+    data.userDocumentCache_deleteAll()
+    data.epubCache_deleteAll()
+
+
+def save_site(site_user_docs: SiteUserDocuments, config: dict):
+    print(f"Saving {len(site_user_docs)} user...")
+    for user_slug, user_docs in site_user_docs.items():
+        if len(user_docs):
+            save_user(user_slug, user_docs, config)
+
+
+def save_user(user_slug, user_docs: UserDocuments, config: dict):
+    print(f"  - Saving user {user_slug}: {len(user_docs)} docs...")
+    for doc_slug, doc_parts in user_docs.items():
+        if len(doc_parts):
+            save_document(user_slug, doc_slug, doc_parts, config)
+
+
+def save_document(
+    user_slug: str, doc_slug: str, doc_parts: DocumentParts, config: dict
+):
+    print(f"      - Saving {user_slug}/{doc_slug} (x{len(doc_parts)})")
+
+    doc = Document(data)
+    doc.set_host(config["config:host"])
+    doc.set_parts(user_slug, doc_slug, doc_parts)
+    doc.save()
+
+    text_parts = {key: part for key, part in doc_parts.items() if isinstance(part, str)}
+    data.userDocument_set(user_slug, doc_slug, text_parts)
+
+    image_parts = {
+        key: part
+        for key, part in doc_parts.items()
+        if key in IMAGE_DIMENSIONS and isinstance(part, ImageType)
+    }
+
+    for file_name, image in image_parts.items():
+        halftone = apply_halftone(image)
+        data.userDocumentImage_set(user_slug, doc_slug, file_name, halftone)
+
+    refresh_document(user_slug, doc_slug, config["config:host"])
 
 
 # ----------------------------------------------------------
@@ -233,11 +357,12 @@ def show_editor(
         },
         fragment=False,
         preview=True,
+        show_image=data.userDocumentImage_exists(user_slug, doc_slug, "title.png"),
     )
 
     template = views.get_template("editor.html")
     html = template.render(
-        page_title="Editing: {:s}".format(title),
+        page_title=f"Editing: {title}",
         config=CONFIG,
         user_slug=user_slug,
         doc_slug=doc_slug,
@@ -311,8 +436,7 @@ async def do_logout(request: Request):
     Destroy redis record for user login, and delete cookie.
     """
     response = RedirectResponse("/")
-    token = request.cookies.get("token", None)
-    if token:
+    if token := request.cookies.get("token", None):
         data.login_delete(token)
         response.delete_cookie(key="token")
     return response
@@ -382,10 +506,22 @@ async def error_500(request: Request, exc: HTTPException) -> HTMLResponse:
 
 
 @app.get("/")
-async def home_page():
+async def home_page(
+    request: Request,
+):
     """
-    SINGLE_USER mode means the admin user's homepage is the site home page.
+    If there is a '?shortcut' suffix, then see if we can find the shortcut.
+    Otherwise just forward to the admin homepage.
     """
+    empty_params = [key for key, value in request.query_params.items() if value == ""]
+    if len(empty_params) > 0:
+        for doc_slug in data.userDocumentSet_list(data.admin_user):
+            metadata = data.userDocumentMetadata_get(data.admin_user, doc_slug)
+            shortcut = metadata.get("shortcut", "")
+            if shortcut == empty_params[0]:
+                slug = metadata.get("slug")
+                if slug:
+                    return RedirectResponse(f"/read/{data.admin_user}/{slug}")
     return RedirectResponse(f"/read/{data.admin_user}/index")
 
 
@@ -403,46 +539,22 @@ async def read_document(user_slug, doc_slug, request: Request):
     Compile the complete html document.
     """
     with RedisTimer(data, user_slug, doc_slug, "read"):
-        page_html = generate_html_document(user_slug, doc_slug, request)
+        html_document = HtmlDocument(
+            data,
+            Wiki(
+                Settings(
+                    {
+                        "config:host": domain_name(request),
+                        "config:user": user_slug,
+                        "config:document": doc_slug,
+                    }
+                )
+            ),
+            views,
+            CONFIG,
+        )
+        page_html = html_document.generate(user_slug, doc_slug, str(request.base_url))
     return HTMLResponse(content=page_html)
-
-
-def generate_html_document(user_slug, doc_slug, request):
-    """
-    Cacheable page generator.
-    """
-    settings = Settings(
-        {
-            "config:host": str(request.base_url),
-            "config:user": user_slug,
-            "config:document": doc_slug,
-        }
-    )
-
-    metadata = data.userDocumentMetadata_get(user_slug, doc_slug)
-    html = data.userDocumentCache_get(user_slug, doc_slug)
-    if not html or not metadata:
-        wiki = Wiki(settings)
-        doc_parts = require_document(user_slug, doc_slug)
-        html = wiki.process(user_slug, doc_slug, doc_parts)
-        data.userDocumentCache_set(user_slug, doc_slug, html)
-        metadata = wiki.compile_metadata(CONFIG["TIME_ZONE"], user_slug, doc_slug)
-        metadata["url"] = "/read/{:s}/{:s}".format(user_slug, doc_slug)
-        data.userDocumentMetadata_set(user_slug, doc_slug, metadata)
-
-    uri = "/read/{:s}/{:s}".format(user_slug, doc_slug)
-    metadata["url"] = urljoin(str(request.base_url), uri)
-    author_uri = "/read/{:s}".format(user_slug)
-    metadata["author_url"] = urljoin(str(request.base_url), author_uri)
-    metadata["home_url"] = urljoin(str(request.base_url), "/")
-    image_uri = "/image/card/{:s}/{:s}.jpg".format(user_slug, doc_slug)
-    metadata["image_url"] = urljoin(str(request.base_url), image_uri)
-
-    template = views.get_template("read.html")
-    template.trim_blocks = True
-    template.lstrip_blocks = True
-    page_html = template.render(config=CONFIG, metadata=metadata, content_html=html)
-    return page_html
 
 
 @app.get("/rss/{user_slug}.xml")
@@ -519,8 +631,7 @@ async def edit_part(
 
             $ AUTHOR = AUTHOR_NAME
             $ EMAIL = AUTHOR_EMAIL
-            $ FACEBOOK = FACEBOOK_USER
-            $ TWITTER = TWITTER_USER
+            $ SHORTCUT = shortcut
             $ DATE = PUBLICATION_DATE
             $ PUBLISH = NO
 
@@ -534,9 +645,7 @@ async def edit_part(
             - Part One
             - - Section A
             - Part Two
-        """.replace(
-                "PUBLICATION_DATE", today
-            )
+        """.replace("PUBLICATION_DATE", today)
         )
 
         html = show_editor(
@@ -659,7 +768,7 @@ async def post_edit_part(
             if old_doc.doc_slug != new_doc_slug:
                 old_doc.delete()
 
-        uri = "/read/{:s}/{:s}".format(user_slug, new_doc_slug)
+        uri = f"/read/{user_slug}/{new_doc_slug}"
         return RedirectResponse(uri, status_code=status.HTTP_303_SEE_OTHER)
 
     is_preview = they_selected_preview is not None
@@ -676,6 +785,53 @@ async def post_edit_part(
         can_be_saved=login.controls(user_slug),
     )
     return HTMLResponse(content=html)
+
+
+@app.get("/files/{user_slug}/{doc_slug}")
+async def files(
+    user_slug: str,
+    doc_slug: str,
+    login: LoginDependency,
+):
+    """
+    Manage page files for user_slug/doc_slug.
+    """
+
+    if not login.controls(user_slug) and not is_published(user_slug, doc_slug):
+        msg = f"Document '{user_slug}/{doc_slug}' not found."
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=msg)
+
+    html = views.get_template("article-files.html").render(
+        user_slug=user_slug,
+        doc_slug=doc_slug,
+        config=CONFIG,
+        dimensions=IMAGE_DIMENSIONS,
+    )
+    return HTMLResponse(content=html)
+
+
+@app.post("/file-delete/{user_slug}/{doc_slug}/{file_name}")
+async def files(
+    user_slug: str,
+    doc_slug: str,
+    file_name: str,
+    login: LoginDependency,
+):
+    """
+    Manage page files for user_slug/doc_slug.
+    """
+
+    login.require_control(user_slug)
+    require_accepted_filename(file_name)
+
+    if not data.userDocumentImage_exists(user_slug, doc_slug, file_name):
+        msg = f"File '{user_slug}/{doc_slug}/{file_name}' not found."
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=msg)
+
+    data.userDocumentImage_delete(user_slug, doc_slug, file_name)
+
+    uri = f"/read/{user_slug}/{doc_slug}"
+    return RedirectResponse(uri, status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get("/playground")
@@ -777,10 +933,10 @@ async def delete_part(
     document.delete_part(part_slug)
     if len(document.parts) > 0:
         document.save()
-        return RedirectResponse("/read/{:s}/{:s}".format(user_slug, doc_slug))
+        return RedirectResponse(f"/read/{user_slug}/{doc_slug}")
     else:
         document.delete()
-        return RedirectResponse("/read/{:s}/index".format(user_slug))
+        return RedirectResponse(f"/read/{user_slug}/index")
 
 
 # -------------------------------------------------------------
@@ -796,123 +952,135 @@ async def admin(
     Show administrative options.
     """
     login.require_admin()
-    html = views.get_template("admin.html").render(config=CONFIG)
+    html = views.get_template("admin-site.html").render(config=CONFIG)
     return HTMLResponse(content=html)
 
 
 @app.post("/admin/initialize")
 async def admin_initialize(
     login: LoginDependency,
+    request: Request,
 ):
     """
     Reset site to starting configuration.
     """
     login.require_admin()
     initialize()
-    return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
+
+    # And logout
+    response = RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
+    if token := request.cookies.get("token", None):
+        data.login_delete(token)
+        response.delete_cookie(key="token")
+
+    return response
 
 
 @app.post("/admin/refresh")
 async def admin_refresh(
     login: LoginDependency,
+    request: Request,
 ):
     """
     Regenerate, re-cache, and correct the metadata for all pages.
     """
     login.require_admin()
-    refresh_metadata(data)
+    refresh_site(str(request.base_url))
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
 
 
 # -------------------------------------------------------------
-#                      Import / Export
+#                       Image files
 # -------------------------------------------------------------
 
 
-@app.get("/download/{user_slug}/{doc_slug}")
-async def download_txt(user_slug, doc_slug, request: Request):
-    """
-    Creates a single text file to download.
-    """
-    document = Document(data)
-    document.set_host(str(request.base_url))
-    if not document.load(user_slug, doc_slug):
-        msg = "Document '{:s}' not found."
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=msg)
-    file_name, file_text = document.export_txt_file()
-    file_headers = {"Content-Disposition": f'attachment; filename="{file_name}"'}
-    return Response(content=file_text, media_type="text/plain", headers=file_headers)
+def require_accepted_filename(file_name):
+    if file_name not in IMAGE_DIMENSIONS.keys():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"The filename must be one of {IMAGE_DIMENSIONS.keys()}, not file_name",
+        )
 
 
-@app.get("/upload/{user_slug}/{doc_slug}")
-async def upload_txt_form(
+def require_accepted_dimensions(file_name, image):
+    if image.size != IMAGE_DIMENSIONS[file_name]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"The file {file_name} must have the size {IMAGE_DIMENSIONS[file_name]}, not {image.size}",
+        )
+
+
+@app.post("/file/{user_slug}/{doc_slug}/{file_name}")
+async def upload_file(
     user_slug: str,
     doc_slug: str,
-    login: LoginDependency,
-):
-    """
-    Show an upload form to upload a document.
-    """
-    login.require_control(user_slug)  # else 403s
-    metadata = {"title": "Upload a document"}
-    content_html = views.get_template("upload.html").render(
-        metadata=metadata,
-        config=CONFIG,
-        user_slug=user_slug,
-        doc_slug=doc_slug,
-    )
-    return HTMLResponse(content=content_html)
-
-
-@app.post("/upload/{user_slug}/{doc_slug}")
-async def post_upload_txt(
-    user_slug,
-    doc_slug,
+    file_name: str,
     upload: UploadFile,
-    request: Request,
-    login: LoginDependency,
+    # login: LoginDependency,
 ):
     """
-    Create and save a document from a download file; show it.
+    Replaces the current file_name with the new file.
+
+    Check permissions
+    Get uploaded file
+    Store into document
+    Stay on page
     """
-    login.require_control(user_slug)  # else 403s
+    # login.require_control(user_slug)
 
-    limit_kb = int(CONFIG["UPLOAD_LIMIT_KB"])
-    if upload.size > (limit_kb * 1024):
-        msg = "The uploaded file is too large (limit: {limit_kb}K)."
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
-    name = upload.filename
-    prefix = "article-wiki_{:s}_{:s}_".format(user_slug, doc_slug)
-    suffix = ".txt"
-    print(name)
-    if not name.startswith(prefix) or not name.endswith(suffix):
-        msg = f"Filename must start with '{prefix}' and end with '{suffix}'"
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
+    require_accepted_filename(file_name)
 
-    file_bytes = await upload.read()
-    file_text = file_bytes.decode("utf-8")
+    image_data = upload.file.read()
+    image = Image.open(io.BytesIO(image_data))
+    image.load()  # load while in memory
 
-    document = Document(data)
-    host = str(request.base_url)
-    document.set_host(host)
-    document.import_txt_file(user_slug, doc_slug, file_text)
-    document.save()
+    require_accepted_dimensions(file_name, image)
 
-    uri = "/read/{:s}/{:s}".format(user_slug, doc_slug)
-    return RedirectResponse(uri, status_code=status.HTTP_303_SEE_OTHER)
+    halftone = apply_halftone(image)
+    data.userDocumentImage_set(user_slug, doc_slug, file_name, halftone)
+
+    # 303 to forward POST to GET
+    return RedirectResponse(
+        f"/files/{user_slug}/{doc_slug}", status_code=status.HTTP_303_SEE_OTHER
+    )
 
 
-@app.get("/export-archive/{user_slug}")
-async def export_archive(user_slug):
+@app.get("/file/{user_slug}/{doc_slug}/{file_name}")
+async def display_image(
+    user_slug: str,
+    doc_slug: str,
+    file_name: str,
+):
+    """
+    /file/ is only used for document images.
+    """
+    require_accepted_filename(file_name)
+    # if cache_bytes := data.userDocumentImageCache_get(user_slug, doc_slug, file_name):
+    #     return send_image_bytes(cache_bytes)
+    # else:
+    if image := data.userDocumentImage_get(user_slug, doc_slug, file_name):
+        return send_image(image)
+
+    # else, not found
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+# -------------------------------------------------------------
+#            Import / Export (.zip for one article)
+# -------------------------------------------------------------
+
+
+@app.get("/download/{user_slug}/{doc_slug}.zip")
+async def download_document_zip(user_slug, doc_slug):
     """
     Downloads an export_archive file.
     - Anyone can do this
     - Ignores whether a doc is published or not.
     """
-    zip_name = make_zip_name(user_slug)
-    doc_files = data.userDocument_hash(user_slug)
+    archive = Archive(data)
+    zip_name = user_document_zip_name(user_slug, doc_slug)
     return Response(
-        make_zip_data(doc_files),
+        archive.zip_document(user_slug, doc_slug),
         headers={
             "Content-Type": "application/zip",
             "Content-Disposition": f'inline; filename="{zip_name}"',
@@ -920,9 +1088,10 @@ async def export_archive(user_slug):
     )
 
 
-@app.get("/import-archive/{user_slug}")
-async def import_archive_form(
+@app.get("/upload/{user_slug}/{doc_slug}")
+async def upload_document_form(
     user_slug: str,
+    doc_slug: str,
     login: LoginDependency,
 ):
     """
@@ -930,15 +1099,97 @@ async def import_archive_form(
     """
     login.require_control(user_slug)
 
-    html = views.get_template("import.html").render(
+    html = views.get_template("upload.html").render(
         config=CONFIG,
         user_slug=user_slug,
+        doc_slug=doc_slug,
+        import_file=user_document_zip_name(user_slug, doc_slug),
     )
     return HTMLResponse(content=html)
 
 
-@app.post("/import-archive/{user_slug}")
-async def post_import_archive(
+@app.post("/upload/{user_slug}/{doc_slug}")
+async def post_upload_document_form(
+    user_slug,
+    doc_slug,
+    upload: UploadFile,
+    request: Request,
+    login: LoginDependency,
+    dir_path=Depends(get_temp_dir, use_cache=False),
+):
+    """
+    Zaps the current user's data replaces it with a previously exported
+    zipfile.
+    """
+    login.require_control(user_slug)
+
+    require_zip(upload.filename)
+
+    file_path = os.path.join(dir_path, upload.filename)
+    with open(file_path, "w+b") as file:
+        shutil.copyfileobj(upload.file, file)
+    uncompress_archive_dir(dir_path, upload.filename)
+    archive_data = read_document_dir(dir_path)
+    save_document(
+        user_slug,
+        doc_slug,
+        archive_data,
+        {
+            "config:host": str(request.base_url),
+        },
+    )
+
+    base_url = str(request.base_url)  # <-- URL type
+    refresh_site(base_url)
+
+    # 303 to forward POST to GET
+    uri = f"/read/{user_slug}/index"
+    return RedirectResponse(uri, status_code=status.HTTP_303_SEE_OTHER)
+
+
+# -------------------------------------------------------------
+#          Import / Export (.zip for a user's archive)
+# -------------------------------------------------------------
+
+
+@app.get("/download/{user_slug}.zip")
+async def download_user_zip(user_slug):
+    """
+    Downloads an export_archive file.
+    - Anyone can do this
+    - Ignores whether a doc is published or not.
+    """
+    archive = Archive(data)
+    zip_name = user_zip_name(user_slug)
+    return Response(
+        archive.zip_user(user_slug),
+        headers={
+            "Content-Type": "application/zip",
+            "Content-Disposition": f'inline; filename="{zip_name}"',
+        },
+    )
+
+
+@app.get("/upload/{user_slug}")
+async def upload_user_form(
+    user_slug: str,
+    login: LoginDependency,
+):
+    """
+    Show upload form for importing an archive zipfile.
+    """
+    login.require_control(user_slug)
+
+    html = views.get_template("upload.html").render(
+        config=CONFIG,
+        user_slug=user_slug,
+        import_file=user_zip_name(user_slug),
+    )
+    return HTMLResponse(content=html)
+
+
+@app.post("/upload/{user_slug}")
+async def post_upload_user_form(
     user_slug,
     upload: UploadFile,
     request: Request,
@@ -948,23 +1199,10 @@ async def post_import_archive(
     """
     Zaps the current user's data replaces it with a previously exported
     zipfile.
-
-    Check permissions
-    Get uploaded file
-    Uncompress file
-    Try to read into an archive_data file.
-    If all OK:
-        (Zap existing site data?)
-        Install archive file
-        Refresh metadata
-        Regenerate the home page.
-        Redirect to home
-    Else:
-        Show error
     """
     login.require_control(user_slug)
 
-    name, ext = os.path.splitext(upload.filename)
+    _, ext = os.path.splitext(upload.filename)
     if ext != ".zip":
         logging.error("Bad uploaded file extension: " + ext)
         raise HTTPException(
@@ -977,27 +1215,91 @@ async def post_import_archive(
         shutil.copyfileobj(upload.file, file)
 
     uncompress_archive_dir(dir_path, upload.filename)
-    archive_data = read_archive_dir(dir_path)
-
-    for doc_slug, doc_parts in archive_data.items():
-        if len(doc_parts):
-            settings = Settings(
-                {
-                    "config:host": str(request.base_url),
-                    "config:user": user_slug,
-                    "config:document": doc_slug,
-                }
-            )
-            wiki = Wiki(settings)
-            html = wiki.process(user_slug, doc_slug, doc_parts)
-            metadata = wiki.compile_metadata(CONFIG["TIME_ZONE"], user_slug, doc_slug)
-            data.userDocument_set(user_slug, doc_slug, doc_parts, metadata)
-            data.userDocumentCache_set(user_slug, doc_slug, html)
-            metadata["url"] = "/read/{:s}/{:s}".format(user_slug, doc_slug)
-            data.userDocumentMetadata_set(user_slug, doc_slug, metadata)
+    archive_data = read_user_dir(dir_path)
+    save_user(
+        user_slug,
+        archive_data,
+        {
+            "config:host": str(request.base_url),
+        },
+    )
 
     # 303 to forward POST to GET
     uri = f"/read/{user_slug}/index"
+    return RedirectResponse(uri, status_code=status.HTTP_303_SEE_OTHER)
+
+
+# -------------------------------------------------------------
+# Download/upload site
+# -------------------------------------------------------------
+
+
+@app.get("/download.zip")
+async def download_site_zip():
+    """
+    Downloads an archive file.
+    - Anyone can do this
+    - Ignores whether a doc is published or not.
+    """
+    archive = Archive(data)
+    file_name = zip_name()
+    return Response(
+        archive.zip_site(),
+        headers={
+            "Content-Type": "application/zip",
+            "Content-Disposition": f'inline; filename="{file_name}"',
+        },
+    )
+
+
+@app.get("/upload")
+async def upload_site_form():
+    """
+    Show upload form for importing an archive zipfile.
+    """
+    html = views.get_template("upload.html").render(
+        config=CONFIG,
+        import_file=zip_name(),
+    )
+    return HTMLResponse(content=html)
+
+
+@app.post("/upload")
+async def post_upload_site_form(
+    upload: UploadFile,
+    request: Request,
+    login: LoginDependency,
+    dir_path=Depends(get_temp_dir, use_cache=False),
+):
+    """
+    Zaps the current site's data replaces it with a previously exported
+    zipfile.
+    """
+    login.require_admin()
+
+    _, ext = os.path.splitext(upload.filename)
+    if ext != ".zip":
+        logging.error("Bad uploaded file extension: " + ext)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The upload must be a .zip file.",
+        )
+
+    file_path = os.path.join(dir_path, upload.filename)
+    with open(file_path, "w+b") as file:
+        shutil.copyfileobj(upload.file, file)
+
+    uncompress_archive_dir(dir_path, upload.filename)
+    archive_data = read_site_dir(dir_path)
+    save_site(
+        archive_data,
+        {
+            "config:host": str(request.base_url),
+        },
+    )
+
+    # 303 to forward POST to GET
+    uri = f"/read/{CONFIG['ADMIN_USER']}/index"
     return RedirectResponse(uri, status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -1016,7 +1318,7 @@ async def generate_svg_sparkline(user_slug: str, doc_slug: str):
     return Response(content=svg_sparkline(points), media_type="image/svg+xml")
 
 
-@app.get("/epub/{user_slug}/{doc_slug}")
+@app.get("/download/{user_slug}/{doc_slug}.epub")
 async def generate_epub(user_slug, doc_slug):
     """
     Generates, caches and downloads an .epub; use a 'generating' notice to say
@@ -1092,13 +1394,20 @@ COLOR_SHADOW = (154, 174, 154)  # <-- Some greeny gray thing
 COLOR_BACKGROUND = (160, 184, 160)  # <-- Norway, Summer Green, Pewter
 
 
-def send_image(image: ImageDraw):
+def send_image(image: ImageType):
     """
     Download image without streaming it
     """
     image_bytes = io.BytesIO()
-    image.save(image_bytes, "JPEG", quality=85)
-    return Response(image_bytes.getvalue(), media_type="image/jpeg")
+    image.save(image_bytes, "PNG", quality=85)
+    return send_image_bytes(image_bytes.getvalue())
+
+
+def send_image_bytes(image_bytes: bytes):
+    """
+    Download image without streaming it
+    """
+    return Response(image_bytes, media_type="image/png")
 
 
 @app.get("/image/cover/{user_slug}/{doc_slug}.jpg")
@@ -1157,30 +1466,42 @@ def cache_generate_card(user_slug, doc_slug, base_url):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
 
 
-@app.get("/image/quote/{checksum}/{encoded}.jpg")
-def generate_quote(checksum, encoded, request: Request):
+@app.get("/{user_slug}/{doc_slug}/image/quote/{checksum}/{encoded}.jpg")
+def generate_quote(user_slug, doc_slug, checksum, encoded, request: Request):
     base_url = str(request.base_url)  # <-- URL type
-    image = cache_generate_quote(checksum, encoded, base_url)
+    decoded = unquote_plus(encoded)
+    image = cache_generate_quote(user_slug, doc_slug, checksum, decoded, base_url)
     return send_image(image)
 
 
 @ttl_cache(ttl=3600)
-def cache_generate_quote(checksum, encoded, base_url):
-    decoded = unquote_plus(encoded)
+def cache_generate_quote(user_slug, doc_slug, checksum, message, base_url):
+    # TODO: Eliminate?
     key = bytes(CONFIG["APP_HASH"], "utf-8")
-    message = bytes(decoded, "utf-8")
-    required = hmac.new(key, message, "sha224").hexdigest()[:16]
+    message_bytes = bytes(message, "utf-8")
+    required = hmac.new(key, message_bytes, "sha224").hexdigest()[:16]
     if checksum != required:
         msg = "No image"
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=msg)
-
-    image_path = os.path.join(os.getcwd(), "resources/quote.png")
+    if data.userDocumentMetadata_exists(user_slug, doc_slug):
+        metadata = data.userDocumentMetadata_get(user_slug, doc_slug)
+        shortcut = metadata.get("shortcut")
+        if shortcut:
+            base_url += "?" + shortcut
+    quote_image = None
+    if data.userDocumentImage_exists(user_slug, doc_slug, "quote.png"):
+        image_data = data.userDocumentImage_get(user_slug, doc_slug, "quote.png")
+        if image_data:
+            width, height = IMAGE_DIMENSIONS["quote.png"]
+            quote_image = Image.frombytes("RGB", (width, height), image_data)
+    background_image_path = os.path.join(os.getcwd(), "resources/quote.png")
+    background = Image.open(background_image_path).convert("RGB")
     byline = base_url
-    image = Image.open(image_path).convert("RGB")
     image = make_quote(
-        image,
+        background,
+        quote_image,
         [
-            decoded,
+            message,
         ],
         [COLOR_BACKGROUND, (238, 238, 238)],
         byline,
@@ -1222,7 +1543,10 @@ def expire(
     """
     login.require_admin()  # else 403
 
+    data.userDocumentCache_deleteAll()
     data.epubCache_deleteAll()
+
+    # 303 to forward POST to GET
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
 
 

@@ -11,7 +11,7 @@ from datetime import datetime
 from ebooklib import epub
 
 from lib.bokeh import make_background
-from lib.data import Data, load_env_config
+from lib.data import CONFIG, Data, load_env_config
 from lib.overlay import make_cover
 from lib.wiki.settings import Settings
 from lib.wiki.wiki import Wiki
@@ -45,6 +45,7 @@ def write_epub(user_slug, doc_slug, file_path):
 
     settings = Settings(
         {
+            "config:host": config.get("HOST", ""),
             "config:user": user_slug,
             "config:document": doc_slug,
         }

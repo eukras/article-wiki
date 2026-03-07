@@ -1,27 +1,34 @@
-{% extends "page.html" %}
+{% extends "admin-template.html" %}
 
-{% block page %}
+{% block title %}
+
+            <header class="titles">
+              <h1>
+                {% if user_slug != "" and doc_slug != "" %}
+                <div class="article-title balance-text">Upload Site</div>
+                <div class="article-subtitle balance-text">* / *</div>
+                {% elif user_slug != "" %}
+                <div class="article-title balance-text">Upload User</div>
+                <div class="article-subtitle balance-text">{{ user_slug }} / *</div>
+                {% else %}
+                <div class="article-title balance-text">Upload Article</div>
+                <div class="article-subtitle balance-text">{{ user_slug }} / {{ doc_slug }}</div>
+                {% endif %}
+              </h1>
+            </header>
+
+{% endblock %}
+
+
+{% block body %}
 
 <div class="wiki">
-<article>
-
-<header>
-    <h1>Upload a Document</h1>
-</header>
-
-<main>
 
 <ul>
-    <li>Note that this will replace the existing article.</li>
-    <li>Your download file will have be called: <tt>article-wiki_{{ user_slug }}_{{ doc_slug }}_########-####.txt</tt>, where the # characters represent date and time stamps.</li>
+    <li>Your download file will have be called: <tt>{{ import_file }}</tt>, only with the date and time that it was generated.</li>
 </ul>
 
 <form
-{% if doc_slug %}
-    action="/upload/{{ user_slug }}/{{ doc_slug }}"
-{% else %}
-    action="/upload/{{ user_slug }}"
-{% endif %}
     method="post"
     enctype="multipart/form-data"
 >
@@ -37,9 +44,6 @@
 
 </form>
 
-</main>
-
-</article>
 </div>
 
 

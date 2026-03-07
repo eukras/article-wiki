@@ -1,0 +1,75 @@
+{% extends "page.html" %}
+
+{% block page %}
+
+<div class="wiki">
+
+  <article>
+
+    <div class="section-group">
+      <div class="left-margin">
+        <div class="sticky-buttons nav-buttons">
+          <a class="button-unit" id="null" href="/">
+            <i class="fa fa-fw fa-home"></i>
+            Home
+          </a>
+        </div>
+      </div>
+      <div class="section-list">
+        <div class="section-item">
+          <div class="section-content">
+            {% block title %}
+            ...
+            {% endblock %}
+          </div>
+          <div class="right-margin">
+            <div class="sticky-buttons option-buttons">
+              <button class="button-unit theme-button" type="button">
+                <i class="fa fa-fw fa-adjust"></i>
+                Dark
+              </button>
+              <button class="button-unit fullscreen-button" type="button">
+                <i class="fa fa-fw fa-expand"></i>
+                Full
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-group">
+      <div class="left-margin">
+        <div class="sticky-buttons">
+          <button class="button-unit navigation-button" type="button">
+            <i class="fa fa-fw fa-bars"></i>
+            Menu
+          </button>
+        </div>
+      </div>
+      <div class="section-list">
+        <div class="section-item">
+          <div class="section-content">
+            <div class="wiki">
+              {% block body %}
+              ...
+              {% endblock %}
+            </div>
+          </div>
+          <div class="right-margin">
+            <!-- <div class="sticky-buttons"> -->
+            <!--   <a class="button-unit" id="null" href="/edit/admin/index/index"> -->
+            <!--     <i class="fa fa-fw fa-pencil"></i> -->
+            <!--     Edit -->
+            <!--   </a> -->
+            <!-- </div> -->
+          </div>
+        </div>
+      </div>
+      <div class="right-margin">
+      </div>
+    </div>
+  </div>
+</article>
+
+{% endblock %}

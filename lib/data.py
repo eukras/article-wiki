@@ -12,10 +12,10 @@ Verbs:
 Objects:
 
     - user: records (hash)
-    - userSet: list of all user_slugs (zset)
+- userSet: list of all user_slugs (zset)
     - userDocument: records (hash)
     - userDocumentSet: list of all document records (zset)
-    - userDocumentMetadata: for homepage summary (hash)
+- userDocumentMetadata: for homepage summary (hash)
     - userDocumentLastChanged: (list) trimmed to 10
     - userDocumentCache: key
 
@@ -33,6 +33,9 @@ import os
 import time
 import uuid
 
+from PIL import Image as ImageClass
+from PIL.Image import Image as ImageType
+from annotated_types import doc
 import redis
 
 from datetime import datetime
@@ -40,6 +43,7 @@ from typing import Dict, List, Union
 
 from lib.calendar import day_in_last_fortnight
 from lib.slugs import slug
+from lib.typing import DocumentParts, SiteUserDocuments, UserDocuments
 from lib.wiki.utils import random_slug
 
 
@@ -48,6 +52,13 @@ LAST_CHANGED_MAX = 10
 RETENTION_DAYS = 14
 SECONDS_PER_DAY = 24 * 60 * 60
 MILLISECONDS_PER_DAY = SECONDS_PER_DAY * 1000
+
+
+IMAGE_DIMENSIONS = {
+    "title.png": (1200, 450),
+    "quote.png": (400, 750),
+    "cover.png": (2100, 2970),
+}
 
 
 def load_env_config() -> dict:
@@ -88,7 +99,17 @@ def load_env_config() -> dict:
     if config["WEB_HOST_PORT"] not in ["80", "443"]:
         config["SITE"] += ":" + config["WEB_HOST_PORT"]
 
+    host = config["WEB_HOST"]
+    port = config["WEB_HOST_PORT"]
+    host_parts = [host]
+    if port not in ["80", "443"]:
+        host_parts.append(port)
+    config["HOST"] = ":".join(host_parts)
+
     return config
+
+
+CONFIG = load_env_config()
 
 
 class Data(object):
@@ -98,6 +119,7 @@ class Data(object):
     """
 
     def __init__(self, config: dict, strict: bool = False):
+        self.config = config
         self.admin_user = config["ADMIN_USER"]
         self.redis = redis.Redis(
             config["REDIS_HOST"],
@@ -148,7 +170,7 @@ class Data(object):
     def require_not_in_context_manager(self):
         """
         Using get/list statements inside a context manager won't work, as
-        they wont' be executed until the end of the __exit__.
+        they won't be executed until the end of the __exit__.
 
         Raises:
             RuntimeError
@@ -157,17 +179,52 @@ class Data(object):
             msg = "Get/list operation was called inside a context manager."
             raise RuntimeError(msg)
 
+    # ------------------
+    # Document retrieval
+    # ------------------
+
+    def get_site_user_documents(self) -> SiteUserDocuments:
+        return {
+            user_slug: self.get_user_document(user_slug)
+            for user_slug in self.userSet_list()
+        }
+
+    def get_user_document(self, user_slug: str) -> UserDocuments:
+        return {
+            doc_slug: self.get_document(user_slug, doc_slug)
+            for doc_slug in self.userDocumentSet_list(user_slug)
+        }
+
+    def get_document(self, user_slug: str, doc_slug: str) -> DocumentParts:
+        """
+        Merge wiki text and image files into a single document dictionary.
+        """
+        return {
+            part_slug + ".txt": wiki_text
+            for part_slug, wiki_text in (
+                self.userDocument_get(user_slug, doc_slug) or {}
+            ).items()
+        } | {
+            file_name: image_obj
+            for file_name, image_obj in self.userDocumentImage_hash(
+                user_slug, doc_slug
+            ).items()
+        }
+
     # -----------------
     # Utility Functions
     # -----------------
 
     def check_slugs(self, *slugs):
-        if self.strict:
-            for _ in slugs:
-                if not isinstance(_, str):
-                    raise ValueError("Slugs must be strings")
-                if _ != slug(_):
-                    raise ValueError("Invalid slug: " + _)
+        for _ in slugs:
+            if not isinstance(_, str):
+                raise ValueError("Slugs must be strings")
+            if (
+                _ != slug(_)
+                and _ != "_"
+                and _ not in ["title.png", "quote.png", "cover.png"]
+            ):
+                raise ValueError("Invalid slug: " + _)
 
     def get_hashes(self, keys: List[str]) -> List[dict]:
         pipe = self.redis.pipeline()
@@ -182,6 +239,63 @@ class Data(object):
 
     def keys_by_prefix(self, prefix: str) -> List[str]:
         return self.redis.keys(prefix + "*")
+
+    def key_endings(self, key_parts: List[str]) -> List[str]:
+        """
+        Find the final slugs in a pattern.
+        """
+        pattern = ":".join(key_parts) + ":"
+        matches = self.redis.keys(pattern + "*")
+        endings = [match[len(pattern) :] for match in list(matches)]
+        return endings
+
+    # ----------
+    # Iteration
+    # ----------
+
+    def non_admin_users(self) -> list[str]:
+        """
+        NOTE: Not needed until multi-user
+        """
+        return [
+            user_slug
+            for user_slug in self.userSet_list()
+            if user_slug not in self.config["ADMIN_USER"]
+        ]
+
+    def non_index_documents(self, user_slug: str) -> list[str]:
+        return [
+            doc_slug
+            for doc_slug in self.userDocumentSet_list(user_slug)
+            if doc_slug not in "index"
+        ]
+
+    # -----------
+    # Deleted
+    # -----------
+
+    def delete_site(self):
+        for user_slug in self.userSet_list():
+            self.delete_user(user_slug)
+        self.userSet_deleteAll()
+        self.login_deleteAll()
+
+    def delete_user(self, user_slug):
+        for doc_slug in self.userDocumentSet_list(user_slug):
+            self.delete_document(user_slug, doc_slug)
+        self.redis.delete(self.userDocumentSet_key(user_slug))
+        self.user_delete(user_slug)
+
+    def delete_document(self, user_slug, doc_slug):
+        self.userDocumentCache_delete(user_slug, doc_slug)
+        for filename in IMAGE_DIMENSIONS.keys():
+            if self.userDocumentImage_exists(user_slug, doc_slug, filename):
+                self.userDocumentImage_delete(user_slug, doc_slug, filename)
+        self.userDocumentMetadata_delete(user_slug, doc_slug)
+        self.userDocumentLastChanged_delete(user_slug, doc_slug)
+        self.userDocument_delete(user_slug, doc_slug)
+        self.epubCachePlaceholder_delete(user_slug, doc_slug)
+        self.epubCache_delete(user_slug, doc_slug)
 
     # --------------
     # Authentication
@@ -215,8 +329,11 @@ class Data(object):
         if isinstance(token, str):
             self.redis.delete(self.login_key(token))
 
+    def login_deleteAll(self):
+        self.del_keys(self.keys_by_prefix("a:"))
+
     # -----------------
-    # Userset Functions
+    # UserSet Functions
     # -----------------
 
     def userSet_key(self) -> str:
@@ -238,10 +355,13 @@ class Data(object):
         key = self.userSet_key()
         self.redis.zrem(key, user_slug)
 
+    def userSet_deleteAll(self):
+        self.redis.delete(self.userSet_key())
+
     def userSet_list(self):
         self.require_not_in_context_manager()
         key = self.userSet_key()
-        return self.redis.zrange(key, 0, -1)
+        return list(self.redis.zrange(key, 0, -1))
 
     def userSet_count(self):
         self.require_not_in_context_manager()
@@ -398,13 +518,101 @@ class Data(object):
             for doc_slug in self.userDocumentSet_list(user_slug)
         }
 
+    # ------------------
+    # User Images: Assumed to be .png; stored one-per-key for efficient
+    # retrieval rather than as a dictionary.
+    # ------------------
+
+    def userDocumentImage_key(self, user_slug: str, doc_slug: str, image_slug: str):
+        self.check_slugs(user_slug, doc_slug, image_slug)
+        return ":".join(["ui", user_slug, doc_slug, image_slug])
+
+    def userDocumentImage_exists(self, user_slug: str, doc_slug: str, file_name: str):
+        self.require_not_in_context_manager()
+        key = self.userDocumentImage_key(user_slug, doc_slug, file_name)
+        return self.redis_binary.exists(key)
+
+    def userDocumentImage_unique_slug(
+        self, user_slug: str, doc_slug: str, base_slug: str
+    ) -> str:
+        """
+        Given a base_slug, try randomised suffixes until one is
+        unique. Collisions should be rare, but there is a 1000-tries
+        sanity check.
+        """
+        n = 0
+        test_slug = base_slug
+        while n < 1000:
+            if self.userDocumentImage_exists(user_slug, doc_slug, test_slug):
+                test_slug = random_slug(base_slug + "-")
+            else:
+                return test_slug
+            n += 1
+        raise ValueError("A unique image_slug could not be created.")
+
+    def userDocumentImage_get(
+        self, user_slug: str, doc_slug: str, image_slug: str
+    ) -> Union[ImageType, None]:
+        self.require_not_in_context_manager()
+
+        if image_slug in IMAGE_DIMENSIONS:
+            width, height = IMAGE_DIMENSIONS[image_slug]
+            key = self.userDocumentImage_key(user_slug, doc_slug, image_slug)
+            if image_data := self.redis_binary.get(key):
+                image = ImageClass.frombytes("L", (width, height), image_data)
+                return image
+        return None
+
+    def userDocumentImage_set(
+        self, user_slug: str, doc_slug: str, image_slug: str, image: ImageType
+    ):
+        """
+        Add pipe.
+        """
+        key = self.userDocumentImage_key(user_slug, doc_slug, image_slug)
+        self.redis_binary.delete(key)
+        self.redis_binary.set(key, image.tobytes())
+
+    def userDocumentImage_delete(self, user_slug: str, doc_slug: str, image_slug: str):
+        """
+        In SINGLE_USER mode (v.0.1.0) there's no need to pipeline these
+        commands. Using the standalone functions...
+
+        To Do:
+            Upgrade.
+        """
+        key = self.userDocumentImage_key(user_slug, doc_slug, image_slug)
+        self.redis_binary.delete(key)
+        self.userDocumentCache_delete(user_slug, doc_slug)
+
+    def userDocumentImage_list(self, user_slug: str, doc_slug: str) -> List[str]:
+        """
+        For a user document, retrieve a list of image file names, e.g. 'title.png'.
+        """
+        self.require_not_in_context_manager()
+        return self.key_endings(["ui", user_slug, doc_slug])
+
+    def userDocumentImage_hash(self, user_slug: str, doc_slug: str) -> dict:
+        """
+        For a user document, retrieve a {file_name: userDocumentImage} dict,
+        as might from an export.
+
+        @todo: Restrict downloads to visible documents?
+        """
+        self.require_not_in_context_manager()
+        image_dict = {
+            file_name: self.userDocumentImage_get(user_slug, doc_slug, file_name)
+            for file_name in self.userDocumentImage_list(user_slug, doc_slug)
+        }
+        return image_dict
+
     # -----------------
     # DOCUMENT METADATA
     # -----------------
 
     def userDocumentMetadata_key(self, user_slug: str, doc_slug: str) -> str:
         self.check_slugs(user_slug, doc_slug)
-        return "udm:{:s}:{:s}".format(user_slug, doc_slug)
+        return f"udm:{user_slug}:{doc_slug}"
 
     def userDocumentMetadata_exists(self, user_slug: str, doc_slug: str) -> bool:
         self.require_not_in_context_manager()
@@ -414,13 +622,13 @@ class Data(object):
         self.require_not_in_context_manager()
         # hgetall returns an empty hash if no match
         record = self.redis.hgetall(self.userDocumentMetadata_key(user_slug, doc_slug))
-        return record if len(record) > 0 else None
+        return record if len(record) > 0 else {}
 
     def userDocumentMetadata_set(self, user_slug: str, doc_slug: str, metadata: dict):
         self.userDocumentSet_set(user_slug, doc_slug)
-        udmk = self.userDocumentMetadata_key(user_slug, doc_slug)
-        self.redis.delete(udmk)  # <-- Or else it merges
-        self.redis.hmset(udmk, metadata)
+        key = self.userDocumentMetadata_key(user_slug, doc_slug)
+        self.redis.delete(key)  # <-- Or else it merges
+        self.redis.hmset(key, metadata)
 
     def userDocumentMetadata_delete(self, user_slug: str, doc_slug: str):
         self.redis.delete(self.userDocumentMetadata_key(user_slug, doc_slug))
@@ -433,7 +641,7 @@ class Data(object):
 
     def userDocumentLastChanged_key(self, user_slug: str) -> str:
         self.check_slugs(user_slug)
-        return "udlc:{:s}".format(user_slug)
+        return f"udlc:{user_slug}"
 
     def userDocumentLastChanged_exists(self, user_slug: str) -> str:
         raise NotImplementedError("Use: userDocumentLastChanged_list().")
@@ -486,6 +694,56 @@ class Data(object):
 
     def userDocumentCache_delete(self, user_slug: str, doc_slug: str):
         self.redis.delete(self.userDocumentCache_key(user_slug, doc_slug))
+
+    def userDocumentCache_deleteAll(self):
+        for user_slug in self.userSet_list():
+            for doc_slug in self.userDocumentSet_list(user_slug):
+                self.userDocumentCache_delete(user_slug, doc_slug)
+
+    # -------------
+    # IMAGE CACHING
+    # -------------
+
+    # def userDocumentImageCache_key(
+    #     self, user_slug: str, doc_slug: str, file_name: str
+    # ) -> str:
+    #     self.check_slugs(user_slug, doc_slug, file_name)
+    #     return "udic:{:s}:{:s}:{:s}".format(user_slug, doc_slug, file_name)
+    #
+    # def userDocumentImageCache_exists(
+    #     self, user_slug: str, doc_slug: str, file_name: str
+    # ) -> bool:
+    #     self.require_not_in_context_manager()
+    #     return self.redis_binary.exists(
+    #         self.userDocumentImageCache_key(user_slug, doc_slug, file_name)
+    #     )
+    #
+    # def userDocumentImageCache_get(
+    #     self, user_slug: str, doc_slug: str, file_name: str
+    # ) -> Union[bytes, None]:
+    #     self.require_not_in_context_manager()
+    #     return self.redis_binary.get(
+    #         self.userDocumentImageCache_key(user_slug, doc_slug, file_name)
+    #     )
+    #
+    # def userDocumentImageCache_set(
+    #     self, user_slug: str, doc_slug: str, file_name: str, image_bytes: bytes
+    # ):
+    #     key = self.userDocumentImageCache_key(user_slug, doc_slug, file_name)
+    #     self.redis_binary.set(key, image_bytes)
+    #
+    # def userDocumentImageCache_delete(
+    #     self, user_slug: str, doc_slug: str, file_name: str
+    # ):
+    #     self.redis_binary.delete(
+    #         self.userDocumentImageCache_key(user_slug, doc_slug, file_name)
+    #     )
+    #
+    # def userDocumentImageCache_deleteAll(self):
+    #     for user_slug in self.userSet_list():
+    #         for doc_slug in self.userDocumentSet_list(user_slug):
+    #             for file_name in IMAGE_DIMENSIONS.keys():
+    #                 self.userDocumentImageCache_delete(user_slug, doc_slug, file_name)
 
     # ----------
     # GENERATION
