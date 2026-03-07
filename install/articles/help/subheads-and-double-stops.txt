@@ -23,7 +23,7 @@ DEMO ===
 . Underline. __ Body text...
 ===
 
-However, while this allows a great deal of control, it means equal space above and below the subheading unless extra space is manually entered with a @[delimiter]. So headlines are best entered with the `@` control character, which formats it in a customary manner. Double-stops are used to select bold or italic.
+However, while this allows a great deal of control, it means equal space above and below the subheading unless extra space is manually entered with a `~` character. So headlines are best entered with the `@` control character, which formats it in a customary manner. Double-stops are used to select bold or italic.
 
 DEMO ===
 (Regular paragraph continues here)

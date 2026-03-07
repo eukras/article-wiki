@@ -1,0 +1,38 @@
+Cheat-sheet for Article Wiki
+
+Click the `Edit` button to see how any effect was achieved in an article or section. This opens that section in the `/playground`. That also lets you print a single section -- like this cheat sheet!
+
+. Character blocks. ** Note that captions can be added to tables and headings as well as quotes.
+
+CENTER (80%) ---
+| `-` | Document outline (used in `index.txt`)
+| `@` | Subheading
+| `> =` | Block quote; Caption
+| `* # _` | Lists: Bullets, Numbers, Checkboxes
+| `\. ; ,` | Alignment: Left, Centre, Right
+| `: ~` | Block Indents, Hanging Indents
+| `\! \|` | Simple Tables: Headers, Cells
+| `/` | Glosses (interlinear translations)
+| `\" & %` | Note to reader, Aside, Comment (hidden)
+---
+
+. Inline Square Brackets. ** For incidental formatting...
+
+* These are combinable, e.g. `\/\*[bold italic]` for /*[bold italic].
+* Some have shorthand: `*bold*` `/italic/` `_underline_`
+* Some == can be used for inline subheadings (`*=/`).
+
+CENTER (80%) ---
+| `/ * _ \`` | /[Italic], *[Bold], _[Underline], `[Monospace]
+| `+ - ' ,` | +[Inserted], -[Deleted], Superscript'[2], Subscript,[2]
+| `= !` | =[Small Caps], ![Highlight]
+---
+
+. Inline Information Brackets. ** For links and other data operations.
+
+CENTER (80%) ---
+| `$` | Values and Counters
+| `^` | Links and Footnotes
+| `@` | Cross references
+| `~` | Citations and Bibliography
+---

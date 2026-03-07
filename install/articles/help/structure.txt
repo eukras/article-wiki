@@ -1,0 +1,16 @@
+Structure
+
+The most important feature of Article Wiki is its structure, which is like a directory of files rather than one very long file, or a set of chapters bound together into a book. In fact, it is exactly these things if you export an article as a `.zip` or an `.epub`.
+
+The structure is defined by the Table of Contents that appears in its `index.txt` file. Each line in the outline begins with a dash, and must correspond to the title of that section. The title in each section is its first paragraph of text.
+
+! Outline/Title ! Document 'Slug' ! Document File
+| `- Introduction` | `introduction` | `introduction.txt`
+| `- The Main Argument` | `the-main-argument` | `the-main-argument.txt`
+| `- - Part One` | `part-one` | `part-one.txt`
+| `- - Part Two` | `part-two` | `part-two.txt`
+| `- Conclusion` | `conclusion` | `conclusion.txt`
+
+= Table $[t++]. ** Titles and 'slugs', the names of document parts.
+
+The names of the individual sections are turned into /slugs/. This style will be familiar from blog or news URLs, even if the name is unfamiliar. They are made by taking the page titles, converting special characters to plain text, converting to lowercase, removing punctuation and consolidating spaces into a single dash. So, the title /Bozo's Big Adventure/ will have the slug `bozos-big-adventure`. If two titles reduce to the same slug, a unique numbered suffix will be generated.

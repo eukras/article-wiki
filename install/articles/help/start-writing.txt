@@ -1,0 +1,45 @@
+Start Writing
+
+To try writing with the wiki just open the ^[playground] on any Article Wiki site. See the @[cheat-sheet] for a handy one-page markup reference. The following three points will cover most of your writing needs, though there are many more features available.
+
+=[Firstly], you'll need to know how to lay out text. Most of the time, this is as simple as adding a single control character at the start of a line or a paragraph, like how `>` indicates a quotation in email.
+
+^ https://chapman.wiki/playground
+
+DEMO ---
+@ A Simple Example
+
+Article Wiki is a wiki designed for humanities writing.
+
+> Article Wiki is a triumph!
+= Albert Einstein
+
+Powerful and intuitive, without being awkward or intrusive. Check out the amazing:
+
+* footnotes
+* bibliographies
+---
+
+From this we can see that `@` is a subheading, `>` and `=` are quotes and captions, and `*` are bullet points. See @[four kinds-of-text-blocks], for a full list of control characters.
+
+=[Secondly], you'll want to add a little styling. This will get you started, but see @[inline-markup] for the full tour.
+
+DEMO ---
+# *Bold*
+# /Italic/
+# _Underline_
+# `Monospace`
+---
+
+=[Thirdly], you might need to know how to add links and footnotes. The short answer is that you mark them in the text, then add their content as a subsequent paragraph, anywhere in the same section. In both cases the magic character is `^`.
+
+DEMO ---
+Here's a ^[link] and a ^[footnote].
+
+Article continues...
+
+^ https://example.org 
+^ This is a footnote. 
+---
+
+This keeps your text free of interruptions, while also giving your links and footnotes as much space as they need. They'll be formatted in a way that is equally readable online (with links) and in print. The trade-off for clean syntax is that you need to keep your links in order. See @[adding-information] for more.

@@ -1,0 +1,40 @@
+Index and Outline
+
+The sections of an article are joined and organised by the /outline/ in the `index.txt` file or `index` page. as with any section, its title is the first paragraph. Information that is need for layout or book generation, like the author name, must be indicated with @[settings]. Lines that are settings begin with `$`, while lines that are outlines begin with `-`.
+
+DEMO (index) ---
+My Article
+
+$ AUTHOR = Author Name
+$ EMAIL = email@example.org
+$ DATE = 18 September 2017
+
+A short example document.
+
+~ 
+
+- Introduction
+- The Main Argument
+- - Part One
+- - Part Two
+- Conclusion
+---
+
+If there is no index page, the document parts will be arranged in alphabetical order by their titles, and there will be no front matter (headings, author, abstract, table of contents).
+
+CENTER (80%) ---
+. ** How do I add a new section to a document?
+: Add it to the outline, and navigate from there.
+. ** How do I reorganise a document's sections?
+: Change their order in the outline.
+. ** How do I find sections not appearing in the outline?
+: They appear in a notification box just below the Table of Contents. If you change a section's title in the editor, the outline will update. If you change it in the outline, the section will appear here until its title is updated.
+. ** How do I delete a section?
+: Use the /Delete/ button in the editor window.
+---
+
+Because Article Wiki aims to take a document from brainstorming through writing to publication, the index page of each document offers a nested 'outline' list, which is autolinked to new pages in the online editor. The index page can thus be used as an outliner and brainstormer, in which sections can be easily added, arranged, and deleted.
+
+# It's easy to rearrange your document by rearranging your outline.
+# In a wiki designed for long arguments, it is a convenience to be working only on one self-contained part of the argument at a time.
+# Your document will be clearly organised when someone later -- maybe you -- has to maintain it.

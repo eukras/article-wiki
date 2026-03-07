@@ -5,7 +5,7 @@ You will have seen some lines began with `$` in the index page: these are called
 ! Value ! Example ! Explanation
 | `NAME` | Fred Smith | Full name of author
 | `EMAIL` | `fred.smith@example.org` | Contact email for the author
-| `DATE` | 18 December 2019 | A human readable date, preferably unambiguous (so not 1/2/2020)
+| `DATE` | $[DATE] | A human readable date, preferably unambiguous (so not 1/2/2020)
 | `LICENSE` | `CC-BY-SA` | One of several codes representing a Creative Commons License
 
 For Creative Commons licenses, the following codes will result in appropriate notices appended to the end of the page.

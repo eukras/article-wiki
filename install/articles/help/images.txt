@@ -1,0 +1,9 @@
+Images
+
+Images can be uploaded using the "Article Files" link in the menu. They can be downloaded and uploaded in zip archives. They must be RGB `.png` files with specific names and dimensions; other files will be ignored.
+
+! File ! Dimensions ! Function
+| `title.png` | 1200 × 450 | Appears above article titles.
+| `quote.png` | 400 × 750 | Appears beside `FEATURE` quotations.
+
+% | `cover.png` | 2100 × 2970 | Used as a cover for the ebook.

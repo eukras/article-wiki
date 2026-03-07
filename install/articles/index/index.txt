@@ -1,17 +1,33 @@
-Your Homepage
+Article Wiki
 
-= Click 'Edit' to change this text
+= Long-form humanities writing in plain text
 
 $ AUTHOR = Your Name
-$ EMAIL = your-address@example.org
+$ EMAIL = email@example.org
 $ SLUG = index
+
+CENTER (80%) ---
+
+@ This is a new Article Wiki website
+
+* See the /Help Page/ below for information.
+* Note the /Menu/, /Edit/, /User Login/, and /New Article/ buttons.
+* Use the `ARTICLES` list in this page to link to link your articles.
 
 ~
 
-; ARTICLES
-
-ARTICLES ---
+ARTICLES ===
 admin/help
+===
+
+~
+
+
+@ About the Author
+
+* Write a little about yourself here..
 ---
 
 ~ ~ ~ ~
+
+^ https://chapman.wiki/read/admin/help

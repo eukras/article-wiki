@@ -1,0 +1,13 @@
+Feature Quotes
+
+Feature quotes use the `quote.png` file and the `$SHORTCUT` setting, if present, to create a meme-friendly featured quotation for screenshots and sharing.
+
+VERBATIM ===
+FEATURE ---
+Feature quotes == use the `quote.png` file and the `$SHORTCUT` setting, if present, to create a meme-friendly featured quotation for screenshots and sharing.
+---
+===
+
+FEATURE ---
+Feature quotes use the `quote.png` file and the `$SHORTCUT` setting, if present, to create a meme-friendly featured quotation for screenshots and sharing.
+---

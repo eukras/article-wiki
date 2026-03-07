@@ -13,6 +13,6 @@ DEMO ---
 This is a good way to lay out questions and answers.
 
 DEMO ---
-| Q. | How can I best format questions and answers?
-| A. | Well, I'm glad you asked! It's like this... 
+~ Q. ** How can I best format questions and answers?
+~ A. ** Well, I'm glad you asked! It's like this... 
 ---
