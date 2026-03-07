@@ -11,6 +11,8 @@ from refspy import refspy
 from refspy.manager import Reference
 from refspy.utils import sequential_replace_tuples
 
+from lib.wiki.blocks import BlockList
+
 # High Voltage U+26a1; special marker. Same as placeholders.
 # Should have been stripped from all wiki source texts
 DELIMITER = "⚡"
@@ -25,7 +27,7 @@ class BibleReferences:
         """
         Create refs list for bible references.
         """
-        self.refspy = refspy()
+        self.refspy = refspy("catholic", "en_US")  # Include regular apocrypha
         self.refs = {}
         self.placeholders = []
         self.outline = outline
@@ -36,16 +38,25 @@ class BibleReferences:
 
         Create placeholders with sequential_replace. This differs from the usual
         pattern-based replacements.
+
+        Exclude headings from consideration.
         """
 
         assert isinstance(parts, dict)
         assert all([isinstance(_, str) for _ in list(parts.keys())])
         assert all([isinstance(_, str) for _ in parts])
 
-        self.refs = {
-            key: self.refspy.find_references(text, include_nones=True)
-            for key, text in parts.items()
-        }
+        self.refs = {}
+        for key, text in parts.items():
+            blocks = BlockList(text)
+            _, _ = blocks.pop_titles()  # <-- Remove title (and summary) from indexing
+            self.refs[key] = self.refspy.find_references(
+                blocks.text(),
+                include_books=False,
+                include_nones=False,
+                use_context=True,
+            )
+
         safe_parts = {}
         for slug, text in parts.items():
             tuples = []
@@ -84,7 +95,13 @@ class BibleReferences:
 
     def hook_before_section_body(self, slug: str) -> Tuple[str, str]:
         references = [ref for _, ref in self.refs[slug]]
-        return "References.", self.refspy.make_summary(references)
+        return "References", self.refspy.make_summary(
+            [
+                ref
+                for ref in references
+                if ref and not ref.is_book() and not ref.is_chapter()
+            ]
+        )
 
     def hook_add_end_section(self) -> Tuple[str, str]:
         refs, index = [], {}
@@ -120,11 +137,13 @@ class BibleReferences:
                         with __.span(_t=self.refspy.numbers(reference)):
                             abbrev_name = self.refspy.abbrev_name(reference)
                             sorted_slugs = sorted(
-                                index[abbrev_name],
-                                key=lambda slug: self.outline.find_numbering(slug),
+                                index[abbrev_name] or [],
+                                key=lambda slug: (
+                                    self.outline.find_numbering(slug) or []
+                                ),
                             )
                             for slug in sorted_slugs:
-                                numbering = self.outline.find_numbering(slug)
+                                numbering = self.outline.find_numbering(slug) or []
                                 number_str = ".".join([str(_) for _ in numbering])
                                 anchor = number_str + "_" + str(slug)
                                 __.a(
