@@ -21,6 +21,8 @@ css:
 csswatch:
 	sass --watch resources/scss/main.scss static/main.css
 
+js:
+	npm run build
 
 lint:
 	flake8
