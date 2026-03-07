@@ -14,9 +14,12 @@ from pprint import pformat
 
 from airium import Airium
 from dateutil.parser import parse
+from icecream import ic
+import segno  # QR codes
 
 from lib.slugs import slug
 from lib.wiki.backslashes import Backslashes
+from lib.wiki.bible_references import BibleReferences
 from lib.wiki.bibliography import Bibliography, split_bibliography
 from lib.wiki.blocks import BlockList, get_title_data
 from lib.wiki.citations import Citations
@@ -28,7 +31,6 @@ from lib.wiki.inline import Inline
 from lib.wiki.links import Links
 from lib.wiki.outline import Outline, default_counters
 from lib.wiki.placeholders import Placeholders
-from lib.wiki.bible_references import BibleReferences
 from lib.wiki.renderer import Html, section_heading, side_button
 from lib.wiki.settings import Settings
 from lib.wiki.utils import (
@@ -42,6 +44,8 @@ from lib.wiki.utils import (
     split_options,
 )
 from lib.wiki.verbatim import Verbatim
+
+inline = Inline()  # <-- We'll use this everywhere
 
 
 class Wiki(object):
@@ -74,7 +78,15 @@ class Wiki(object):
         self.bibliography = None
         self.citations = None
 
-    def process(self, user_slug, doc_slug, parts_dict, fragment=False, preview=False):
+    def process(
+        self,
+        user_slug,
+        doc_slug,
+        parts_dict,
+        fragment=False,
+        preview=False,
+        show_image=False,
+    ):
         """
         Generate a complete HTML document from a dictionary.
 
@@ -87,7 +99,7 @@ class Wiki(object):
         """
 
         if len(parts_dict) == 0:
-            return ValueError("Document is empty.")
+            raise ValueError("Document is empty.")
 
         validate_document(parts_dict, fragment)
         parts, files = clean_document(parts_dict)
@@ -116,7 +128,7 @@ class Wiki(object):
         self.settings.extract(parts)
 
         # @todo:decide on file support.
-        self.settings.set_config("files", files)
+        # self.settings.set_config("files", files)
 
         # @[Cross Reference]
         self.outline = Outline(parts, default_counters())
@@ -208,14 +220,24 @@ class Wiki(object):
         __ = Airium()
         with __.article():
             if not fragment:
-                __(self.make_header(fragment, preview))
+                __(
+                    self.make_header(
+                        user_slug,
+                        doc_slug,
+                        fragment,
+                        preview,
+                        show_image if not preview else False,
+                    )
+                )
             __(self.make_sections(html_parts, fragment, preview))
             if not fragment and not preview:
                 for plugin in self.plugins:
                     __(self.make_plugin_footer(plugin))
         return str(__)
 
-    def make_header(self, fragment, preview) -> Airium:
+    def make_header(
+        self, user_slug, doc_slug, fragment, preview, show_image=False
+    ) -> Airium:
         """
         Create front matter with margins.
         """
@@ -228,7 +250,11 @@ class Wiki(object):
             with __.div(klass="section-list"):
                 with __.div(klass="section-item"):
                     with __.div(klass="section-content"):
-                        __(self.make_title_card())
+                        __(
+                            make_title_card(
+                                user_slug, doc_slug, show_image, self.settings
+                            )
+                        )
                     if not fragment and not preview:
                         with __.div(klass="right-margin"):
                             with __.div(klass="sticky-buttons option-buttons"):
@@ -331,55 +357,6 @@ class Wiki(object):
                             __.div(klass="right-margin")
         return __
 
-    def make_title_card(self) -> Airium:
-        """
-        Format the document header.
-
-        <header class="titles">
-            <hgroup>
-                <h1>
-                <h2>
-            <div class="addresses">
-                <address>
-            <div class="date">
-                <time>
-        """
-        title = self.settings.get("TITLE", "")
-        subtitle = self.settings.get("SUMMARY", "")
-        author = self.settings.get("AUTHOR", "")
-        email = self.settings.get("EMAIL", "")
-        date_str = self.settings.get("DATE", "")
-        try:
-            dt = parse(date_str)
-            date_yyyymmdd = dt.date().isoformat()
-        except ValueError:
-            date_yyyymmdd = None
-
-        __ = Airium()
-        with __.header(klass="titles"):
-            inline = Inline()
-            with __.hgroup():
-                if title != "":
-                    __.h1(klass="balance-text", _t=inline.process(title))
-                if subtitle != "":
-                    __.h2(klass="balance-text", _t=inline.process(subtitle))
-            if author != "" or email != "":
-                with __.div(klass="author-list"):
-                    with __.address():
-                        __.div(_t=inline.process(author))
-                        __.div(_t=inline.process(email))
-            if date_str != "":
-                if date_yyyymmdd is not None:
-                    with __.p(klass="space", rel="date"):
-                        __.time(
-                            pubdate=None,
-                            datetime=date_yyyymmdd,
-                            _t=inline.process(date_str),
-                        )
-                else:
-                    __(inline.process(date_str))
-        return __
-
     def dump(self):
         """
         Diagnostics 101
@@ -392,7 +369,7 @@ class Wiki(object):
         metadata cache. Self.metadata is a copy of settings made after
         processing the index part, plus other items like count_words.
         """
-        data = {}
+        data = dict()
 
         data["user"] = user_slug
         data["title"] = self.settings.get("TITLE", "")
@@ -401,6 +378,7 @@ class Wiki(object):
         data["license"] = self.settings.get("LICENSE", "")
         data["publish"] = self.settings.get("PUBLISH", "YES")  # <-- Default
         data["shortcut"] = self.settings.get("SHORTCUT", "")
+        data["version"] = self.settings.get("VERSION", "")
 
         data["author"] = self.settings.get("AUTHOR", "")
         data["email"] = self.settings.get("EMAIL", "")
@@ -493,7 +471,7 @@ def is_published(article):
     publish = article.get("publish", "YES")  # <-- visible by default
     try:
         if datetime.strptime(publish, "%Y-%m-%d"):
-            return publish <= datetime.today.strftime("%Y-%m-%d")
+            return publish <= datetime.today().strftime("%Y-%m-%d")
     except ValueError:
         pass
     return publish != "NO"
@@ -505,6 +483,121 @@ def split_published(article_list):
         [_ for _ in article_list if is_published(_)],
         [_ for _ in article_list if not is_published(_)],
     )
+
+
+# ------------------------------
+# Stateless templating functions
+# ------------------------------
+
+
+def make_titles(title: str, subtitle: str) -> Airium:
+
+    __ = Airium()
+    with __.h1():
+        if title != "":
+            __.div(
+                klass="article-title balance-text",
+                _t=inline.process(title),
+            )
+        if subtitle != "":
+            __.div(
+                klass="article-subtitle balance-text",
+                _t=inline.process(subtitle),
+            )
+    return __
+
+
+def make_details(settings: Settings) -> Airium:
+    __ = Airium()
+
+    author = settings.get("AUTHOR", "")
+    email = settings.get("EMAIL", "")
+    date_str = settings.get("DATE", "")
+    version = settings.get("VERSION", "")
+    shortcut = settings.get("SHORTCUT", "")
+
+    try:
+        dt = parse(date_str)
+        date_yyyymmdd = dt.date().isoformat()
+    except ValueError:
+        date_yyyymmdd = None
+
+    if author != "" or email != "" or date_str != "" or version != "" or shortcut != "":
+        with __.div(klass="wiki-header-details"):
+            with __.div(klass="wiki-header-details-list"):
+                if author != "" or email != "":
+                    with __.div(klass="wiki-header-details-cell"):
+                        if author != "":
+                            __.div(klass="text-bold", _t=inline.process(author))
+                        if email != "":
+                            __.div(klass="text-sm", _t=inline.process(email))
+                if date_str != "" or version != "":
+                    with __.div(klass="wiki-header-details-cell"):
+                        if date_str:
+                            if date_yyyymmdd is not None:
+                                with __.div(rel="date", klass="text-bold"):
+                                    __.time(
+                                        pubdate=None,
+                                        datetime=date_yyyymmdd,
+                                        _t=inline.process(date_str),
+                                    )
+                            else:
+                                __.div(_t=inline.process(date_str))
+                        if version != "":
+                            __.div(klass="text-sm", _t="Version " + version)
+                if shortcut != "":
+                    base_url = settings.get("config:host", "")
+                    site_url = (
+                        base_url.replace("http:", "")
+                        .replace("https:", "")
+                        .replace("/", "")
+                    )
+
+                    with __.div(klass="wiki-header-details-cell"):
+                        __.div(klass="text-bold", _t="Shortcut")
+                        with __.div(klass="text-sm"):
+                            __.a(
+                                href=base_url + "?" + shortcut,
+                                _t=site_url + "?" + shortcut,
+                            )
+                    with __.div(klass="wiki-header-details-cell"):
+                        qrcode = segno.make(base_url + "?" + shortcut, micro=False)
+                        __.p(_t=qrcode.svg_inline(scale=4))
+    return __
+
+
+def make_title_card(
+    user_slug, doc_slug, show_image=False, settings: dict[str, str] = {}
+) -> Airium:
+    """
+    Format the document header.
+
+    <header class="titles">
+        <a>
+            <img>
+        <h1>
+            <div class="article-title" />
+            <div class="article-subtitle" />
+        <div class="wiki-header-details" />
+            <div class="wiki-header-details-list" />
+                <div class="wiki-header-details-cell" />
+
+    TODO: Separate out settings formatting, so this is only layout.
+    """
+
+    title = settings.get("TITLE", "")
+    subtitle = settings.get("SUMMARY", "")
+
+    __ = Airium()
+    with __.header(klass="titles"):
+        if show_image:
+            uri = f"/file/{user_slug}/{doc_slug}/title.png"
+            with __.a(href=uri, target="_blank"):
+                __.img(src=uri, width="1200", klass="article-image")
+        if title != "" or subtitle != "":
+            __(make_titles(title, subtitle))
+            __(make_details(settings))
+    return __
 
 
 # ------------------------------
