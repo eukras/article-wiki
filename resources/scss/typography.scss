@@ -16,7 +16,7 @@
 }
 
 /*
- * TOOD: Check if we float anything.
+ * TOOD: Check if we still float anything.
  */
 .clear {
     clear: both;
@@ -27,11 +27,6 @@
 }
 
 .text-center {
-    text-align: center;
-}
-
-.text-center span {
-    display: block;
     text-align: center;
 }
 
@@ -159,7 +154,7 @@ ul, ol, dl {
     font-size: fonts.$fontSizeMinus2;
     border: dotted 1px var(--page-text);
     border-radius: geometry.$borderRadius;
-    margin: 0 0 1rem 1rem;
+    margin: 1rem;
     padding: 0.5rem 1rem;
     line-height: 1rem;
 }
@@ -177,11 +172,10 @@ ul, ol, dl {
 aside {
   font-family: fonts.$fontFamilySansSerif;
   font-size: fonts.$fontSizeMinus3;
-  text-align: right;
-  margin: 1rem 0 1rem 4.8em;
+  text-align: left;
+  margin: 1rem 0 1rem 4.8rem;
   padding: 0 1rem;
-  line-height: 1rem;
-  text-wrap: balance;
+  line-height: 115%;
 }
 
 a.reference {
@@ -270,8 +264,8 @@ ul > ul, ol > ol {
     line-height: 1rem;
 }
 
-.text-large {
-    font-size: fonts.$fontSize;
+.text-bold {
+    font-weight: bold;
 }
 
 .big-space {
@@ -374,13 +368,7 @@ sup {
 img { 
     max-width: 100%;
     max-height: 30em;
-}
 
-div.text-header, 
-div.text-footer {
-    font-size: fonts.$fontSizeMinus2;
-    margin: 1em 0 1em 2.4rem;
-    padding: 0.5em 0;
 }
 
 blockquote { 
@@ -399,10 +387,15 @@ p.subhead {
     text-align: center;
     margin: 0;
     padding: 1.4rem 1rem 0.5rem 1rem;
+    text-wrap: balance;
 }
 
 p + p.subhead {
     margin-top: 1rem;
+}
+
+.subhead p {
+  margin: 1rem;
 }
 
 p.summary,
@@ -448,6 +441,7 @@ blockquote + p.caption {
     -webkit-column-gap: 1.5rem;
     -moz-column-gap: 1.5rem;
     column-gap: 1.5rem;
+    text-wrap: balance;
 }
 
 .columns-x3 {
@@ -457,7 +451,36 @@ blockquote + p.caption {
     -webkit-column-gap: 1.5rem;
     -moz-column-gap: 1.5rem;
     column-gap: 1.5rem;
+    text-wrap: balance;
 }
+
+.columns-x2, .columns-x3 {
+  p, ul, ol {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+.columns-x2, .columns-x3 {
+  li {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  li:first-child {
+    margin-top: 0;
+  }
+  li:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.aw-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+
 
 @include breakpoints.isTabletOrSmaller {
     .columns-x2, .columns-x3 {
@@ -483,6 +506,12 @@ hr {
     margin: 1rem 0;
 }
 
+/**
+ *  -------------------------------------
+ *  DIVIDERS
+ *  -------------------------------------
+ */
+
 hr.div-dotted { 
     border-bottom: dotted 0.8pt var(--page-text);
 }
@@ -495,10 +524,6 @@ hr.div-thick {
     border-bottom: solid 3pt var(--page-text);
 }
 
-hr.div-center { 
-    margin: 1rem 40%;
-}
-
 hr.div-left { 
     width: 30%;
     max-width: 8rem;
@@ -507,6 +532,7 @@ hr.div-left {
 
 hr.div-center { 
     width: 4em;
+    margin: 1rem 40%;
 }
 
 hr.div-10em {
@@ -633,11 +659,12 @@ tbody td {
     border-radius: 3pt;
 }
 
-small {
+small, 
+.text-sm {
     font-size: fonts.$fontSizeMinus1;
 }
 
-.large { 
+.text-lg { 
     font-size: fonts.$fontSizePlus1;
 }
 

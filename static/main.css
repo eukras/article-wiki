@@ -413,6 +413,7 @@ div#background {
   max-width: var(--page-width);
   margin: 2rem auto;
   padding: 0;
+  border-radius: 0.2rem;
   box-shadow: 0, 0, 2.5rem, rgba(30, 60, 30, 0.25);
 }
 
@@ -423,10 +424,9 @@ header {
 header.titles {
   font-size: 105%;
   text-align: center;
-  padding: 6rem 2rem 0 2rem;
+  padding: 6rem 2rem 3rem 2rem;
 }
 header.titles h1, header.titles h2 {
-  text-align: center;
   text-align: center;
 }
 
@@ -548,7 +548,7 @@ body {
 }
 #login input {
   width: 100%;
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", Helvetica, sans-serif;
   font-size: 117.6%;
   border: 1px solid rgba(128, 128, 128, 0.5);
   border-radius: 0.5rem;
@@ -588,7 +588,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 /*
- * TOOD: Check if we float anything.
+ * TOOD: Check if we still float anything.
  */
 .clear {
   clear: both;
@@ -599,11 +599,6 @@ body::-webkit-scrollbar-thumb {
 }
 
 .text-center {
-  text-align: center;
-}
-
-.text-center span {
-  display: block;
   text-align: center;
 }
 
@@ -669,7 +664,7 @@ a.unmarked {
 .opposite {
   color: inherit;
   text-decoration: none;
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", Helvetica, sans-serif;
 }
 
 .side-nav a:hover {
@@ -721,17 +716,17 @@ ul, ol, dl {
 }
 
 .note {
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", Helvetica, sans-serif;
   font-size: 81.312%;
   border: dotted 1px var(--page-text);
   border-radius: 0.5rem;
-  margin: 0 0 1rem 1rem;
+  margin: 1rem;
   padding: 0.5rem 1rem;
   line-height: 1rem;
 }
 
 .wiki-note {
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", Helvetica, sans-serif;
   font-size: 81.312%;
   border: solid 2pt red;
   border-radius: 0.5rem;
@@ -741,13 +736,12 @@ ul, ol, dl {
 }
 
 aside {
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", Helvetica, sans-serif;
   font-size: 71.55456%;
-  text-align: right;
-  margin: 1rem 0 1rem 4.8em;
+  text-align: left;
+  margin: 1rem 0 1rem 4.8rem;
   padding: 0 1rem;
-  line-height: 1rem;
-  text-wrap: balance;
+  line-height: 115%;
 }
 
 a.reference {
@@ -827,7 +821,7 @@ ul > ul, ol > ol {
 }
 
 .compact {
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", Helvetica, sans-serif;
   font-size: 81.312%;
   margin: 1rem 0;
 }
@@ -836,8 +830,8 @@ ul > ul, ol > ol {
   line-height: 1rem;
 }
 
-.text-large {
-  font-size: 105%;
+.text-bold {
+  font-weight: bold;
 }
 
 .big-space {
@@ -937,13 +931,6 @@ img {
   max-height: 30em;
 }
 
-div.text-header,
-div.text-footer {
-  font-size: 81.312%;
-  margin: 1em 0 1em 2.4rem;
-  padding: 0.5em 0;
-}
-
 blockquote {
   border: none;
   padding: 0 2.4rem 0 2.4rem;
@@ -960,10 +947,15 @@ p.subhead {
   text-align: center;
   margin: 0;
   padding: 1.4rem 1rem 0.5rem 1rem;
+  text-wrap: balance;
 }
 
 p + p.subhead {
   margin-top: 1rem;
+}
+
+.subhead p {
+  margin: 1rem;
 }
 
 p.summary,
@@ -1008,6 +1000,7 @@ blockquote + p.caption {
   -webkit-column-gap: 1.5rem;
   -moz-column-gap: 1.5rem;
   column-gap: 1.5rem;
+  text-wrap: balance;
 }
 
 .columns-x3 {
@@ -1017,6 +1010,29 @@ blockquote + p.caption {
   -webkit-column-gap: 1.5rem;
   -moz-column-gap: 1.5rem;
   column-gap: 1.5rem;
+  text-wrap: balance;
+}
+
+.columns-x2 p, .columns-x2 ul, .columns-x2 ol, .columns-x3 p, .columns-x3 ul, .columns-x3 ol {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.columns-x2 li, .columns-x3 li {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.columns-x2 li:first-child, .columns-x3 li:first-child {
+  margin-top: 0;
+}
+.columns-x2 li:last-child, .columns-x3 li:last-child {
+  margin-bottom: 0;
+}
+
+.aw-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
 
 @media screen and (max-width: 1100px) {
@@ -1042,6 +1058,11 @@ hr {
   margin: 1rem 0;
 }
 
+/**
+ *  -------------------------------------
+ *  DIVIDERS
+ *  -------------------------------------
+ */
 hr.div-dotted {
   border-bottom: dotted 0.8pt var(--page-text);
 }
@@ -1054,10 +1075,6 @@ hr.div-thick {
   border-bottom: solid 3pt var(--page-text);
 }
 
-hr.div-center {
-  margin: 1rem 40%;
-}
-
 hr.div-left {
   width: 30%;
   max-width: 8rem;
@@ -1066,6 +1083,7 @@ hr.div-left {
 
 hr.div-center {
   width: 4em;
+  margin: 1rem 40%;
 }
 
 hr.div-10em {
@@ -1108,7 +1126,7 @@ pre.verse {
 
 var {
   float: none;
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", Helvetica, sans-serif;
   font-size: 92.4%;
   font-style: inherit;
   font-weight: bold;
@@ -1189,11 +1207,12 @@ tbody td {
   border-radius: 3pt;
 }
 
-small {
+small,
+.text-sm {
   font-size: 92.4%;
 }
 
-.large {
+.text-lg {
   font-size: 117.6%;
 }
 
@@ -1281,7 +1300,7 @@ div.icon-block div.icon {
   padding: 0.5em;
 }
 div.icon-block div.text {
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", Helvetica, sans-serif;
   font-size: 92.4%;
   padding: 0.5em;
 }
@@ -1318,6 +1337,32 @@ div.gloss div.phrase div.translation {
 }
 div.gloss div.phrase div.translation sub, div.gloss div.phrase div.translation sup {
   font-size: 71.55456%;
+}
+
+.aw-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.aw-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.aw-col-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.aw-img {
+  background-color: #888;
+  max-width: 20rem;
+  max-height: 10rem;
+  object-fit: contain;
 }
 
 /* Application */
@@ -1399,7 +1444,7 @@ article {
   border: 1px solid var(--page-outline);
   width: 3rem;
   text-align: center;
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", Helvetica, sans-serif;
   font-size: 71.55456%;
   cursor: pointer;
   color: var(--desk-text);
@@ -1411,6 +1456,10 @@ article {
   height: 1.2rem;
   width: 1.2rem;
   fill: var(--desk-text);
+}
+
+html.theme-dark svg.segno {
+  background-color: var(--page-text);
 }
 
 .left-margin a.button-unit:hover,
@@ -1464,37 +1513,44 @@ article {
   opacity: 1;
 }
 
-section header {
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+section header.section-header {
   font-size: 81.312%;
   margin-bottom: 3rem;
 }
 
-section footer {
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+section footer.section-footer {
   font-size: 81.312%;
   margin-top: 3rem;
 }
 
 footer.footnotes {
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
   font-size: 81.312%;
   margin-top: 2rem;
   overflow-wrap: break-word;
 }
 
-header hgroup h1 {
+header img.article-image {
+  margin-top: -2rem;
+  margin-bottom: 2rem;
+  width: 85%;
+  border-radius: 0.2rem;
+}
+header h1 {
+  padding: 2rem;
+}
+header h1 div.article-title {
   padding: 0;
-  margin: 1rem 0 0 0;
+  margin: 0 0 0.5em 0;
   font-weight: bold;
   font-size: 185.045876736%;
+  line-height: 120%;
 }
-header hgroup h2 {
+header h1 div.article-subtitle {
   padding: 0;
   margin: 1rem 0 1rem 0;
-  font-style: italic;
   font-weight: normal;
   font-size: 147.51744%;
+  line-height: 120%;
 }
 header address {
   margin: 4rem 0 3rem 0;
@@ -1510,8 +1566,8 @@ header address a[href^="mailto:"] {
   text-decoration: none;
 }
 
-hgroup {
-  margin: 0.5em 0;
+html.theme-dark header img#article-image {
+  opacity: 0.75;
 }
 
 section#footnotes {
@@ -1571,6 +1627,60 @@ div.headline-title {
   flex: 1 1 auto;
 }
 
+div.wiki-stack {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+div.wiki-feature {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 80%;
+  border: 1px dotted black;
+  border-radius: 0.2rem;
+  margin: 2rem auto;
+}
+
+div.wiki-feature-image {
+  width: 33%;
+  background-size: cover;
+  background-position: center;
+}
+
+div.wiki-feature-text {
+  width: 66%;
+  display: flex;
+  padding: 1rem 2rem;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: stretch;
+  justify-content: space-between;
+}
+div.wiki-feature-text div.wiki-feature-html {
+  text-align: left;
+  font-family: "IBM Plex Serif", "GFS Didot", serif;
+  font-size: 185.045876736%;
+  font-size: 115%;
+  font-weight: bold;
+  line-break: loose;
+}
+div.wiki-feature-text div.wiki-feature-link {
+  text-align: left;
+  font-family: "IBM Plex Serif", "GFS Didot", serif;
+  font-size: 71.55456%;
+}
+
+/**
+ * Consistent image shadows.
+ */
+.wiki-image {
+  border-radius: 0.2rem;
+  box-shadow: 0 0.5rem 1rem rgba(136, 136, 136, 0.1333333333);
+}
+
 /**
  * Put wiki demo sections side by side when there is space available.
  *
@@ -1603,18 +1713,23 @@ div.headline-title {
 .wiki-demo-input,
 .wiki-demo-output {
   flex: 1 1 50%;
-  padding: 1rem;
-  border: 1px solid var(--page-outline);
-  border-width: 1px 0 0 1px;
-  border-top-left-radius: 0.5rem;
+  border-width: 1px;
+}
+
+.wiki-demo-input {
+  border: 1px dashed var(--page-outline);
 }
 
 .wiki-demo-input pre {
+  padding: 1rem;
   font-size: 71.55456%;
 }
 
 .wiki-demo-output {
   font-size: 92.4%;
+  padding: 1rem;
+  border: 1px solid var(--page-outline);
+  box-shadow: 5px 5px 5px rgba(136, 136, 136, 0.5333333333);
 }
 
 .wiki-demo-output article,
@@ -1625,6 +1740,21 @@ div.headline-title {
   padding-top: 0;
   margin-bottom: 0;
   padding-bottom: 0;
+}
+
+div.wiki-header-details {
+  margin: 2rem;
+}
+
+div.wiki-header-details-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem 4rem;
+}
+
+div.wiki-header-details-cell {
+  width: 15rem;
 }
 
 /**
@@ -1638,9 +1768,14 @@ div.headline-title {
 }
 
 .article-card {
-  width: 100%;
   text-align: center;
+  padding: 2rem;
+}
+
+img.article-card-image {
   margin-bottom: 2rem;
+  width: 60%;
+  border-radius: 0.2rem;
 }
 
 .article-card-title {
@@ -1757,7 +1892,7 @@ html.navigation-sidebars #site-menu, html.navigation-sidebars #page-outline {
   top: 0;
   max-height: 100vh;
   overflow: hidden;
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", Helvetica, sans-serif;
   color: var(--desk-text);
   font-size: 81.312%;
 }
@@ -1947,8 +2082,11 @@ html.theme-dark #page-outline img.sparkline {
   flex-flow: row;
 }
 
-a.button, input[type=submit], button {
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+a.button,
+input[type=submit],
+button,
+input[type=file]::file-selector-button {
+  font-family: "IBM Plex Sans", Helvetica, sans-serif;
   font-size: 92.4%;
   border-radius: 0.5rem;
   background-color: var(--page-background);
@@ -1962,16 +2100,11 @@ a.button, input[type=submit], button {
   cursor: pointer;
   outline: none;
 }
-a.button i.fa, input[type=submit] i.fa, button i.fa {
+a.button i.fa,
+input[type=submit] i.fa,
+button i.fa,
+input[type=file]::file-selector-button i.fa {
   padding-right: 4px;
-}
-
-input[type=file] {
-  text-align: center;
-  margin: 1rem;
-  width: 60%;
-  padding: 3rem;
-  border: dashed 1px rgba(128, 128, 128, 0.5);
 }
 
 a.button.feature,
@@ -1994,7 +2127,7 @@ button[disabled=DISABLED] {
   grid-gap: 0;
 }
 #editor a.button, #editor button {
-  font-family: "IBM Plex Sans Condensed", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", Helvetica, sans-serif;
   font-size: 81.312%;
   vertical-align: middle;
   text-align: center;
@@ -2153,6 +2286,49 @@ button[disabled=DISABLED] {
   #editor.mode-preview main {
     display: block;
     grid-area: 2 / 1 / 3 / 5;
+    height: none;
+  }
+}
+@media print {
+  #editor {
+    display: block;
+    overflow: visible;
+    height: auto;
+  }
+  #editor #btn-back {
+    display: none;
+  }
+  #editor #btn-help {
+    display: none;
+  }
+  #editor #btn-copy {
+    display: none;
+  }
+  #editor #btn-cleanup {
+    display: none;
+  }
+  #editor #btn-preview {
+    display: none;
+  }
+  #editor #btn-edit {
+    display: none;
+  }
+  #editor #btn-print {
+    display: none;
+  }
+  #editor #btn-delete {
+    display: none;
+  }
+  #editor #btn-save {
+    display: none;
+  }
+  #editor textarea {
+    display: none;
+  }
+  #editor main {
+    display: block;
+    overflow: visible;
+    height: auto;
   }
 }
 /**

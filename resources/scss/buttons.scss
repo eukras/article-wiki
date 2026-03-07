@@ -42,7 +42,10 @@
     }
 }
 
-a.button, input[type="submit"], button {
+a.button,
+input[type="submit"],
+button,
+input[type=file]::file-selector-button {
     font-family: fonts.$fontFamilySansSerif;
     font-size: fonts.$fontSizeMinus1;
     border-radius: geometry.$borderRadius;
@@ -62,13 +65,7 @@ a.button, input[type="submit"], button {
     }
 }
 
-
 input[type="file"] {
-    text-align: center;
-    margin: 1rem;
-    width: 60%;
-    padding: 3rem;
-    border: dashed 1px rgba(128, 128, 128, 0.5);
 }
 
 a.button.feature,

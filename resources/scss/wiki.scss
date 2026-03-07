@@ -1,6 +1,6 @@
 @use "vars/breakpoints";
-@use "vars/colors";
 @use "vars/fonts";
+@use "vars/colors";
 
 /**
  * -------------------------------------------------------------------------
@@ -96,6 +96,12 @@ article {
     }
 }
 
+html.theme-dark {
+  svg.segno {
+    background-color: var(--page-text);
+  }
+}
+
 .left-margin {
     a.button-unit,
     button.button-unit {
@@ -154,20 +160,17 @@ article {
     }
 }
 
-section header {
-  font-family: fonts.$fontFamilySansSerif;
+section header.section-header {
   font-size: fonts.$fontSizeMinus2;
   margin-bottom: 3rem;
 }
 
-section footer {
-  font-family: fonts.$fontFamilySansSerif;
+section footer.section-footer {
   font-size: fonts.$fontSizeMinus2;
   margin-top: 3rem;
 }
 
 footer.footnotes {
-  font-family: fonts.$fontFamilySansSerif;
   font-size: fonts.$fontSizeMinus2;
   margin-top: 2rem;
   overflow-wrap: break-word;
@@ -175,38 +178,52 @@ footer.footnotes {
 
 header {
 
-    hgroup h1 {
-        padding: 0;
-        margin: 1rem 0 0 0;
-        font-weight: bold;
-        font-size: fonts.$fontSizePlus5;
+  img.article-image {
+    margin-top: -2rem;
+    margin-bottom: 2rem;
+    width: 85%;
+    border-radius: 0.2rem;
+  }
+
+  h1 {
+    padding: 2rem;
+
+    div.article-title {
+      padding: 0;
+      margin: 0 0 0.5em 0;
+      font-weight: bold;
+      font-size: fonts.$fontSizePlus5;
+      line-height: 120%;
     }
 
-    hgroup h2 {
-        padding: 0;
-        margin: 1rem 0 1rem 0;
-        font-style: italic;
-        font-weight: normal;
-        font-size: fonts.$fontSizePlus3;
+    div.article-subtitle {
+      padding: 0;
+      margin: 1rem 0 1rem 0;
+      font-weight: normal;
+      font-size: fonts.$fontSizePlus3;
+      line-height: 120%;
     }
+  }
 
-    address {
-        margin: 4rem 0 3rem 0;
-        font-style: normal;
-        div:first-child {
-            font-size: fonts.$fontSizePlus1;
-            font-weight: bold;
-        }
-        a[href^="mailto:"] {
-            font-size: fonts.$fontSizeMinus1;
-            font-color: inherit;
-            text-decoration: none;
-        }
+  address {
+    margin: 4rem 0 3rem 0;
+    font-style: normal;
+    div:first-child {
+      font-size: fonts.$fontSizePlus1;
+      font-weight: bold;
     }
+    a[href^="mailto:"] {
+      font-size: fonts.$fontSizeMinus1;
+      font-color: inherit;
+      text-decoration: none;
+    }
+  }
 }
 
-hgroup {
-    margin: 0.5em 0;
+html.theme-dark {
+  header img#article-image {
+    opacity: 0.75;
+  }
 }
 
 section#footnotes {
@@ -273,6 +290,63 @@ div.headline-title {
     flex: 1 1 auto;
 }
 
+div.wiki-stack {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+div.wiki-feature {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 80%;
+  border: 1px dotted black;
+  border-radius: 0.2rem;
+  margin: 2rem auto;
+} 
+
+div.wiki-feature-image {
+  width: 33%;  
+  background-size: cover;
+  background-position: center;
+}
+
+div.wiki-feature-text {
+  width: 66%;
+  display: flex;
+  padding: 1rem 2rem;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: stretch;
+  justify-content: space-between;
+
+  div.wiki-feature-html {
+    text-align: left;
+    font-family: fonts.$fontFamilySerif;
+    font-size: fonts.$fontSizePlus5;
+    font-size: 115%;
+    font-weight: bold;
+    line-break: loose;
+  }
+
+  div.wiki-feature-link {
+    text-align: left;
+    font-family: fonts.$fontFamilySerif;
+    font-size: fonts.$fontSizeMinus3;
+  }
+
+}
+
+/**
+ * Consistent image shadows.
+ */
+
+.wiki-image {
+  border-radius: 0.2rem;
+  box-shadow: 0 0.5rem 1rem  #8882;
+}
 
 /**
  * Put wiki demo sections side by side when there is space available.
@@ -306,18 +380,23 @@ div.headline-title {
 .wiki-demo-input,
 .wiki-demo-output {
     flex: 1 1 50%;
-    padding: 1rem;
-    border: 1px solid var(--page-outline);
-    border-width: 1px 0 0 1px;
-    border-top-left-radius: 0.5rem;
+    border-width: 1px;
+}
+
+.wiki-demo-input {
+    border: 1px dashed var(--page-outline);
 }
 
 .wiki-demo-input pre {
+    padding: 1rem;
     font-size: fonts.$fontSizeMinus3;
 }
 
 .wiki-demo-output {
     font-size: fonts.$fontSizeMinus1; 
+    padding: 1rem;
+    border: 1px solid var(--page-outline);
+    box-shadow: 5px 5px 5px #8888;
 }
 
 .wiki-demo-output article,
@@ -328,6 +407,21 @@ div.headline-title {
     padding-top: 0;
     margin-bottom: 0;
     padding-bottom: 0;
+}
+
+div.wiki-header-details {
+  margin: 2rem;
+}
+
+div.wiki-header-details-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem 4rem;
+}
+
+div.wiki-header-details-cell {
+  width: 15rem;
 }
 
 /**
@@ -341,9 +435,13 @@ div.headline-title {
     padding: 0;
 }
 .article-card {
-    width: 100%;
     text-align: center;
+    padding: 2rem;
+}
+img.article-card-image {
     margin-bottom: 2rem;
+    width: 60%;
+    border-radius: 0.2rem;
 }
 .article-card-title {
     font-size: fonts.$fontSizePlus2;
