@@ -20,14 +20,14 @@ class Sparkline(object):
     """
 
     def __init__(self, points: list):
-        self.max_y = max([y for _, y in points])
+        self.max_y = max([y for _, y in points]) if len(points) else 0
         self.points = scale_points(
             flip_vertically(fill_zeroes(points or DEFAULT_POINTS))
         )
 
     def svg(self, stroke="#ddddddff", fill="#ffffff40") -> str:
         __ = Airium()
-        (cx, cy) = self.points[-1] if len(self.points) > 0 else (0, 0)
+        (cx, cy) = self.points[-1] if len(self.points) else (0, 0)
         with __.svg(
             xmlns="http://www.w3.org/2000/svg",
             width="140px",
