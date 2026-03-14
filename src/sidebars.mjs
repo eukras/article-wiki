@@ -313,7 +313,7 @@ function createSiteMenu() {
             </div>
             <div class="space">
         `;
-  if (user_slug !== undefined) {
+  if (user_slug !== undefined && doc_slug !== 'index') {
     // ^ Fix hard coding
     if (doc_slug !== undefined) {
       html += `
@@ -768,6 +768,14 @@ function initScrollHandling() {
   });
 }
 
+function initResizeHandling() {
+  window.addEventListener('resize', function () {
+    hideScrollDownIndicator();
+    mode = READ;
+    hideSidebars();
+  });
+}
+
 function updateEscapeOption() {
   stopWaitTimer();
   stopBlinkTimer();
@@ -839,7 +847,7 @@ function initBookmarks() {
 }
 
 function initSidebars() {
-  outline = getOutline('hgroup.section-heading')
+  outline = getOutline('div.section-heading')
 
   totalSectionVisibilityTime = loadSectionVisibilityTime()
 
@@ -855,6 +863,7 @@ function initSidebars() {
   initClickHandling();
   initKeystrokeHandling();
   initScrollHandling();
+  initResizeHandling();
 
   initSectionObservers();
   setInterval(incrementVisibilityTimers, 1000);
