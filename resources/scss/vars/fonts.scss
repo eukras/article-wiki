@@ -1,8 +1,8 @@
 @use 'sass:math';
 
 $fontFamilySerif: ('IBM Plex Serif', 'GFS Didot', serif); 
-$fontFamilySansSerif: ('IBM Plex Sans', Helvetica, sans-serif);
-$fontFamilyMonospace: ('Fira Mono', 'Andale Mono', monospace);
+$fontFamilySansSerif: ('IBM Plex Sans', sans-serif);
+$fontFamilyMonospace: ('IBM Plex Mono', monospace);
 
 $baseFontSize: 1.05;
 $stepUp: 1.12;
@@ -17,3 +17,4 @@ $fontSize: math.percentage($baseFontSize);
 $fontSizeMinus1: math.percentage($baseFontSize * $stepDown);
 $fontSizeMinus2: math.percentage($baseFontSize * $stepDown * $stepDown);
 $fontSizeMinus3: math.percentage($baseFontSize * $stepDown * $stepDown * $stepDown);
+

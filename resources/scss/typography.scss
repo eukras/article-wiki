@@ -48,9 +48,6 @@
   }
 }
 
-/**
- * TODO: Decide BG color for links.
- */
 @media screen {
     a.web-link {
         padding: 0 .25rem;
@@ -151,12 +148,19 @@ ul, ol, dl {
 
 .note {
     font-family: fonts.$fontFamilySansSerif;
-    font-size: fonts.$fontSizeMinus2;
-    border: dotted 1px var(--page-text);
-    border-radius: geometry.$borderRadius;
+    font-size: fonts.$fontSizeMinus1;
+    background-color: var(--page-text-link-background);
     margin: 1rem;
     padding: 0.5rem 1rem;
     line-height: 1rem;
+}
+
+@media print {
+  .note {
+    background-color: none;
+    border: dotted 1px var(--page-text);
+    border-radius: geometry.$borderRadius;
+  }
 }
 
 .wiki-note {
@@ -192,6 +196,11 @@ a.reference {
 .vpad { 
     padding-top: 0.5em;
     padding-bottom: 0.5em;
+}
+
+.inset {
+    padding-left: 2.4em;
+    padding-right: 2.4em;
 }
 
 ul > ul, ol > ol {
@@ -344,9 +353,20 @@ h6 {
     font-size: fonts.$fontSize;
 }
 
-mark { 
-    padding: none;
-    background-color: inherit;
+u { 
+    text-decoration: none;
+    color: var(--page-text);
+    background-color: var(--page-text-link-background);
+    padding: 0 0.3rem;
+}
+
+@media print {
+  u {
+    text-decoration: underline;
+    color: var(--page-text);
+    background-color: none;
+    padding: 0;
+  }
 }
 
 cite {
@@ -355,6 +375,7 @@ cite {
 
 sub, sup {
     font-size: fonts.$fontSizeMinus3;
+    padding-left: 0.2em;;
 }
 
 sub {
@@ -403,17 +424,8 @@ p.summary a {
     color: var(--page-text-secondary);
     font-size: fonts.$fontSizePlus1;
     font-style: italic;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 1rem 0;
 }
-
-/*
-html.theme-dark {
-    p.summary, 
-    p.summary a {
-        color: $darkFgHighlight;
-    }
-}
-*/
 
 p.caption {
     font-size: fonts.$fontSizeMinus2;
@@ -455,7 +467,7 @@ blockquote + p.caption {
 }
 
 .columns-x2, .columns-x3 {
-  p, ul, ol {
+  p, ul, ol, dl {
     margin-top: 0;
     margin-bottom: 0;
   }
@@ -512,35 +524,9 @@ hr {
  *  -------------------------------------
  */
 
-hr.div-dotted { 
-    border-bottom: dotted 0.8pt var(--page-text);
-}
-
-hr.div-solid { 
-    border-bottom: solid 0.8pt var(--page-text);
-}
-
-hr.div-thick { 
-    border-bottom: solid 3pt var(--page-text);
-}
-
-hr.div-left { 
-    width: 30%;
-    max-width: 8rem;
-    text-align: left;
-}
-
-hr.div-center { 
-    width: 4em;
-    margin: 1rem 40%;
-}
-
-hr.div-10em {
-    width: 10em;
-}
-
-hr.div-wide { 
-    width: 100%;
+.article-svg {
+  fill: var(--page-text);
+  stroke: none;
 }
 
 textarea {
@@ -587,21 +573,19 @@ var {
     white-space: nowrap;
 }
 
-mark {
-    padding: 0;
-}
-
 kbd { 
     font-family: fonts.$fontFamilyMonospace;
-    font-size: fonts.$fontSizeMinus2;
+    font-size: fonts.$fontSize;
 }
 
 dl dt {
     font-weight: normal;
+    orphans: 2;
 }
 
 dl dd {
     padding-left: 2.4rem;
+    orphans: 2;
 }
 
 ins {
@@ -650,18 +634,10 @@ tbody td {
     overflow-y: visible;
 }
 
-.highlight {
-    padding-left: .6rem;
-    padding-right: .6rem;
-    color: var(--page-text);
-    font-weight: bold;
-    background-color: var(--page-text-selection);
-    border-radius: 3pt;
-}
-
 small, 
 .text-sm {
-    font-size: fonts.$fontSizeMinus1;
+  font-family: fonts.$fontFamilySansSerif;
+  font-size: fonts.$fontSizeMinus2;
 }
 
 .text-lg { 

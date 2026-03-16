@@ -28,6 +28,7 @@
     --page-background: #{colors.$gray97};
     --page-outline: #{colors.$gray75};
     --page-text: #{colors.$gray03};
+    --page-text-highlight: #{colors.$mintGreen};
     --page-text-secondary: #{colors.$gray03};
     --page-text-tertiary: #{colors.$gray03};
     --page-text-link: #{colors.$gray03};
@@ -51,10 +52,11 @@
     --page-background: #{colors.$gray03};
     --page-outline: #{colors.$gray25};
     --page-text: #{colors.$gray50};
+    --page-text-highlight: #{colors.$blueWhale};
     --page-text-secondary: #{colors.$indigoBlue};
     --page-text-tertiary: #{colors.$bostonBlue};
-    --page-text-link: #{colors.$gray90};
-    --page-text-link-background: #{colors.$gray03};
+    --page-text-link: #{colors.$gray75};
+    --page-text-link-background: #{colors.$blueWhale};
     --page-text-selection: #{colors.$bostonBlue};
     --page-icon-background: #{colors.$gray10};
     --page-icon-text: #{colors.$gray25};
@@ -74,10 +76,11 @@ html.theme-dark {
     --page-background: #{colors.$gray03};
     --page-outline: #{colors.$gray25};
     --page-text: #{colors.$gray50};
+    --page-text-highlight: #{colors.$blueWhale};
     --page-text-secondary: #{colors.$indigoBlue};
     --page-text-tertiary: #{colors.$bostonBlue};
-    --page-text-link: #{colors.$gray90};
-    --page-text-link-background: #{colors.$gray03};
+    --page-text-link: #{colors.$gray75};
+    --page-text-link-background: #{colors.$blueWhale};
     --page-text-selection: #{colors.$bostonBlue};
     --page-icon-background: #{colors.$gray10};
     --page-icon-text: #{colors.$gray25};
@@ -96,6 +99,7 @@ html.theme-light {
     --page-background: #{colors.$gray97};
     --page-outline: #{colors.$gray75};
     --page-text: #{colors.$gray03};
+    --page-text-highlight: #{colors.$mintGreen};
     --page-text-secondary: #{colors.$gray03};
     --page-text-tertiary: #{colors.$gray03};
     --page-text-link: #{colors.$gray03};
@@ -119,6 +123,7 @@ html.theme-light {
         --side-background-right: #{colors.$white};
         --page-background: #{colors.$white};
         --page-text: #{colors.$black};
+        --page-text-highlight: none;
         --page-text-secondary: #{colors.$black};
         --page-text-link: #{colors.$black};
         --page-text-selection: none;

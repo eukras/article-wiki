@@ -105,7 +105,7 @@ dd {
 
 body {
   text-align: left;
-  line-height: 120%;
+  line-height: 125%;
 }
 
 h1 {
@@ -323,7 +323,7 @@ article {
   border: 1px solid var(--page-outline);
   width: 3rem;
   text-align: center;
-  font-family: "IBM Plex Sans", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
   font-size: 71.55456%;
   cursor: pointer;
   color: var(--desk-text);
@@ -392,19 +392,21 @@ html.theme-dark svg.segno {
   opacity: 1;
 }
 
-section header.section-header {
-  font-size: 81.312%;
-  margin-bottom: 3rem;
+header.section-header {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 92.4%;
+  padding-bottom: 1.5em;
 }
 
-section footer.section-footer {
-  font-size: 81.312%;
-  margin-top: 3rem;
+footer.section-footer {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 92.4%;
+  padding-top: 1.5em;
 }
 
 footer.footnotes {
-  font-size: 81.312%;
-  margin-top: 2rem;
+  font-size: 92.4%;
+  margin-top: 1.5em;
   overflow-wrap: break-word;
 }
 
@@ -428,6 +430,7 @@ header h1 div.article-subtitle {
   padding: 0;
   margin: 1rem 0 1rem 0;
   font-weight: normal;
+  font-style: italic;
   font-size: 147.51744%;
   line-height: 120%;
 }
@@ -445,8 +448,8 @@ header address a[href^="mailto:"] {
   text-decoration: none;
 }
 
-html.theme-dark header img#article-image {
-  opacity: 0.75;
+html.theme-dark img.article-image {
+  opacity: 0.66;
 }
 
 section#footnotes {
@@ -460,7 +463,7 @@ a, button {
 
 section {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 0;
   margin-top: 1rem;
   padding-top: 2rem;
@@ -518,7 +521,7 @@ div.wiki-feature {
   flex-direction: row;
   align-items: stretch;
   width: 80%;
-  border: 1px dotted black;
+  border: 1px dotted var(--page-text);
   border-radius: 0.2rem;
   margin: 2rem auto;
 }
@@ -657,6 +660,10 @@ img.article-card-image {
   border-radius: 0.2rem;
 }
 
+html.theme-dark img.article-card-image {
+  opacity: 0.66;
+}
+
 .article-card-title {
   font-size: 131.712%;
   font-weight: bold;
@@ -753,7 +760,8 @@ td {
   orphans: 3;
 }
 
-.bibliography {
+.section-supplementary {
+  font-family: "IBM Plex Sans", sans-serif;
   font-size: 92.4%;
 }
 
@@ -801,9 +809,6 @@ td {
     opacity: 0;
   }
 }
-/**
- * TODO: Decide BG color for links.
- */
 @media screen {
   a.web-link {
     padding: 0 0.25rem;
@@ -846,7 +851,7 @@ a.unmarked {
 .opposite {
   color: inherit;
   text-decoration: none;
-  font-family: "IBM Plex Sans", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
 }
 
 .side-nav a:hover {
@@ -898,17 +903,23 @@ ul, ol, dl {
 }
 
 .note {
-  font-family: "IBM Plex Sans", Helvetica, sans-serif;
-  font-size: 81.312%;
-  border: dotted 1px var(--page-text);
-  border-radius: 0.5rem;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 92.4%;
+  background-color: var(--page-text-link-background);
   margin: 1rem;
   padding: 0.5rem 1rem;
   line-height: 1rem;
 }
 
+@media print {
+  .note {
+    background-color: none;
+    border: dotted 1px var(--page-text);
+    border-radius: 0.5rem;
+  }
+}
 .wiki-note {
-  font-family: "IBM Plex Sans", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
   font-size: 81.312%;
   border: solid 2pt red;
   border-radius: 0.5rem;
@@ -918,7 +929,7 @@ ul, ol, dl {
 }
 
 aside {
-  font-family: "IBM Plex Sans", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
   font-size: 71.55456%;
   text-align: left;
   margin: 1rem 0 1rem 4.8rem;
@@ -940,6 +951,11 @@ a.reference {
 .vpad {
   padding-top: 0.5em;
   padding-bottom: 0.5em;
+}
+
+.inset {
+  padding-left: 2.4em;
+  padding-right: 2.4em;
 }
 
 ul > ul, ol > ol {
@@ -1003,7 +1019,7 @@ ul > ul, ol > ol {
 }
 
 .compact {
-  font-family: "IBM Plex Sans", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
   font-size: 81.312%;
   margin: 1rem 0;
 }
@@ -1087,17 +1103,28 @@ h6 {
   font-size: 105%;
 }
 
-mark {
-  padding: none;
-  background-color: inherit;
+u {
+  text-decoration: none;
+  color: var(--page-text);
+  background-color: var(--page-text-link-background);
+  padding: 0 0.3rem;
 }
 
+@media print {
+  u {
+    text-decoration: underline;
+    color: var(--page-text);
+    background-color: none;
+    padding: 0;
+  }
+}
 cite {
   font-style: normal;
 }
 
 sub, sup {
   font-size: 71.55456%;
+  padding-left: 0.2em;
 }
 
 sub {
@@ -1145,17 +1172,9 @@ p.summary a {
   color: var(--page-text-secondary);
   font-size: 117.6%;
   font-style: italic;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 1rem 0;
 }
 
-/*
-html.theme-dark {
-    p.summary, 
-    p.summary a {
-        color: $darkFgHighlight;
-    }
-}
-*/
 p.caption {
   font-size: 81.312%;
   line-height: inherit;
@@ -1195,7 +1214,7 @@ blockquote + p.caption {
   text-wrap: balance;
 }
 
-.columns-x2 p, .columns-x2 ul, .columns-x2 ol, .columns-x3 p, .columns-x3 ul, .columns-x3 ol {
+.columns-x2 p, .columns-x2 ul, .columns-x2 ol, .columns-x2 dl, .columns-x3 p, .columns-x3 ul, .columns-x3 ol, .columns-x3 dl {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -1245,43 +1264,17 @@ hr {
  *  DIVIDERS
  *  -------------------------------------
  */
-hr.div-dotted {
-  border-bottom: dotted 0.8pt var(--page-text);
-}
-
-hr.div-solid {
-  border-bottom: solid 0.8pt var(--page-text);
-}
-
-hr.div-thick {
-  border-bottom: solid 3pt var(--page-text);
-}
-
-hr.div-left {
-  width: 30%;
-  max-width: 8rem;
-  text-align: left;
-}
-
-hr.div-center {
-  width: 4em;
-  margin: 1rem 40%;
-}
-
-hr.div-10em {
-  width: 10em;
-}
-
-hr.div-wide {
-  width: 100%;
+.article-svg {
+  fill: var(--page-text);
+  stroke: none;
 }
 
 textarea {
-  font-family: "Fira Mono", "Andale Mono", monospace;
+  font-family: "IBM Plex Mono", monospace;
 }
 
 pre {
-  font-family: "Fira Mono", "Andale Mono", monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 81.312%;
   background-color: inherit;
   border: none;
@@ -1308,7 +1301,7 @@ pre.verse {
 
 var {
   float: none;
-  font-family: "IBM Plex Sans", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
   font-size: 92.4%;
   font-style: inherit;
   font-weight: bold;
@@ -1318,21 +1311,19 @@ var {
   white-space: nowrap;
 }
 
-mark {
-  padding: 0;
-}
-
 kbd {
-  font-family: "Fira Mono", "Andale Mono", monospace;
-  font-size: 81.312%;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 105%;
 }
 
 dl dt {
   font-weight: normal;
+  orphans: 2;
 }
 
 dl dd {
   padding-left: 2.4rem;
+  orphans: 2;
 }
 
 ins {
@@ -1380,18 +1371,10 @@ tbody td {
   overflow-y: visible;
 }
 
-.highlight {
-  padding-left: 0.6rem;
-  padding-right: 0.6rem;
-  color: var(--page-text);
-  font-weight: bold;
-  background-color: var(--page-text-selection);
-  border-radius: 3pt;
-}
-
 small,
 .text-sm {
-  font-size: 92.4%;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 81.312%;
 }
 
 .text-lg {
@@ -1482,7 +1465,7 @@ div.icon-block div.icon {
   padding: 0.5em;
 }
 div.icon-block div.text {
-  font-family: "IBM Plex Sans", Helvetica, sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
   font-size: 92.4%;
   padding: 0.5em;
 }

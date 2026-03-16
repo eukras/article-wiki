@@ -160,19 +160,21 @@ html.theme-dark {
     }
 }
 
-section header.section-header {
-  font-size: fonts.$fontSizeMinus2;
-  margin-bottom: 3rem;
+header.section-header {
+  font-family: fonts.$fontFamilySansSerif;
+  font-size: fonts.$fontSizeMinus1;
+  padding-bottom: 1.5em;
 }
 
-section footer.section-footer {
-  font-size: fonts.$fontSizeMinus2;
-  margin-top: 3rem;
+footer.section-footer {
+  font-family: fonts.$fontFamilySansSerif;
+  font-size: fonts.$fontSizeMinus1;
+  padding-top: 1.5em;
 }
 
 footer.footnotes {
-  font-size: fonts.$fontSizeMinus2;
-  margin-top: 2rem;
+  font-size: fonts.$fontSizeMinus1;
+  margin-top: 1.5em;
   overflow-wrap: break-word;
 }
 
@@ -200,6 +202,7 @@ header {
       padding: 0;
       margin: 1rem 0 1rem 0;
       font-weight: normal;
+      font-style: italic;
       font-size: fonts.$fontSizePlus3;
       line-height: 120%;
     }
@@ -221,8 +224,8 @@ header {
 }
 
 html.theme-dark {
-  header img#article-image {
-    opacity: 0.75;
+  img.article-image {
+    opacity: 0.66;
   }
 }
 
@@ -237,7 +240,7 @@ a, button {
 
 section {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 0;
     margin-top: 1rem;
     padding-top: 2rem;
@@ -302,7 +305,7 @@ div.wiki-feature {
   flex-direction: row;
   align-items: stretch;
   width: 80%;
-  border: 1px dotted black;
+  border: 1px dotted var(--page-text);
   border-radius: 0.2rem;
   margin: 2rem auto;
 } 
@@ -443,6 +446,11 @@ img.article-card-image {
     width: 60%;
     border-radius: 0.2rem;
 }
+html.theme-dark {
+  img.article-card-image {
+    opacity: 0.66;
+  }
+}
 .article-card-title {
     font-size: fonts.$fontSizePlus2;
     font-weight: bold;
@@ -547,6 +555,7 @@ td {
     orphans: 3;
 }
 
-.bibliography {
+.section-supplementary {
+    font-family: fonts.$fontFamilySansSerif;
     font-size: fonts.$fontSizeMinus1;
 }
