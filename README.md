@@ -1,22 +1,20 @@
 # Article Wiki
 
-## Long-form humanities writing in plain text.
+## Long-form humanities writing in plain text
 
 Article Wiki is a web app for writing long, structured articles using wiki
 markup. It lets you work in plain text on any device, with footnotes,
 bibliographies, and indexes that don't clutter up your text.
 
-* Author: Nigel Chapman, nigel@chapman.id.au.
-* Technologies: Python, Redis.
-* Version: v.0.2.1 (beta, single user only)
-* License: GPL v.3; see [LICENSE.txt](LICENSE.txt).
+- Author: Nigel Chapman, <nigel@chapman.id.au>.
+- Technologies: Python, Redis.
+- Version: v.0.2.1 (beta, single user only)
+- License: GPL v.3; see [LICENSE.txt](LICENSE.txt).
 
+## Getting Started
 
-## Getting Started 
-
-* Running my website: https://chapman.wiki
-* A help page and demo of all wiki features: https://chapman.wiki/read/eukras/help
-
+- Running my website: <https://chapman.wiki>
+- A help page and demo of all wiki features: <https://chapman.wiki/read/admin/help>
 
 ## Screenshots
 
@@ -24,14 +22,12 @@ bibliographies, and indexes that don't clutter up your text.
 
 ![Editor screenshot](media/screenshots/editor.png)
 
-* Images are of v.0.2.1
-* See also the 'Theme' button in the footer for low-light reading or editing.
-
+- Images are of v.0.2.1
+- See also the 'Theme' button in the footer for low-light reading or editing.
 
 ## Prerequisites, Installation, Tests, Deployment
 
-* See [INSTALL.md](INSTALL.md) to get up and running.
-
+- See [INSTALL.md](INSTALL.md) to get up and running.
 
 ## Languages
 
@@ -58,9 +54,8 @@ SUM:                           133           2883           3512          10633
 
 Stats are from v.0.2.1.
 
-
 ## Contributing
 
-Questions about using or adapting the software are welcome.  Bug reports can be
+Questions about using or adapting the software are welcome. Bug reports can be
 filed on GitHub. If you add anything interesting, point me to a demo, or submit
-a pull request. 
+a pull request.
