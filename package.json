@@ -1,7 +1,7 @@
 {
   "name": "ArticleWiki",
   "dependencies": {
-    "js-cookie": "^3.0.5",
+    "js-cookie": "^3.0.7",
     "sass": "^1.94.2"
   },
   "scripts": {
